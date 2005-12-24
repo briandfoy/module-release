@@ -7,4 +7,3 @@ t/pod_coverage.t
 t/test_manifest
 lib/Release.pm
 script/release
-META.yml                                 Module meta-data (added by MakeMaker)

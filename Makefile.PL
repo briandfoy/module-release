@@ -15,6 +15,7 @@ WriteMakefile(
 		'Net::FTP'             => 0,
 		'HTTP::Message'        => 0,
 		'Crypt::SSLeay'        => 0,
+		'File::Temp'           => 0,
 		},
 
 	'PM'           => {
