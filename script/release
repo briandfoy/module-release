@@ -261,6 +261,50 @@ $r->dist_test;
 $r->check_cvs;
 exit if $opts{t};
 
+my $Changes = do {
+	my $changes = "Changes";
+	my $bak     = $changes . ".bak";
+	
+	die "Changes file does not exist!\n" unless -e $changes;
+	
+	print "\n", "-" x 73, "\n", "Enter Changes section\n\n> ";
+	
+	my $str = $Version . " - " . localtime() . "\n";
+	
+	while( <STDIN> )
+		{
+		$_ =~ s/^(\S)/\t$1/; # always indent
+		
+		$str .= $_;
+		print "> ";
+		}
+		
+	$str .= "\n";
+	
+	rename $changes, $bak or die "Could not backup $changes. $!\n";
+	open my $in, $bak or die "Could not read old $changes file! $!\n";
+	open my $out, ">", $changes;
+	
+	while( <$in> )
+		{
+		print $out $_;
+		last unless m/\S/;
+		}
+		
+	print $out $str;
+	
+	print $out $_ while( <$in> );
+	
+	close $in;
+	close $out;
+
+	my $cvs_commit = `cvs commit -m "* for version $Version" $changes 2>&1`;
+	
+	print $cvs_commit;
+	
+	$str;
+	};
+	
 $r->check_for_passwords;
 $r->ftp_upload;
 $r->pause_claim;

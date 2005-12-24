@@ -838,7 +838,7 @@ you may well want to overload it.
 
 sub get_changes 
 	{
-	open my $fh, '<Changes' or return '';
+	open my $fh, '<', 'Changes' or return '';
 
 	my $data = <$fh>;  # get first line
 
@@ -902,6 +902,10 @@ sub getpass
 	}
 
 =back
+
+=head1 TO DO
+
+* What happened to my Changes munging?
 
 =head1 CREDITS
 
