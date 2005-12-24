@@ -2,3 +2,4 @@ compile.t
 pod.t
 pod_coverage.t
 #prereq.t
+#sf_login.t

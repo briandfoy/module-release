@@ -28,7 +28,6 @@ use HTTP::Cookies;
 use HTTP::Request;
 use Net::FTP;
 use File::Spec;
-use File::Temp;
 
 use constant DASHES => "-" x 73;
 
@@ -243,15 +242,41 @@ sub new
     # Set up the browser
     $self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
 
-    my $fh = File::Temp->new( UNLINK => 1 );
+    # my $fh = File::Temp->new( UNLINK => 1 );
     $self->{cookies} = HTTP::Cookies->new(
-					    file           => $fh->filename,
+					    #file           => $fh->filename,
 					    hide_cookie2   => 1,
-					    autosave       => 1 );
+					    autosave       => 1,
+					    );
     $self->{cookies}->clear;
 
     return $self;
 	}
+
+=item config
+
+Get the configuration object. By default this is a C<ConfigReader::Simple>
+object;
+
+=cut
+
+sub config { $_[0]->{config} }
+
+=item debug
+
+Get the value of the debugging flag.
+
+=cut
+
+sub debug { $_[0]->{debug} }
+
+=item ua
+
+Get the value of the web user agent.
+
+=cut
+
+sub ua { $_[0]->{ua} }
 
 =item clean
 
@@ -347,7 +372,7 @@ sub dist
 
     unless( $self->{local} )
     	{
-        print ", guessing local distribution name" if $self->{debug};
+        print ", guessing local distribution name" if $self->debug;
         ($self->{local}) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
         $self->{local} .= '.gz';
         $self->{remote} = $self->{local};
@@ -478,7 +503,7 @@ sub ftp_upload
     
     ( $self->{release} ) = $self->{remote} =~ m/^(.*?)(?:\.tar\.gz)?$/g;
     
-    my $config = $self->{config};
+    my $config = $self->config;
     # set your own release name if you want to ...
     if( $config->sf_release_match && $config->sf_release_replace ) 
     	{
@@ -488,7 +513,7 @@ sub ftp_upload
     	}
     
     print "Release name is $self->{release}\n";
-    print "Will use passive FTP transfers\n" if $self->{passive_ftp} && $self->{debug};
+    print "Will use passive FTP transfers\n" if $self->{passive_ftp} && $self->debug;
 
     my $local_file = $self->{local};
     my $local_size = -s $local_file;
@@ -499,7 +524,7 @@ sub ftp_upload
         my $ftp = Net::FTP->new( 
         	$site, 
         	Hash    => \*STDOUT, 
-        	Debug   => $self->{debug},
+        	Debug   => $self->debug,
         	Passive => $self->{passive_ftp} 
         	) or die "Couldn't open FTP connection to $site: $@";
 
@@ -544,7 +569,7 @@ sub pause_claim
     my $request = HTTP::Request->new( POST =>
             'https://pause.perl.org/pause/authenquery' );
 
-    $cgi->param( 'HIDDENNAME', $self->{config}->cpan_user );
+    $cgi->param( 'HIDDENNAME', $self->config->cpan_user );
     $cgi->param( 'CAN_MULTIPART', 1 );
     $cgi->param( 'pause99_add_uri_upload', $self->{remote} );
     $cgi->param( 'SUBMIT_pause99_add_uri_upload', 'Upload the checked file' );
@@ -555,7 +580,7 @@ sub pause_claim
  	$request->content( $cgi->query_string );
  
  	$request->authorization_basic( 
-    	$self->{config}->cpan_user, $self->{cpan_pass} );
+    	$self->config->cpan_user, $self->{cpan_pass} );
  
     my $response = $ua->request( $request );
 
@@ -611,7 +636,23 @@ sub make_cvs_tag
 # SourceForge.net seems to know our path through the system
 # Hit all the pages, collect the right cookies, etc
 
-=item sf_login()
+=item sf_user( [ SF_USER ] )
+
+Set or GET the SourceForge user name
+
+=cut
+
+sub sf_user
+	{
+	my $self = shift;
+	my $user = shift;
+	
+	$self->config->set( 'sf_user', $user ) if defined $user;
+	
+	return $self->config->sf_user;
+	}
+	
+=item sf_login
 
 Authenticate with Sourceforge
 
@@ -629,52 +670,62 @@ sub sf_login
         'https://sourceforge.net/account/login.php' );
     $self->{cookies}->add_cookie_header( $request );
 
-    $cgi->param( 'return_to', '' );
-    $cgi->param( 'form_loginname', $self->{config}->sf_user );
-    $cgi->param( 'form_pw', $self->{sf_pass} );
-    $cgi->param( 'stay_in_ssl', 1 );
-    $cgi->param( 'login', 'Login With SSL' );
+    $cgi->param( 'return_to',      ''                     );
+    $cgi->param( 'form_loginname', $self->config->sf_user );
+    $cgi->param( 'form_pw',        $self->{sf_pass}       );
+    $cgi->param( 'persistent_login',    1                      );
+    $cgi->param( 'login',          'Login'       );
 
     $request->content_type('application/x-www-form-urlencoded');
     $request->content( $cgi->query_string );
 
     $request->header( "Referer", "http://sourceforge.net/account/login.php" );
 
-    print $request->as_string, DASHES, "\n" if $self->{debug};
+    print STDERR $request->as_string, DASHES, "\n" if $self->debug;
 
-    my $ua = $self->{ua};
-    my $response = $ua->request( $request );
+    my $response = $self->ua->request( $request );
     $self->{cookies}->extract_cookies( $response );
 
-    print $response->headers_as_string, DASHES, "\n" if $self->{debug};
+    print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
 
+    REDIRECT: {
     if( $response->code == 302 ) 
     	{
         my $location = $response->header('Location');
-        print "Location is $location\n" if $self->{debug};
-        my $request = HTTP::Request->new( GET => $location );
-        $self->{cookies}->add_cookie_header( $request );
-        print $request->as_string, DASHES, "\n" if $self->{debug};
-        $response = $ua->request( $request );
-        print $response->headers_as_string, DASHES, "\n" if $self->{debug};
-        $self->{cookies}->extract_cookies( $response );
-    	}
+        print STDERR "Location is $location\n" if $self->debug;
+ 
+ 		my $request = HTTP::Request->new( POST => $location );
+		$request->content_type('application/x-www-form-urlencoded');
+		$request->content( $cgi->query_string );
+		$self->{cookies}->add_cookie_header( $request );
 
+        print STDERR $request->as_string, DASHES, "\n" if $self->debug;
+        $response = $self->ua->request( $request );
+
+        print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
+        $self->{cookies}->extract_cookies( $response );
+        
+        redo REDIRECT;
+    	}
+	}
+	
     my $content = $response->content;
     $content =~ s|.*<!-- begin SF.net content -->||s;
     $content =~ s|Register New Project.*||s;
 
-    print $content if $self->{debug};
+    print STDERR $content if $self->debug;
 
-    my $sf_user = $self->{config}->sf_user;
+    my $sf_user = $self->config->sf_user;
 
     if( $content =~ m/welcome.*$sf_user/i ) 
     	{
         print "Logged in!\n";
+        return 1;
     	} 
     else 
     	{
         print "Not logged in! Aborting\n";
+        #return 0;
         exit;
     	}
 	}
@@ -692,15 +743,15 @@ sub sf_qrs
 
     my $request = HTTP::Request->new( GET =>
         'https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=' . 
-        $self->{config}->sf_group_id
+        $self->config->sf_group_id
     	);
     	
     $self->{cookies}->add_cookie_header( $request );
-    print $request->as_string, DASHES, "\n" if $self->{debug};
+    print $request->as_string, DASHES, "\n" if $self->debug;
  
 	my $response = $self->{ua}->request( $request );
 
-    print $response->headers_as_string,  DASHES, "\n" if $self->{debug};
+    print $response->headers_as_string,  DASHES, "\n" if $self->debug;
     $self->{cookies}->extract_cookies( $response );
 	}
 
@@ -726,37 +777,37 @@ sub sf_release
 
     $self->{cookies}->add_cookie_header( $request );
 
-    $cgi->param( 'MAX_FILE_SIZE',   1_000_000                                );
-    $cgi->param( 'package_id',      $self->{config}->sf_package_id           );
-    $cgi->param( 'release_name',    $self->{release}                         );
-    $cgi->param( 'release_date',    $date                                    );
-    $cgi->param( 'status_id',       1                                        );
-    $cgi->param( 'file_name',       $self->{remote}                          );
-    $cgi->param( 'type_id',         $self->{config}->sf_type_id || 5002      );
-    $cgi->param( 'processor_id',    $self->{config}->sf_processor_id || 8000 );
-    $cgi->param( 'release_notes',   get_readme()                             );
-    $cgi->param( 'release_changes', get_changes()                            );
-    $cgi->param( 'group_id',        $self->{config}->sf_group_id             );
-    $cgi->param( 'preformatted',    1                                        );
-    $cgi->param( 'submit',         'Release File'                            );
+    $cgi->param( 'MAX_FILE_SIZE',   1_000_000                              );
+    $cgi->param( 'package_id',      $self->config->sf_package_id           );
+    $cgi->param( 'release_name',    $self->{release}                       );
+    $cgi->param( 'release_date',    $date                                  );
+    $cgi->param( 'status_id',       1                                      );
+    $cgi->param( 'file_name',       $self->{remote}                        );
+    $cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
+    $cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
+    $cgi->param( 'release_notes',   get_readme()                           );
+    $cgi->param( 'release_changes', get_changes()                          );
+    $cgi->param( 'group_id',        $self->config->sf_group_id             );
+    $cgi->param( 'preformatted',    1                                      );
+    $cgi->param( 'submit',         'Release File'                          );
 
     $request->content_type('application/x-www-form-urlencoded');
     $request->content( $cgi->query_string );
 
     $request->header( "Referer",
         "https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=" . 
-        $self->{config}->sf_group_id
+        $self->config->sf_group_id
     	);
-    print $request->as_string, "\n", DASHES, "\n" if $self->{debug};
+    print $request->as_string, "\n", DASHES, "\n" if $self->debug;
 
     my $response = $self->{ua}->request( $request );
-    print $response->headers_as_string, "\n", DASHES, "\n" if $self->{debug};
+    print $response->headers_as_string, "\n", DASHES, "\n" if $self->debug;
 
     my $content = $response->content;
     $content =~ s|.*Database Admin.*?<H3><FONT.*?>\s*||s;
     $content =~ s|\s*</FONT></H3>.*||s;
 
-    print "$content\n" if $self->{debug};
+    print "$content\n" if $self->debug;
     print "File Released\n";
 	}
 
@@ -809,7 +860,7 @@ Run a command in the shell.
 sub run 
 	{
     my ($self, $command) = @_;
-    print "$command\n" if $self->{debug};
+    print "$command\n" if $self->debug;
     open my($fh), "$command |" or die $!;
     my $output = '';
     local $| = 1;
@@ -817,10 +868,10 @@ sub run
     while (<$fh>) 
     	{
         $output .= $_;
-        print if $self->{debug};
+        print if $self->debug;
     	}
     	
-    print DASHES, "\n" if $self->{debug};
+    print DASHES, "\n" if $self->debug;
     
 	close $fh or die "Could not run '$command' successfully, got '$output'";
 
