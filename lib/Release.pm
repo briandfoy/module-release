@@ -17,7 +17,7 @@ Module::Release - Automate software releases
 	
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
 
 use strict;
 use Config;
