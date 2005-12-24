@@ -1,0 +1,137 @@
+$Id$
+
+0.25 - Fri Dec 17 15:53:15 CST 2004
+	* No changes to functionality.
+	* Released only because I (Andy) deleted the latest version,
+	  because I thought brian had newer ones, when he didn't.
+	  This meant that the indexer got all confused.  I hope this
+	  stops people from now wondering "Where did Module::Release go?"
+	* Modernized t/pod.t
+	* Made tests in t/load.t more inclusive
+	* Updated the Makefile.PL
+
+0.24 - Sat Nov 29 09:29:36 2003
+	* fixed a problem in Module::Release's check_cvs routine where
+	it was not checking each line of output
+
+0.23 - Sun Jun 22 23:40:00 2003 (Andy Lester)
+	* All output now goes to the screen if --debug is on.  Thanks to
+	Ken Williams.  "High school students."
+
+0.23
+	* release will show the user all STDOUT of the subprocesses
+	  whenever debug is on.  This will prevent the machine from waiting
+	  for a response from you because you don't know it's there.
+
+0.22 - Wed Apr  9 16:05:08 2003 (Andy Lester)
+	* release will not run if there are any switch errors
+
+	* Added many error checks in ftp_upload.
+    
+	* Added some docs on how to find sf_group_id and sf_release_id.
+
+	* Removed a "last CVS" in cvs() method.  It would have
+  	  blown up if someone didn't have a CVS directory.
+
+	* Renamed perl() method to build_makefile()
+
+	* Renamed cvs() to check_cvs()
+
+	* Added basic POD docs for the functions
+
+0.21 - Sat Mar 29 16:19:00 2003 (Andy Lester)
+	Many more patches, thanks to Ken Williams.  I fear it won't be
+	long until Module::Release is sending & receiving mail.
+
+	* release only checks for passwords if they're necessary.
+	  This means you don't have to have a password if you're running
+	  "release -t" to test.
+
+	* A more complete dependency list in Makefile.PL
+
+	* A new 'release_subclass' config file entry lets you subclass
+	  Module::Release.  There's an example in the docs.
+
+	* After FTP upload, we check to see whether the two versions of
+	  the file have the same size.	This should catch my FTP-ing bug.
+
+	* The cvs_tag() method now calls make_cvs_tag() to make the
+	  tag string.  This lets me override make_cvs_tag() in a subclass.
+
+0.20 - Wed Mar 26 11:05:00 2003 (Andy Lester)
+	* Moved all the real work into Module::Release.  Thanks to 
+	Ken Williams for doing all the dirty work on this.
+
+	* Fixed the Test::Pod dependency
+
+0.16 - Wed Mar 19 15:38:00 2003 (Andy Lester)
+	* No new features
+	* Removed the dependency on Test::Pod
+
+0.15 - Fri Mar 14 17:23:30 2003 (Andy Lester)
+	* Support for the PERL environment variable.
+	* Cleaned up tabs 'n' spaces in the source.  Shouldn't
+	  affect anything in how you use the program.
+
+0.14 - Wed Mar 12 10:09:00 2003 (Andy Lester)
+	* 0.13 is an incorrect distro.  This is what you want.
+
+0.13 - Wed Mar 12 09:58:00 2003 (Andy Lester)
+	Most of these changes are from Max Maischein.  Cross-platform
+	compatibility should be a lot better.  Thanks, Max!
+
+	* Prompts for passwords that are not set in the environment.
+
+	* Fixed a bug in checking for required fields
+
+	* Uses "$Config{make}" instead of "make".
+
+	* Moved all backticks into a subroutine "run", that also echoes
+	  the command if "-d" is set.
+
+	* Added a check whether the file-to-distribute actually exists,
+	  before making the ftp connection.
+
+	* The regex to guess the distname from the tardist output
+	  needed some whitespace added to work with Win32.
+
+	* Added support for passive FTP.
+
+0.12 - Thu Mar  6 13:55:47 2003 (Andy Lester)
+	Most of the changes in this revision are from Chris Nandor:
+
+	* Add basic help page
+	
+	* Add more debugging information (dump `` output)
+
+	* Add command-line switches for help, debug, and test (exits after
+	  testing phase)
+
+	* Allow not using either the CPAN or SourceForge.net (but not both)
+
+	* Check cvs exit status
+
+	* Do not update CVS automatically; release will exit if it sees a U
+	  anyway, so might as well just let the developer handle it
+
+	* Allow modification of "release name" via regex in .releaserc
+
+	* Update docs
+
+	* General cleanup
+
+0.11 - Mon Mar  3 11:58:42 2003 (Andy Lester)
+	* Patches to make this less brian-specific.  Thanks to Chris
+	  Nandor for taking it upon himself to do so.
+
+	* Removed a lot of dependencies on external modules. 
+
+0.10 - Wed Dec 11 16:40:53 2002 (brian d foy)
+	* prompt for comments to put in Changes, commit Changes, and
+	use comments in SourceForge change log notes
+
+	* guess the release file name from 'make dist' so the first
+	argument is now optional
+
+	* put the right date in the SourceForge release date
+

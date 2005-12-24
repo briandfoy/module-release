@@ -1,0 +1,12 @@
+.releaserc
+Changes
+MANIFEST
+Makefile.PL
+release
+t/compile.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+lib/Module/Release.pm
+release
+META.yml                                 Module meta-data (added by MakeMaker)
