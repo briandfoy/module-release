@@ -17,7 +17,10 @@ Module::Release - Automate software releases
 	
 =cut
 
-our $VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
+use vars qw( $VERSION );
+
+$VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
+sub VERSION () { $VERSION };
 
 use strict;
 use Config;
@@ -266,9 +269,20 @@ sub config { $_[0]->{config} }
 
 Get the value of the debugging flag.
 
+=item debug_on
+
+Turn on debugging
+
+=item debug_off
+
+Turn off debugging
+
 =cut
 
-sub debug { $_[0]->{debug} }
+sub debug_on  { $_[0]->{debug} = 1 }
+sub debug_off { $_[0]->{debug} = 0 }
+
+sub debug     { $_[0]->{debug} }
 
 =item ua
 
@@ -390,23 +404,61 @@ Run `make disttest`. If the tests fail, it dies.
 
 =cut
 
-sub dist_test {
+sub dist_test 
+	{
     my $self = shift;
+
     print "Checking disttest... ";
 
-    unless( -e 'Makefile.PL' ) {
+    unless( -e 'Makefile.PL' ) 
+    	{
         print " no Makefile.PL---skipping\n";
         return;
-    }
+		}
 
     my $tests = $self->run( "$self->{make} disttest 2>&1" );
 
     die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
-            unless $tests =~ /All tests successful/;
+		unless $tests =~ /All tests successful/;
 
     print "all tests pass\n";
-} # dist_test
+	} 
 
+=item dist_version
+
+Return the distribution version ( set in dist() )
+
+=cut
+
+sub dist_version
+	{
+	my $self = shift;
+	
+	die "Can't get dist_version! It's not set (did you run dist first?)"
+		unless defined $self->{remote};
+		
+	my( $major, $minor ) = $self->{remote} 
+    	=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
+    	
+    $self->dist_version_format( $major, $minor );
+	}
+
+=item dist_version_format
+
+Return the distribution version ( set in dist() )
+
+# XXX make this configurable
+
+=cut
+
+sub dist_version_format( MAJOR, MINOR )
+	{
+	my $self = shift;
+	my( $major, $minor ) = @_;
+	
+	sprintf "%d.%02d", $major, $minor;
+	}
+	
 =item check_cvs
 
 Run `cvs update` and report the state of the repository. If something
@@ -851,15 +903,28 @@ sub get_changes
 	return $data;
 	}
 
-=item run()
+=item run
 
 Run a command in the shell.
 
+=item run_error
+
+Returns true if the command ran successfully, and false otherwise. Use
+this function in any other method that calls run to figure out what to
+do when a command doesn't work. You may want to handle that yourself.
+
 =cut
+
+sub _run_error_reset { $_[0]->{_run_error} = 0 }
+sub _run_error_set   { $_[0]->{_run_error} = 1 }
+sub run_error        { $_[0]->{_run_error}     }
 
 sub run 
 	{
-    my ($self, $command) = @_;
+    my( $self, $command ) = @_;
+    
+    $self->_run_error_reset;
+    
     print "$command\n" if $self->debug;
     open my($fh), "$command |" or die $!;
     my $output = '';
@@ -873,10 +938,14 @@ sub run
     	
     print DASHES, "\n" if $self->debug;
     
-	close $fh or die "Could not run '$command' successfully, got '$output'";
-
+	unless( close $fh )
+		{
+		$self->_run_error_set;
+		carp "Command [$command] had problems" if $self->debug;
+		}
+		
     return $output;
-	};
+	}
 
 =item getpass
 
