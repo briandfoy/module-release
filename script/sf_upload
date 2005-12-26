@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+use strict;
+
+use Module::Release;
+
+$ENV{RELEASE_DEBUG} = 1;
+delete $ENV{CPAN_USER};
+delete $ENV{CPAN_PASS};
+
+my $release = Module::Release->new();
+
+$release->{cpan}        = 0;
+$release->{sf}          = 1;
+
+$release->{remote}      = 'Module-Release-1.05.tar.gz';
+$release->{local}       = 'Module-Release-1.05.tar.gz';
+$release->{passive_ftp} = 1;
+
+$release->sf_user( $ENV{SF_USER} );
+$release->check_for_passwords;
+
+$release->sf_login;
+$release->sf_qrs;
+$release->sf_release;
+
+
+__END__
