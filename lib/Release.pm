@@ -23,6 +23,7 @@ $VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
 sub VERSION () { $VERSION };
 
 use strict;
+use Carp;
 use Config;
 use CGI qw(-oldstyle_urls);
 use ConfigReader::Simple;
@@ -451,7 +452,7 @@ Return the distribution version ( set in dist() )
 
 =cut
 
-sub dist_version_format( MAJOR, MINOR )
+sub dist_version_format
 	{
 	my $self = shift;
 	my( $major, $minor ) = @_;
@@ -498,16 +499,14 @@ sub check_cvs
 		}
 
     my $rule = "-" x 50;
-    my $count;
-    my $question_count;
+    my $count = 0;
 
     foreach my $key ( sort keys %cvs_state ) 
     	{
 		my $list = $cvs_state{$key};
 		next unless @$list;
 		
-		$count += @$list unless $key eq '?';
-		$question_count += @$list if $key eq '?';
+		$count += @$list;
 
 	    local $" = "\n\t";
 		print "\n\t$message{$key}\n\t$rule\n\t@$list\n";
@@ -515,13 +514,6 @@ sub check_cvs
 
     die "\nERROR: CVS is not up-to-date ($count files): Can't release files\n"
 		if $count;
-
-    if( $question_count ) 
-    	{
-		print "\nWARNING: CVS is not up-to-date ($question_count files unknown); ",
-			"continue anwyay? [Ny] " ;
-		die "Exiting\n" unless <> =~ /^[yY]/;
-		}
 
     print "CVS up-to-date\n";
 	}
@@ -1006,7 +998,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002-2005 brian d foy.  All rights reserved.
+Copyright (c) 2002-2006 brian d foy.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

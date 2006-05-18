@@ -1,9 +1,12 @@
 Changes
-MANIFEST
+lib/Release.pm
 Makefile.PL
+MANIFEST
+README
+script/release
+script/sf_upload
 t/compile.t
 t/pod.t
 t/pod_coverage.t
+t/sf_login.t
 t/test_manifest
-lib/Release.pm
-script/release

@@ -324,7 +324,11 @@ my $Changes = do {
 	
 	$str;
 	};
-	
+
+$release->clean;
+$release->build_makefile;
+$release->dist;
+
 $release->check_for_passwords;
 $release->ftp_upload;
 $release->pause_claim;
