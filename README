@@ -1,0 +1,24 @@
+$Id$
+
+You can install this using in the usual Perl fashion
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+The documentation is in the module file.  Once you install
+the file, you can read it with perldoc.
+
+	perldoc Module::Release
+
+Look at the example script in script/release.
+	
+This module is also in CVS on SourceForge
+
+	http://sourceforge.net/projects/brian-d-foy/
+
+
+Enjoy, 
+
+brian d foy, bdfoy@cpan.org
