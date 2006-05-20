@@ -1,5 +1,16 @@
 $Id$
 
+1.08 - Sat May 20 03:04:01 2006
+	* Added MANIFEST checking feature. If `make manifest` has to change
+	MANIFEST, check_manifest() dies. You'll have to check in MANIFEST
+	before you can go on anyway, so you might as well stop and take a
+	look at it (and maybe update MANIFEST.SKIP too). I needed this 
+	because although I had a lot of pod_coverage tests lying about, 
+	they never made it into the dists because I never added them to
+	MANIFEST. Stoopid me.
+	* This updates the release(1) script too. Make sure you want this
+	feature before you overwrite your old release(1).
+
 1.07 - Wed May 17 21:06:39 2006
 	* Minor updates to the distro - no code changes. No need to upgrade
 
