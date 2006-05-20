@@ -273,6 +273,7 @@ print STDERR "release $script_version, using Module::Release "
 
 $release->clean;
 $release->build_makefile;
+$release->check_manifest;
 $release->test;
 $release->dist;
 $release->dist_test;

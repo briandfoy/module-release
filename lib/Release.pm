@@ -459,6 +459,78 @@ sub dist_version_format
 	
 	sprintf "%d.%02d", $major, $minor;
 	}
+
+=item check_manifest
+
+Run `make manifest` and report anything it finds. If it gives output,
+die. You should check C<MANIFEST> to ensure it has the things it needs.
+If files that shouldn't show up do, put them in MANIFEST.SKIP.
+
+Since `make manifest` takes care of things for you, you might just have
+to re-run your release script. 
+
+=cut
+
+
+# _check_output_lines - for command output with one message per line.
+# The message hash identifies the first part of the line and serves
+# as a category for the message. If a line doesn't matter, don't put
+# it's pattern in the message hash.
+#
+# Prints a summary of what it found. The message is the hash value 
+# for that output type.
+#
+# returns the number of interesting things it found, but that's it.
+sub _check_output_lines
+	{
+	my $self = shift;
+	my( $message_hash, $message ) = @_;
+	
+	my %state;
+    foreach my $state ( keys %$message_hash ) 
+    	{
+        $state{$state} = [ $message =~ /^\Q$state\E\s+(.+)/gm ];
+		}
+
+    my $rule = "-" x 50;
+    my $count = 0;
+
+    foreach my $key ( sort keys %state ) 
+    	{
+		my $list = $state{$key};
+		next unless @$list;
+		
+		$count += @$list;
+
+	    local $" = "\n\t";
+		print "\n\t$message_hash->{$key}\n\t$rule\n\t@$list\n";
+		}
+	
+	
+	return $count;
+	}
+	
+sub check_manifest
+	{
+	my $self = shift;
+	
+    print "Checking state of MANIFEST... ";
+
+	my $manifest = $self->run( "make manifest 2>&1" );
+		
+    my %message    = (
+		"Removed from MANIFEST:"  => 'These files were removed from MANIFEST',
+		"Added to MANIFEST:"      => 'These files were added to MANIFEST',
+		);	
+	
+	my $count = $self->_check_output_lines( \%message, $manifest );
+	
+    die "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n"
+		if $count;
+
+    print "MANIFEST up-to-date\n";
+	}
+
 	
 =item check_cvs
 
@@ -490,29 +562,10 @@ sub check_cvs
 		A   => 'These files were added but not checked in',
 		'?' => q|I don't know about these files|,
 		);
-    my @cvs_states = keys %message;
 
-    my %cvs_state;
-    foreach my $state ( @cvs_states ) 
-    	{
-        $cvs_state{$state} = [ $cvs_update =~ /^\Q$state\E (.+)/gm ];
-		}
+	my $count = $self->_check_output_lines( \%message, $cvs_update );
 
-    my $rule = "-" x 50;
-    my $count = 0;
-
-    foreach my $key ( sort keys %cvs_state ) 
-    	{
-		my $list = $cvs_state{$key};
-		next unless @$list;
-		
-		$count += @$list;
-
-	    local $" = "\n\t";
-		print "\n\t$message{$key}\n\t$rule\n\t@$list\n";
-		}
-
-    die "\nERROR: CVS is not up-to-date ($count files): Can't release files\n"
+    die "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n"
 		if $count;
 
     print "CVS up-to-date\n";
