@@ -42,11 +42,22 @@ Look in the current working directory for C<.releaserc>.  See
 the Configuration section.  If release cannot find the
 configuration file, it dies.
 
-=item Test and make the distribution
+=item make the distribution
 
-Run make realclean, perl Makefile.PL, make test, make dist, make
-disttest.  If testing fails, release dies.  make dist provides the name
-of the distribution if LOCAL_FILE is not provided on the command line.
+Run make realclean, perl Makefile.PL to get to a stable starting
+point.
+
+=item Check MANIFEST
+
+Run make manifest and die if it does anything to change MANIFEST.
+If it does something, you need to decide if you like what it did
+then check in the new version of MANIFEST.
+
+=item Test the distribution
+
+Run make test, make dist, make disttest.  If testing fails, release
+dies.  make dist provides the name of the distribution if LOCAL_FILE
+is not provided on the command line.
 
 =item Check that CVS is up-to-date
 
