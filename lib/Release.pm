@@ -20,13 +20,13 @@ Module::Release - Automate software releases
 use vars qw( $VERSION );
 
 $VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
-sub VERSION () { $VERSION };
 
 use strict;
 use Carp;
 use Config;
 use CGI qw(-oldstyle_urls);
 use ConfigReader::Simple;
+use Exporter;
 use LWP::UserAgent;
 use HTTP::Cookies;
 use HTTP::Request;
