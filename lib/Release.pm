@@ -89,8 +89,8 @@ tries to upload anonymously but cannot claim the file for you.
 
 =item CPAN_PASS
 
-Your SourceForge password. If you don't set this and you want to upload
-to SourceForge, you should be prompted for it. Failing that, the module
+Your CPAN password. If you don't set this and you want to upload
+to PAUSE, you should be prompted for it. Failing that, the module
 tries to upload anonymously but cannot claim the file for you.
 
 =back

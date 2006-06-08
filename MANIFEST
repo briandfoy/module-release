@@ -9,5 +9,4 @@ script/sf_upload
 t/compile.t
 t/pod.t
 t/pod_coverage.t
-t/sf_login.t
 t/test_manifest

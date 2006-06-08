@@ -1,7 +1,7 @@
 # $Id$
 use ExtUtils::MakeMaker;
 
-eval "use Test::Manifest";
+eval "use Test::Manifest 1.14";
 	   
 WriteMakefile(
 	'NAME'	       => 'Module::Release',
@@ -19,7 +19,7 @@ WriteMakefile(
 		},
 
 	'PM'           => {
-        'lib/Release.pm'     => '$(INST_LIBDIR)/Release.pm',
+        'lib/Release.pm' => '$(INST_LIBDIR)/Release.pm',
 		},
 
 	'MAN1PODS'     => {

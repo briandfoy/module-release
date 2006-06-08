@@ -10,3 +10,4 @@ MANIFEST.SKIP
 \.DS_Store
 \.\#
 \.old
+sf_login\.t
