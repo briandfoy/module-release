@@ -1,5 +1,9 @@
 $Id$
 
+1.10 - Thu Jun  8 06:51:25 2006
+	* Distro cleanup (removed sf_login.t test), fixed doc bug about
+	PAUSE, cleansed POD. No need to upgrade.
+
 1.08 - Sat May 20 03:04:01 2006
 	* Added MANIFEST checking feature. If `make manifest` has to change
 	MANIFEST, check_manifest() dies. You'll have to check in MANIFEST
