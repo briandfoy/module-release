@@ -6,6 +6,7 @@ eval "use Test::Manifest 1.14";
 WriteMakefile(
 	'NAME'	       => 'Module::Release',
 	'VERSION_FROM' => "lib/Release.pm",
+	'LICENSE'       => 'perl',
 	
 	'EXE_FILES'    =>  [ 'script/release' ],
 	    	
