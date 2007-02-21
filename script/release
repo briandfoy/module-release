@@ -1,5 +1,9 @@
 #!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
 use strict;
+use warnings;
 
 # $Id$
 
@@ -42,22 +46,11 @@ Look in the current working directory for C<.releaserc>.  See
 the Configuration section.  If release cannot find the
 configuration file, it dies.
 
-=item make the distribution
+=item Test and make the distribution
 
-Run make realclean, perl Makefile.PL to get to a stable starting
-point.
-
-=item Check MANIFEST
-
-Run make manifest and die if it does anything to change MANIFEST.
-If it does something, you need to decide if you like what it did
-then check in the new version of MANIFEST.
-
-=item Test the distribution
-
-Run make test, make dist, make disttest.  If testing fails, release
-dies.  make dist provides the name of the distribution if LOCAL_FILE
-is not provided on the command line.
+Run make realclean, perl Makefile.PL, make test, make dist, make
+disttest.  If testing fails, release dies.  make dist provides the name
+of the distribution if LOCAL_FILE is not provided on the command line.
 
 =item Check that CVS is up-to-date
 
@@ -101,10 +94,10 @@ in the Quick Release Form.
 
 release's own F<.releaserc> looks like this:
 
-    sf_user petdance
+    sf_user comdog
     sf_group_id 36221
     sf_package_id 56559
-    cpan_user PETDANCE
+    cpan_user BDFOY
 
 =over 4
 
@@ -219,14 +212,19 @@ members of the project can shepherd this software appropriately.
 
 =head1 AUTHOR
 
-brian d foy, C<< <bdfoy@cpan.org> >> and
-Andy Lester, C<< <andy@petdance.com> >>
+brian d foy, C<< <bdfoy@cpan.org> >>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2005, brian d foy, All rights reserved.
+Copyright 2002-2007, brian d foy, All rights reserved.
 
 You may use this software under the same terms as Perl itself.
+
+=head1 CREDITS
+
+Ken Williams turned the original release(1) script into a module.
+
+Andy Lester contributed to the module and script. 
 
 =cut
 
@@ -243,18 +241,18 @@ if( $opts{h} )
 	{
 	print <<"USAGE";
 
-Usage: release -hdt [ LOCAL_FILE REMOTE_FILE ]
+Use: release -hdt [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
-get LOCAL_FILE and REMOTE_FILE automatically (using same name for both)
-if not supplied.
+get LOCAL_FILE and REMOTE_FILE automatically (using same name for
+both) if not supplied.
 
-  -h   This help
-  -d   Print extra debugging information
-  -t   Just make and test distribution, don't tag/upload
+	-h   This help 
+	-d   Print extra debugging information 
+	-t   Just make and test distribution, don't tag/upload
 
 The program works in the current directory, and looks for a .releaserc
-file and the environment for its preferences.  See `man release`, or
+or releaserc file and the environment for its preferences.  See
 `perldoc $0`, for more information.
 
 USAGE
@@ -284,11 +282,11 @@ print STDERR "release $script_version, using Module::Release "
 
 $release->clean;
 $release->build_makefile;
-$release->check_manifest;
 $release->test;
 $release->dist;
 $release->dist_test;
 $release->check_cvs;
+
 exit if $opts{t};
 
 my $Version = $release->dist_version;
@@ -330,7 +328,7 @@ my $Changes = do {
 	close $in;
 	close $out;
 
-	my $cvs_commit = `cvs commit -m "* for version $Version" $changes 2>&1`;
+	my $cvs_commit = `svn commit -m "* for version $Version" 2>&1`;
 	
 	print $cvs_commit;
 	

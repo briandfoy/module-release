@@ -1,0 +1,6 @@
+Makefile
+Module-*
+*.old
+*.bak
+*.tgz
+.lwpcookies

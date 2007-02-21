@@ -14,12 +14,12 @@ Module::Release - Automate software releases
 	# call methods to automate your release process
 	$release->check_cvs;
 	...
-	
+
 =cut
 
 use vars qw( $VERSION );
 
-$VERSION = sprintf "%d.%02d", q$Revision$ =~ m/(\d+) \. (\d+)/xg;
+$VERSION = 1.13;
 
 use strict;
 use Carp;
@@ -105,8 +105,22 @@ to get these values:
 
 =item release_subclass
 
-(DEPRECATED) The subclass that you want to use. If you want to do this,
-just subclass it the right way (by overloading new and calling SUPER::new).
+The subclass of C<Module::Release> that you want to use. This allows
+you to specify the subclass via a F<.releaserc> file; otherwise you
+wouldn't be able to use the C<release> script because the
+C<Module::Release> class name is hard-coded there.
+
+=item makefile_PL
+
+The name of the file to run as F<Makefile.PL>.  The default is
+C<"Makefile.PL">, but you can set it to C<"Build.PL"> to use a
+C<Module::Build>-based system.
+
+=item makefile
+
+The name of the file created by C<makefile_PL> above.  The default is
+C<"Makefile">, but you can set it to C<"Build"> for
+C<Module::Build>-based systems.
 
 =item cpan_user
 
@@ -120,19 +134,19 @@ Your SourceForge account (i.e. login) name.
 
 Set this to a true value to enable passive FTP.
 
-=item sf_group_id 
+=item sf_group_id
 
 The Group ID of your SourceForge project. This is a numeric ID given to
 the project usually, and you can see it in the URLs when you browse
 the SourceForge files area.
 
-=item sf_package_id 
+=item sf_package_id
 
 The Package ID of your SourceForge package. This is a numeric ID given to
 a particular file release, and you can see it in the URLs when you browse
 the SourceForge files area.
 
-=item sf_release_match 
+=item sf_release_match
 
 This is a regular expression. Given the file release name that
 C<Module::Release> picks (e.g. "Foo-Bar-1.15.tgz"), you can run a
@@ -169,92 +183,91 @@ If you don't like what any of these methods do, override them in a subclass.
 Create a Module::Release object.  Any arguments passed are assumed to
 be key-value pairs that override the default values.
 
-At this point, the C<new()> method is not overridable via the
-C<release_subclass> config file entry.  It would be nice to fix this
-sometime.
 
 =cut
 
-sub new 
+sub new
 	{
-    my ($class, %params) = @_;
-    
-    my $conf = -e ".releaserc" ? ".releaserc" : "releaserc";
-    
-    my $self = {
-			make     => $Config{make},
-			perl     => $ENV{PERL} || $^X,
-			conf     => $conf,
-			debug    => $ENV{RELEASE_DEBUG} || 0,
-			local    => undef,
-			remote   => undef,
+	my ($class, %params) = @_;
+
+	my $conf = -e ".releaserc" ? ".releaserc" : "releaserc";
+
+	my $self = {
+			makefile_PL => 'Makefile.PL',
+			makefile    => 'Makefile',
+			make        => $Config{make},
+			perl        => $ENV{PERL} || $^X,
+			conf        => $conf,
+			debug       => $ENV{RELEASE_DEBUG} || 0,
+			local       => undef,
+			remote      => undef,
 			%params,
-	       };
+		   };
 
-    # Read the configuration
-    die "Could not find conf file $self->{conf}\n" unless -e $self->{conf};
-    my $config = $self->{config} = ConfigReader::Simple->new( $self->{conf} );
-    die "Could not get configuration data\n" unless ref $config;
+	# Read the configuration
+	die "Could not find conf file $self->{conf}\n" unless -e $self->{conf};
+	my $config = $self->{config} = ConfigReader::Simple->new( $self->{conf} );
+	die "Could not get configuration data\n" unless ref $config;
 
-    # See whether we should be using a subclass
-    if( my $subclass = $config->release_subclass ) 
-    	{
-		unless (UNIVERSAL::can($subclass, 'new')) 
+	# See whether we should be using a subclass
+	if( my $subclass = $config->release_subclass )
+		{
+		unless (UNIVERSAL::can($subclass, 'new'))
 			{
 			require File::Spec->catfile( split '::', $subclass ) . '.pm';
 			}
 
-		bless $self, $subclass;
-		} 
-	else {	bless $self, $class; }
+		return $subclass->new(@_) unless $subclass eq $class;
+		}
+	bless $self, $class;
 
-    # Figure out options
-    $self->{cpan} = $config->cpan_user eq '<none>' ? 0 : 1;
-    $self->{sf}   = $config->sf_user   eq '<none>' ? 0 : 1;
- 
-	$self->{passive_ftp} = 
-    	($config->passive_ftp && $config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
+	# Figure out options
+	$self->{cpan} = $config->cpan_user eq '<none>' ? 0 : 1;
+	$self->{sf}   = $config->sf_user   eq '<none>' ? 0 : 1;
 
-    my @required = qw( sf_user cpan_user );
-    push( @required, qw( sf_group_id sf_package_id ) ) if $self->{sf};
+	$self->{passive_ftp} =
+		($config->passive_ftp && $config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
 
-    my $ok = 1;
-    for( @required ) 
-    	{
-		unless( length $config->$_() ) 
+	my @required = qw( sf_user cpan_user );
+	push( @required, qw( sf_group_id sf_package_id ) ) if $self->{sf};
+
+	my $ok = 1;
+	for( @required )
+		{
+		unless( length $config->$_() )
 			{
-			$ok = 0;  
+			$ok = 0;
 			print "Missing configuration data: $_; Aborting!\n";
 			}
 		}
-    die "Missing configuration data" unless $ok;
-  
-    if( !$self->{cpan} && !$self->{sf} ) 
-    	{
+	die "Missing configuration data" unless $ok;
+
+	if( !$self->{cpan} && !$self->{sf} )
+		{
 		die "Must upload to the CPAN or SourceForge.net; Aborting!\n";
 		}
-    elsif( !$self->{cpan} ) 
-    	{
+	elsif( !$self->{cpan} )
+		{
 		print "Uploading to SourceForge.net only\n";
 		}
-    elsif( !$self->{sf} ) 
-    	{
+	elsif( !$self->{sf} )
+		{
 		print "Uploading to the CPAN only\n";
 		}
-  
 
-    # Set up the browser
-    $self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
 
-    # my $fh = File::Temp->new( UNLINK => 1 );
-    $self->{cookies} = HTTP::Cookies->new(
+	# Set up the browser
+	$self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
+
+	# my $fh = File::Temp->new( UNLINK => 1 );
+	$self->{cookies} = HTTP::Cookies->new(
 					    #file           => $fh->filename,
 					    hide_cookie2   => 1,
 					    autosave       => 1,
 					    );
-    $self->{cookies}->clear;
+	$self->{cookies}->clear;
 
-    return $self;
+	return $self;
 	}
 
 =item config
@@ -299,20 +312,20 @@ Run `make realclean`
 
 =cut
 
-sub clean 
+sub clean
 	{
-    my $self = shift;
-    print "Cleaning directory... ";
-    
-    unless( -e 'Makefile' ) 
-    	{
-        print " no Makefile---skipping\n";
-        return;
-    	}
+	my $self = shift;
+	print "Cleaning directory... ";
 
-    $self->run( "$self->{make} realclean 2>&1" );
+	unless( -e $self->{makefile} )
+		{
+		print " no $self->{makefile}---skipping\n";
+		return;
+		}
 
-    print "done\n";
+	$self->run( "$self->{make} realclean 2>&1" );
+
+	print "done\n";
 	}
 
 =item build_makefile()
@@ -324,20 +337,20 @@ C<Makefile.PL>.
 
 =cut
 
-sub build_makefile 
+sub build_makefile
 	{
-    my $self = shift;
-    print "Recreating make file... ";
+	my $self = shift;
+	print "Recreating make file... ";
 
-    unless( -e 'Makefile.PL' ) 
-    	{
-        print " no Makefile.PL---skipping\n";
-        return;
-    	}
+	unless( -e '$self->{makefile_PL}' )
+		{
+		print " no $self->{makefile_PL}---skipping\n";
+		return;
+		}
 
-    $self->run( "$self->{perl} Makefile.PL 2>&1" );
+	$self->run( "$self->{perl} $self->{makefile_PL} 2>&1" );
 
-    print "done\n";
+	print "done\n";
 	}
 
 =item test()
@@ -346,23 +359,23 @@ Run `make test`. If any tests fail, it dies.
 
 =cut
 
-sub test 
+sub test
 	{
-    my $self = shift;
-    print "Checking make test... ";
+	my $self = shift;
+	print "Checking make test... ";
 
-    unless( -e 'Makefile.PL' ) 
-    	{
-        print " no Makefile.PL---skipping\n";
-        return;
-    	}
+	unless( -e $self->{makefile_PL} )
+		{
+		print " no $self->{makefile_PL}---skipping\n";
+		return;
+		}
 
-    my $tests = $self->run( "$self->{make} test 2>&1" );
+	my $tests = $self->run( "$self->{make} test 2>&1" );
 
-    die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
-            unless $tests =~ /All tests successful/;
+	die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
+		    unless $tests =~ /All tests successful/;
 
-    print "all tests pass\n";
+	print "all tests pass\n";
 	}
 
 =item dist()
@@ -372,31 +385,31 @@ name if not set on the command line.
 
 =cut
 
-sub dist 
+sub dist
 	{
-    my $self = shift;
-    print "Making dist... ";
+	my $self = shift;
+	print "Making dist... ";
 
-    unless( -e 'Makefile.PL' ) 
-    	{
-        print " no Makefile.PL---skipping\n";
-        return;
-    	}
+	unless( -e $self->{makefile_PL} )
+		{
+		print " no $self->{makefile_PL}---skipping\n";
+		return;
+		}
 
-    my $messages = $self->run( "$self->{make} dist 2>&1 < /dev/null" );
+	my $messages = $self->run( "$self->{make} dist 2>&1 < /dev/null" );
 
-    unless( $self->{local} )
-    	{
-        print ", guessing local distribution name" if $self->debug;
-        ($self->{local}) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
-        $self->{local} .= '.gz';
-        $self->{remote} = $self->{local};
-    	}
+	unless( $self->{local} )
+		{
+		print ", guessing local distribution name" if $self->debug;
+		($self->{local}) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
+		$self->{local} .= '.gz';
+		$self->{remote} = $self->{local};
+		}
 
-    die "Couldn't guess distname from dist output\n"   unless $self->{local};
-    die "Local file '$self->{local}' does not exist\n" unless -f $self->{local};
+	die "Couldn't guess distname from dist output\n"   unless $self->{local};
+	die "Local file '$self->{local}' does not exist\n" unless -f $self->{local};
 
-    print "done\n";
+	print "done\n";
 	}
 
 =item dist_test
@@ -405,25 +418,25 @@ Run `make disttest`. If the tests fail, it dies.
 
 =cut
 
-sub dist_test 
+sub dist_test
 	{
-    my $self = shift;
+	my $self = shift;
 
-    print "Checking disttest... ";
+	print "Checking disttest... ";
 
-    unless( -e 'Makefile.PL' ) 
-    	{
-        print " no Makefile.PL---skipping\n";
-        return;
+	unless( -e $self->{makefile_PL} )
+		{
+		print " no $self->{makefile_PL}---skipping\n";
+		return;
 		}
 
-    my $tests = $self->run( "$self->{make} disttest 2>&1" );
+	my $tests = $self->run( "$self->{make} disttest 2>&1" );
 
-    die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
+	die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
 		unless $tests =~ /All tests successful/;
 
-    print "all tests pass\n";
-	} 
+	print "all tests pass\n";
+	}
 
 =item dist_version
 
@@ -434,14 +447,14 @@ Return the distribution version ( set in dist() )
 sub dist_version
 	{
 	my $self = shift;
-	
+
 	die "Can't get dist_version! It's not set (did you run dist first?)"
 		unless defined $self->{remote};
-		
-	my( $major, $minor ) = $self->{remote} 
-    	=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
-    	
-    $self->dist_version_format( $major, $minor );
+
+	my( $major, $minor ) = $self->{remote}
+		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
+
+	$self->dist_version_format( $major, $minor );
 	}
 
 =item dist_version_format
@@ -456,7 +469,7 @@ sub dist_version_format
 	{
 	my $self = shift;
 	my( $major, $minor ) = @_;
-	
+
 	sprintf "%d.%02d", $major, $minor;
 	}
 
@@ -467,7 +480,7 @@ die. You should check C<MANIFEST> to ensure it has the things it needs.
 If files that shouldn't show up do, put them in MANIFEST.SKIP.
 
 Since `make manifest` takes care of things for you, you might just have
-to re-run your release script. 
+to re-run your release script.
 
 =cut
 
@@ -477,7 +490,7 @@ to re-run your release script.
 # as a category for the message. If a line doesn't matter, don't put
 # it's pattern in the message hash.
 #
-# Prints a summary of what it found. The message is the hash value 
+# Prints a summary of what it found. The message is the hash value
 # for that output type.
 #
 # returns the number of interesting things it found, but that's it.
@@ -485,53 +498,53 @@ sub _check_output_lines
 	{
 	my $self = shift;
 	my( $message_hash, $message ) = @_;
-	
+
 	my %state;
-    foreach my $state ( keys %$message_hash ) 
-    	{
-        $state{$state} = [ $message =~ /^\Q$state\E\s+(.+)/gm ];
+	foreach my $state ( keys %$message_hash )
+		{
+		$state{$state} = [ $message =~ /^\Q$state\E\s+(.+)/gm ];
 		}
 
-    my $rule = "-" x 50;
-    my $count = 0;
+	my $rule = "-" x 50;
+	my $count = 0;
 
-    foreach my $key ( sort keys %state ) 
-    	{
+	foreach my $key ( sort keys %state )
+		{
 		my $list = $state{$key};
 		next unless @$list;
-		
+
 		$count += @$list;
 
-	    local $" = "\n\t";
+		local $" = "\n\t";
 		print "\n\t$message_hash->{$key}\n\t$rule\n\t@$list\n";
 		}
-	
-	
+
+
 	return $count;
 	}
-	
+
 sub check_manifest
 	{
 	my $self = shift;
-	
-    print "Checking state of MANIFEST... ";
+
+	print "Checking state of MANIFEST... ";
 
 	my $manifest = $self->run( "make manifest 2>&1" );
-		
-    my %message    = (
+
+	my %message    = (
 		"Removed from MANIFEST:"  => 'These files were removed from MANIFEST',
 		"Added to MANIFEST:"      => 'These files were added to MANIFEST',
-		);	
-	
+		);
+
 	my $count = $self->_check_output_lines( \%message, $manifest );
-	
-    die "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n"
+
+	die "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n"
 		if $count;
 
-    print "MANIFEST up-to-date\n";
+	print "MANIFEST up-to-date\n";
 	}
 
-	
+
 =item check_cvs
 
 Run `cvs update` and report the state of the repository. If something
@@ -539,22 +552,22 @@ isn't checked in or imported, die.
 
 =cut
 
-sub check_cvs 
+sub check_cvs
 	{
-    my $self = shift;
-    return unless -d 'CVS';
+	my $self = shift;
+	return unless -d 'CVS';
 
-    print "Checking state of CVS... ";
+	print "Checking state of CVS... ";
 
-    my $cvs_update = $self->run( "cvs -n update 2>&1" );
+	my $cvs_update = $self->run( "cvs -n update 2>&1" );
 
-    if( $? )
+	if( $? )
 		{
 		die sprintf("\nERROR: cvs failed with non-zero exit status: %d\n\n" .
 			"Aborting release\n", $? >> 8);
 		}
 
-    my %message    = (
+	my %message    = (
 		C   => 'These files have conflicts',
 		M   => 'These files have not been checked in',
 		U   => 'These files need to be updated',
@@ -565,10 +578,10 @@ sub check_cvs
 
 	my $count = $self->_check_output_lines( \%message, $cvs_update );
 
-    die "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n"
+	die "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n"
 		if $count;
 
-    print "CVS up-to-date\n";
+	print "CVS up-to-date\n";
 	}
 
 =item check_for_passwords
@@ -577,9 +590,9 @@ Get passwords for CPAN or SourceForge.
 
 =cut
 
-sub check_for_passwords 
+sub check_for_passwords
 	{
-    my $self = shift;
+	my $self = shift;
 
 	$self->{cpan_pass} = $self->getpass( "CPAN_PASS" ) if $self->{cpan};
 	$self->{sf_pass}   = $self->getpass( "SF_PASS" )   if $self->{sf};
@@ -591,61 +604,61 @@ Upload the files to the FTP servers
 
 =cut
 
-sub ftp_upload 
+sub ftp_upload
 	{
-    my $self = shift;
-    my @Sites;
-    push @Sites, 'pause.perl.org' if $self->{cpan};
-    push @Sites, 'upload.sourceforge.net' if $self->{sf};
-    
-    ( $self->{release} ) = $self->{remote} =~ m/^(.*?)(?:\.tar\.gz)?$/g;
-    
-    my $config = $self->config;
-    # set your own release name if you want to ...
-    if( $config->sf_release_match && $config->sf_release_replace ) 
-    	{
-        my $match   = $config->sf_release_match;
-        my $replace = $config->sf_release_replace;
-        $self->{release} =~ s/$match/$replace/ee;
-    	}
-    
-    print "Release name is $self->{release}\n";
-    print "Will use passive FTP transfers\n" if $self->{passive_ftp} && $self->debug;
+	my $self = shift;
+	my @Sites;
+	push @Sites, 'pause.perl.org' if $self->{cpan};
+	push @Sites, 'upload.sourceforge.net' if $self->{sf};
 
-    my $local_file = $self->{local};
-    my $local_size = -s $local_file;
+	( $self->{release} ) = $self->{remote} =~ m/^(.*?)(?:\.tar\.gz)?$/g;
 
-    foreach my $site ( @Sites ) 
-    	{
-        print "Logging in to $site\n";
-        my $ftp = Net::FTP->new( 
-        	$site, 
-        	Hash    => \*STDOUT, 
-        	Debug   => $self->debug,
-        	Passive => $self->{passive_ftp} 
-        	) or die "Couldn't open FTP connection to $site: $@";
+	my $config = $self->config;
+	# set your own release name if you want to ...
+	if( $config->sf_release_match && $config->sf_release_replace )
+		{
+		my $match   = $config->sf_release_match;
+		my $replace = $config->sf_release_replace;
+		$self->{release} =~ s/$match/$replace/ee;
+		}
+
+	print "Release name is $self->{release}\n";
+	print "Will use passive FTP transfers\n" if $self->{passive_ftp} && $self->debug;
+
+	my $local_file = $self->{local};
+	my $local_size = -s $local_file;
+
+	foreach my $site ( @Sites )
+		{
+		print "Logging in to $site\n";
+		my $ftp = Net::FTP->new(
+			$site,
+			Hash    => \*STDOUT,
+			Debug   => $self->debug,
+			Passive => $self->{passive_ftp}
+			) or die "Couldn't open FTP connection to $site: $@";
 
 		my $email = ($config->cpan_user || "anonymous") . '@cpan.org';
-        $ftp->login( "anonymous", $email )
-	 		or die "Couldn't log in anonymously to $site";
+		$ftp->login( "anonymous", $email )
+			or die "Couldn't log in anonymously to $site";
 
-        $ftp->pasv if $self->{passive_ftp};
-        $ftp->binary;
+		$ftp->binary;
 
-        $ftp->cwd( "/incoming" )
-	    	or die "Couldn't chdir to /incoming";
+		$ftp->cwd( "/incoming" )
+			or die "Couldn't chdir to /incoming";
 
 		print "Putting $local_file\n";
 		my $remote_file = $ftp->put( $self->{local}, $self->{remote} );
-		die "PUT failed: $@\n" if $remote_file ne $self->{remote};
+		die "PUT failed: " . $ftp->message . "\n" 
+			if $remote_file ne $self->{remote};
 
 		my $remote_size = $ftp->size( $self->{remote} );
 
-	    warn "WARNING: Uploaded file is $remote_size bytes, " .
-	    	"but local file is $local_size bytes" 
-	    		if $remote_size != $local_size;
-	
-        $ftp->quit;
+		warn "WARNING: Uploaded file is $remote_size bytes, " .
+			"but local file is $local_size bytes"
+				if $remote_size != $local_size;
+
+		$ftp->quit;
 		}
 	}
 
@@ -655,33 +668,33 @@ Claim the file in PAUSE
 
 =cut
 
-sub pause_claim 
+sub pause_claim
 	{
-    my $self = shift;
-    return unless $self->{cpan};
+	my $self = shift;
+	return unless $self->{cpan};
 
-    my $cgi = CGI->new();
-    my $ua  = LWP::UserAgent->new();
+	my $cgi = CGI->new();
+	my $ua  = LWP::UserAgent->new();
 
-    my $request = HTTP::Request->new( POST =>
-            'https://pause.perl.org/pause/authenquery' );
+	my $request = HTTP::Request->new( POST =>
+		    'https://pause.perl.org/pause/authenquery' );
 
-    $cgi->param( 'HIDDENNAME', $self->config->cpan_user );
-    $cgi->param( 'CAN_MULTIPART', 1 );
-    $cgi->param( 'pause99_add_uri_upload', $self->{remote} );
-    $cgi->param( 'SUBMIT_pause99_add_uri_upload', 'Upload the checked file' );
-    $cgi->param( 'pause99_add_uri_sub', 'pause99_add_uri_subdirtext' );
+	$cgi->param( 'HIDDENNAME', $self->config->cpan_user );
+	$cgi->param( 'CAN_MULTIPART', 1 );
+	$cgi->param( 'pause99_add_uri_upload', $self->{remote} );
+	$cgi->param( 'SUBMIT_pause99_add_uri_upload', 'Upload the checked file' );
+	$cgi->param( 'pause99_add_uri_sub', 'pause99_add_uri_subdirtext' );
 
-    $request->content_type('application/x-www-form-urlencoded');
+	$request->content_type('application/x-www-form-urlencoded');
 
  	$request->content( $cgi->query_string );
- 
- 	$request->authorization_basic( 
-    	$self->config->cpan_user, $self->{cpan_pass} );
- 
-    my $response = $ua->request( $request );
 
-    print "PAUSE upload ",
+ 	$request->authorization_basic(
+		$self->config->cpan_user, $self->{cpan_pass} );
+
+	my $response = $ua->request( $request );
+
+	print "PAUSE upload ",
 		$response->as_string =~ /Query succeeded/ ? "successful" : 'failed',
 		"\n";
 	}
@@ -692,23 +705,23 @@ Tag the release in local CVS. The tag name comes from C<make_cvs_tag>.
 
 =cut
 
-sub cvs_tag 
+sub cvs_tag
 	{
-    my $self = shift;
-    return unless -d 'CVS';
+	my $self = shift;
+	return unless -d 'CVS';
 
-    my $tag = $self->make_cvs_tag;
-    print "Tagging release with $tag\n";
+	my $tag = $self->make_cvs_tag;
+	print "Tagging release with $tag\n";
 
-    system 'cvs', 'tag', $tag;
+	system 'cvs', 'tag', $tag;
 
-    if ( $? ) 
-    	{ # already uploaded, so warn, don't die
+	if ( $? )
+		{ # already uploaded, so warn, don't die
 		warn sprintf(
 			"\nWARNING: cvs failed with non-zero exit status: %d\n",
 			$? >> 8
-            );
-    	}
+		    );
+		}
 
 	}
 
@@ -721,13 +734,13 @@ different tagging scheme.
 
 =cut
 
-sub make_cvs_tag 
+sub make_cvs_tag
 	{
-    my $self = shift;
-    my( $major, $minor ) = $self->{remote} 
-    	=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
+	my $self = shift;
+	my( $major, $minor ) = $self->{remote}
+		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
 
-    return "RELEASE_${major}_${minor}";
+	return "RELEASE_${major}_${minor}";
 	}
 
 # SourceForge.net seems to know our path through the system
@@ -743,88 +756,88 @@ sub sf_user
 	{
 	my $self = shift;
 	my $user = shift;
-	
+
 	$self->config->set( 'sf_user', $user ) if defined $user;
-	
+
 	return $self->config->sf_user;
 	}
-	
+
 =item sf_login
 
 Authenticate with Sourceforge
 
 =cut
 
-sub sf_login 
+sub sf_login
 	{
-    my $self = shift;
-    return unless $self->{sf};
+	my $self = shift;
+	return unless $self->{sf};
 
-    print "Logging in to SourceForge.net... ";
+	print "Logging in to SourceForge.net... ";
 
-    my $cgi = CGI->new();
-    my $request = HTTP::Request->new( POST =>
-        'https://sourceforge.net/account/login.php' );
-    $self->{cookies}->add_cookie_header( $request );
+	my $cgi = CGI->new();
+	my $request = HTTP::Request->new( POST =>
+		'https://sourceforge.net/account/login.php' );
+	$self->{cookies}->add_cookie_header( $request );
 
-    $cgi->param( 'return_to',      ''                     );
-    $cgi->param( 'form_loginname', $self->config->sf_user );
-    $cgi->param( 'form_pw',        $self->{sf_pass}       );
-    $cgi->param( 'persistent_login',    1                      );
-    $cgi->param( 'login',          'Login'       );
+	$cgi->param( 'return_to',      ''                     );
+	$cgi->param( 'form_loginname', $self->config->sf_user );
+	$cgi->param( 'form_pw',        $self->{sf_pass}       );
+	$cgi->param( 'persistent_login',    1                      );
+	$cgi->param( 'login',          'Login'       );
 
-    $request->content_type('application/x-www-form-urlencoded');
-    $request->content( $cgi->query_string );
+	$request->content_type('application/x-www-form-urlencoded');
+	$request->content( $cgi->query_string );
 
-    $request->header( "Referer", "http://sourceforge.net/account/login.php" );
+	$request->header( "Referer", "http://sourceforge.net/account/login.php" );
 
-    print STDERR $request->as_string, DASHES, "\n" if $self->debug;
+	print STDERR $request->as_string, DASHES, "\n" if $self->debug;
 
-    my $response = $self->ua->request( $request );
-    $self->{cookies}->extract_cookies( $response );
+	my $response = $self->ua->request( $request );
+	$self->{cookies}->extract_cookies( $response );
 
-    print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
+	print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
 
-    REDIRECT: {
-    if( $response->code == 302 ) 
-    	{
-        my $location = $response->header('Location');
-        print STDERR "Location is $location\n" if $self->debug;
- 
+	REDIRECT: {
+	if( $response->code == 302 )
+		{
+		my $location = $response->header('Location');
+		print STDERR "Location is $location\n" if $self->debug;
+
  		my $request = HTTP::Request->new( POST => $location );
 		$request->content_type('application/x-www-form-urlencoded');
 		$request->content( $cgi->query_string );
 		$self->{cookies}->add_cookie_header( $request );
 
-        print STDERR $request->as_string, DASHES, "\n" if $self->debug;
-        $response = $self->ua->request( $request );
+		print STDERR $request->as_string, DASHES, "\n" if $self->debug;
+		$response = $self->ua->request( $request );
 
-        print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
-        $self->{cookies}->extract_cookies( $response );
-        
-        redo REDIRECT;
-    	}
+		print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
+		$self->{cookies}->extract_cookies( $response );
+
+		redo REDIRECT;
+		}
 	}
-	
-    my $content = $response->content;
-    $content =~ s|.*<!-- begin SF.net content -->||s;
-    $content =~ s|Register New Project.*||s;
 
-    print STDERR $content if $self->debug;
+	my $content = $response->content;
+	$content =~ s|.*<!-- begin SF.net content -->||s;
+	$content =~ s|Register New Project.*||s;
 
-    my $sf_user = $self->config->sf_user;
+	print STDERR $content if $self->debug;
 
-    if( $content =~ m/welcome.*$sf_user/i ) 
-    	{
-        print "Logged in!\n";
-        return 1;
-    	} 
-    else 
-    	{
-        print "Not logged in! Aborting\n";
-        #return 0;
-        exit;
-    	}
+	my $sf_user = $self->config->sf_user;
+
+	if( $content =~ m/welcome.*$sf_user/i )
+		{
+		print "Logged in!\n";
+		return 1;
+		}
+	else
+		{
+		print "Not logged in! Aborting\n";
+		#return 0;
+		exit;
+		}
 	}
 
 =item sf_qrs()
@@ -833,23 +846,23 @@ Visit the Quick Release System form
 
 =cut
 
-sub sf_qrs 
+sub sf_qrs
 	{
-    my $self = shift;
-    return unless $self->{sf};
+	my $self = shift;
+	return unless $self->{sf};
 
-    my $request = HTTP::Request->new( GET =>
-        'https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=' . 
-        $self->config->sf_group_id
-    	);
-    	
-    $self->{cookies}->add_cookie_header( $request );
-    print $request->as_string, DASHES, "\n" if $self->debug;
- 
+	my $request = HTTP::Request->new( GET =>
+		'https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=' .
+		$self->config->sf_group_id
+		);
+
+	$self->{cookies}->add_cookie_header( $request );
+	print $request->as_string, DASHES, "\n" if $self->debug;
+
 	my $response = $self->{ua}->request( $request );
 
-    print $response->headers_as_string,  DASHES, "\n" if $self->debug;
-    $self->{cookies}->extract_cookies( $response );
+	print $response->headers_as_string,  DASHES, "\n" if $self->debug;
+	$self->{cookies}->extract_cookies( $response );
 	}
 
 =item sf_release()
@@ -858,54 +871,54 @@ Release the file to Sourceforge
 
 =cut
 
-sub sf_release 
+sub sf_release
 	{
-    my $self = shift;
-    return unless $self->{sf};
+	my $self = shift;
+	return unless $self->{sf};
 
-    my @time = localtime();
-    my $date = sprintf "%04d-%02d-%02d", 
-    	$time[5] + 1900, $time[4] + 1, $time[3];
+	my @time = localtime();
+	my $date = sprintf "%04d-%02d-%02d",
+		$time[5] + 1900, $time[4] + 1, $time[3];
 
-    print "Connecting to SourceForge.net QRS... ";
-    my $cgi = CGI->new();
-    my $request = HTTP::Request->new( 
-    	POST => 'https://sourceforge.net/project/admin/qrs.php' );
+	print "Connecting to SourceForge.net QRS... ";
+	my $cgi = CGI->new();
+	my $request = HTTP::Request->new(
+		POST => 'https://sourceforge.net/project/admin/qrs.php' );
 
-    $self->{cookies}->add_cookie_header( $request );
+	$self->{cookies}->add_cookie_header( $request );
 
-    $cgi->param( 'MAX_FILE_SIZE',   1_000_000                              );
-    $cgi->param( 'package_id',      $self->config->sf_package_id           );
-    $cgi->param( 'release_name',    $self->{release}                       );
-    $cgi->param( 'release_date',    $date                                  );
-    $cgi->param( 'status_id',       1                                      );
-    $cgi->param( 'file_name',       $self->{remote}                        );
-    $cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
-    $cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
-    $cgi->param( 'release_notes',   get_readme()                           );
-    $cgi->param( 'release_changes', get_changes()                          );
-    $cgi->param( 'group_id',        $self->config->sf_group_id             );
-    $cgi->param( 'preformatted',    1                                      );
-    $cgi->param( 'submit',         'Release File'                          );
+	$cgi->param( 'MAX_FILE_SIZE',   1_000_000                              );
+	$cgi->param( 'package_id',      $self->config->sf_package_id           );
+	$cgi->param( 'release_name',    $self->{release}                       );
+	$cgi->param( 'release_date',    $date                                  );
+	$cgi->param( 'status_id',       1                                      );
+	$cgi->param( 'file_name',       $self->{remote}                        );
+	$cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
+	$cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
+	$cgi->param( 'release_notes',   get_readme()                           );
+	$cgi->param( 'release_changes', get_changes()                          );
+	$cgi->param( 'group_id',        $self->config->sf_group_id             );
+	$cgi->param( 'preformatted',    1                                      );
+	$cgi->param( 'submit',         'Release File'                          );
 
-    $request->content_type('application/x-www-form-urlencoded');
-    $request->content( $cgi->query_string );
+	$request->content_type('application/x-www-form-urlencoded');
+	$request->content( $cgi->query_string );
 
-    $request->header( "Referer",
-        "https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=" . 
-        $self->config->sf_group_id
-    	);
-    print $request->as_string, "\n", DASHES, "\n" if $self->debug;
+	$request->header( "Referer",
+		"https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=" .
+		$self->config->sf_group_id
+		);
+	print $request->as_string, "\n", DASHES, "\n" if $self->debug;
 
-    my $response = $self->{ua}->request( $request );
-    print $response->headers_as_string, "\n", DASHES, "\n" if $self->debug;
+	my $response = $self->{ua}->request( $request );
+	print $response->headers_as_string, "\n", DASHES, "\n" if $self->debug;
 
-    my $content = $response->content;
-    $content =~ s|.*Database Admin.*?<H3><FONT.*?>\s*||s;
-    $content =~ s|\s*</FONT></H3>.*||s;
+	my $content = $response->content;
+	$content =~ s|.*Database Admin.*?<H3><FONT.*?>\s*||s;
+	$content =~ s|\s*</FONT></H3>.*||s;
 
-    print "$content\n" if $self->debug;
-    print "File Released\n";
+	print "$content\n" if $self->debug;
+	print "File Released\n";
 	}
 
 =item get_readme()
@@ -915,13 +928,13 @@ you may well want to overload it.
 
 =cut
 
-sub get_readme 
+sub get_readme
 	{
 	open my $fh, '<README' or return '';
 	my $data = do {
 		local $/;
 		<$fh>;
-        };
+		};
 
 	return $data;
 	}
@@ -933,13 +946,13 @@ you may well want to overload it.
 
 =cut
 
-sub get_changes 
+sub get_changes
 	{
 	open my $fh, '<', 'Changes' or return '';
 
 	my $data = <$fh>;  # get first line
 
-	while( <$fh> ) 
+	while( <$fh> )
 		{
 		last if /^\S/;
 		$data .= $_;
@@ -964,32 +977,39 @@ sub _run_error_reset { $_[0]->{_run_error} = 0 }
 sub _run_error_set   { $_[0]->{_run_error} = 1 }
 sub run_error        { $_[0]->{_run_error}     }
 
-sub run 
+sub run
 	{
-    my( $self, $command ) = @_;
-    
-    $self->_run_error_reset;
-    
-    print "$command\n" if $self->debug;
-    open my($fh), "$command |" or die $!;
-    my $output = '';
-    local $| = 1;
-    
-    while (<$fh>) 
-    	{
-        $output .= $_;
-        print if $self->debug;
-    	}
-    	
-    print DASHES, "\n" if $self->debug;
-    
+	my( $self, $command ) = @_;
+
+	$self->_run_error_reset;
+
+	print "$command\n" if $self->debug;
+	open my($fh), "$command |" or die $!;
+	$fh->autoflush;
+	
+	my $output = '';
+	my $buffer = '';
+	local $| = 1;
+
+	my $readlen = $self->{debug} ? 1 : 256;
+
+	while (read $fh, $buffer, $readlen)
+		{
+		$output .= $_;
+		print if $self->debug;
+		print $buffer if $self->{debug};
+		$output .= $buffer;
+		}
+
+	print DASHES, "\n" if $self->debug;
+
 	unless( close $fh )
 		{
 		$self->_run_error_set;
 		carp "Command [$command] had problems" if $self->debug;
 		}
-		
-    return $output;
+
+	return $output;
 	}
 
 =item getpass
@@ -998,21 +1018,24 @@ Get a password from the user if it isn't found.
 
 =cut
 
-sub getpass 
+sub getpass
 	{
-    my ($self, $field) = @_;
+	my ($self, $field) = @_;
 
-    my $pass = $ENV{$field};
-    
-    return $pass if defined( $pass ) && length( $pass );
+	# Check for an explicit argument passed
+	return $self->{lc $field} if defined $self->{lc $field};
 
-    print "$field is not set.  Enter it now: ";
-    $pass = <>;
-    chomp $pass;
+	my $pass = $ENV{$field};
 
-    return $pass if defined( $pass ) && length( $pass );
+	return $pass if defined( $pass ) && length( $pass );
 
-    die "$field not supplied.  Aborting...\n";
+	print "$field is not set.  Enter it now: ";
+	$pass = <>;
+	chomp $pass;
+
+	return $pass if defined( $pass ) && length( $pass );
+
+	die "$field not supplied.  Aborting...\n";
 	}
 
 =back

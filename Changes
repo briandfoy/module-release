@@ -1,5 +1,37 @@
 $Id$
 
+1.12 - Mon Sep 25 22:38:35 CDT 2006
+
+	* Changes from Ken Williams
+	
+	* New 'makefile_PL' and 'makefile' parameters to the new()
+	method allow Module::Build-based distributions to work more
+	smoothly - set them to 'Build.PL' and 'Build', respectively.
+	
+	* The 'release_subclass' parameter to new() is un-deprecated
+	again.
+	
+	* Subclasses previously could not override the new() method
+	when invoked via the 'release_subclass' mechanism, now they can.
+	
+	* When running under a passive FTP mode, we were telling the
+	server to go into passive mode twice, which causes some
+	servers to bomb out.  This is fixed.
+	
+	* The error message when an FTP PUT operation failed has been
+	improved.
+	
+	* System calls made during the release process will now read
+	their underlying STDOUT and STDERR using read(), which helps
+	you see what's going on when there are interactive steps.
+	
+	* The getpass() method will now check for CPAN_PASS and
+	SF_PASS values previously set as member variables.  This
+	helps users who might want to, for example, look their
+	values up in the OS X keychain using a custom subclass.
+	
+	* Fixed a couple of minor POD formatting errors.
+	
 1.10 - Thu Jun  8 06:51:25 2006
 	* Distro cleanup (removed sf_login.t test), fixed doc bug about
 	PAUSE, cleansed POD. No need to upgrade.

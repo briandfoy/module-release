@@ -11,3 +11,4 @@ MANIFEST.SKIP
 \.\#
 \.old
 sf_login\.t
+\.svn\b

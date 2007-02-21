@@ -3,7 +3,6 @@ examples/README
 lib/Release.pm
 Makefile.PL
 MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
 README
 script/release
 script/sf_upload
