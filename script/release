@@ -230,9 +230,10 @@ Andy Lester contributed to the module and script.
 
 use Getopt::Std;
 use Module::Release;
+use Module::Release::Subversion;
 
 my( $script_version ) = 
-	sprintf "%d.%02d", q$Revision$ =~ m/ (\d+) \. (\d+) /xg;
+	sprintf "%d.%02d", q$Revision$ =~ m/ (\d+) /xg;
 
 my %opts;
 getopts('hdt', \%opts) or $opts{h} = 1;
@@ -274,7 +275,7 @@ elsif( $params{local} )
 
 $params{debug} = 1 if $opts{d};
 
-my $release = Module::Release->new( %params );
+my $release = Module::Release::Subversion->new( %params );
 
 print STDERR "release $script_version, using Module::Release "
 	.  Module::Release->VERSION . "\n" 
@@ -287,9 +288,12 @@ $release->dist;
 $release->dist_test;
 $release->check_cvs;
 
-exit if $opts{t};
 
 my $Version = $release->dist_version;
+
+print STDERR "dist version is  $Version\n" if $release->debug;
+
+exit if $opts{t};
 
 my $Changes = do {
 	my $changes = "Changes";
