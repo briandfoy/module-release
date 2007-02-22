@@ -269,7 +269,7 @@ if( -d '.svn' )
 	$class = "Module::Release::Subversion";
 	
 	print STDERR "I see an .svn directory, so I'm loading $class"
-		if $opt{d};
+		if $opts{d};
 		
 	eval "use Module::Release::Subversion";
 	die "Could not load $class: $@\n" if $@;
