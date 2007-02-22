@@ -38,7 +38,7 @@ use constant DASHES => "-" x 73;
 =head1 DESCRIPTION
 
 C<Module::Release> automates your software release process. It started as
-a script that automated my (brian) release process, so it has bits to
+a script that automated my release process, so it has bits to
 talk to PAUSE (CPAN) and SourceForge, and to use C<Makefile.PL> and
 C<CVS>. Other people have extended this in other modules under the same
 namespace so you can use C<Module::Build>, C<svn>, and many other things.
@@ -83,23 +83,24 @@ Do you want debugging output? Set this to a true value
 
 =item SF_PASS
 
-Your SourceForge password. If you don't set this and you want to upload
-to SourceForge, you should be prompted for it. Failing that, the module
-tries to upload anonymously but cannot claim the file for you.
+Your SourceForge password. If you don't set this and you want to
+upload to SourceForge, you should be prompted for it. Failing that,
+the module tries to upload anonymously but cannot claim the file for
+you.
 
 =item CPAN_PASS
 
-Your CPAN password. If you don't set this and you want to upload
-to PAUSE, you should be prompted for it. Failing that, the module
-tries to upload anonymously but cannot claim the file for you.
+Your CPAN password. If you don't set this and you want to upload to
+PAUSE, you should be prompted for it. Failing that, the module tries
+to upload anonymously but cannot claim the file for you.
 
 =back
 
 =head3 C<.releaserc>
 
 C<Module::Release> looks for either C<.releaserc> or C<releaserc> in
-the current working directory. It reads that with C<ConfigReader::Simple>
-to get these values:
+the current working directory. It reads that with
+C<ConfigReader::Simple> to get these values:
 
 =over 4
 
@@ -193,14 +194,14 @@ sub new
 	my $conf = -e ".releaserc" ? ".releaserc" : "releaserc";
 
 	my $self = {
-			makefile_PL => 'Makefile.PL',
-			makefile    => 'Makefile',
-			make        => $Config{make},
-			perl        => $ENV{PERL} || $^X,
-			conf        => $conf,
-			debug       => $ENV{RELEASE_DEBUG} || 0,
-			local       => undef,
-			remote      => undef,
+			'Makefile.PL' => 'Makefile.PL',
+			'Makefile'    => 'Makefile',
+			make          => $Config{make},
+			perl          => $ENV{PERL} || $^X,
+			conf          => $conf,
+			debug         => $ENV{RELEASE_DEBUG} || 0,
+			'local'       => undef,
+			remote        => undef,
 			%params,
 		   };
 
@@ -212,7 +213,7 @@ sub new
 	# See whether we should be using a subclass
 	if( my $subclass = $config->release_subclass )
 		{
-		unless (UNIVERSAL::can($subclass, 'new'))
+		unless( eval { $subclass->can( 'new' ) } )
 			{
 			require File::Spec->catfile( split '::', $subclass ) . '.pm';
 			}
@@ -317,9 +318,9 @@ sub clean
 	my $self = shift;
 	print "Cleaning directory... ";
 
-	unless( -e $self->{makefile} )
+	unless( -e $self->{Makefile} )
 		{
-		print " no $self->{makefile}---skipping\n";
+		print " no $self->{Makefile}---skipping\n";
 		return;
 		}
 
@@ -342,13 +343,13 @@ sub build_makefile
 	my $self = shift;
 	print "Recreating make file... ";
 
-	unless( -e '$self->{makefile_PL}' )
+	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{makefile_PL}---skipping\n";
+		print " no $self->{'Makefile.PL'}---skipping\n";
 		return;
 		}
 
-	$self->run( "$self->{perl} $self->{makefile_PL} 2>&1" );
+	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1" );
 
 	print "done\n";
 	}
@@ -364,9 +365,9 @@ sub test
 	my $self = shift;
 	print "Checking make test... ";
 
-	unless( -e $self->{makefile_PL} )
+	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{makefile_PL}---skipping\n";
+		print " no $self->{'Makefile.PL'}---skipping\n";
 		return;
 		}
 
@@ -390,9 +391,9 @@ sub dist
 	my $self = shift;
 	print "Making dist... ";
 
-	unless( -e $self->{makefile_PL} )
+	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{makefile_PL}---skipping\n";
+		print " no $self->{'Makefile.PL'}---skipping\n";
 		return;
 		}
 
@@ -412,6 +413,33 @@ sub dist
 	print "done\n";
 	}
 
+=item check_kwalitee()
+
+Run `cpants_lints.pl distname.tgz`. If it doesn't see "a 'perfect' distribution"
+it dies. 
+
+=cut
+
+sub check_kwalitee
+	{
+	my $self = shift;
+	print "Making dist... ";
+
+	unless( -e $self->{'Makefile.PL'} )
+		{
+		print " no $self->{'Makefile.PL'}---skipping\n";
+		return;
+		}
+
+	# XXX: what if it's not .tar.gz?
+	my $messages = $self->run( "cpants_lint.pl *.tar.gz" );
+
+	die "Kwalitee is less than perfect:\n$messages\n"
+		unless $messages =~ m/a 'perfect' distribution!/;
+	
+	print "done\n";
+	}
+	
 =item dist_test
 
 Run `make disttest`. If the tests fail, it dies.
@@ -424,9 +452,9 @@ sub dist_test
 
 	print "Checking disttest... ";
 
-	unless( -e $self->{makefile_PL} )
+	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{makefile_PL}---skipping\n";
+		print " no $self->{'Makefile.PL'}---skipping\n";
 		return;
 		}
 
@@ -1059,7 +1087,7 @@ Chris Nandor helped with figuring out the broken SourceForge stuff.
 =head1 SOURCE AVAILABILITY
 
 This source is part of a SourceForge project which always has the
-latest sources in CVS, as well as all of the previous releases. This
+latest sources in SVN, as well as all of the previous releases. This
 source now lives in the "Module/Release" section of the repository,
 and older sources live in the "release" section.
 

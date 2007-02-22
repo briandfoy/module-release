@@ -1,7 +1,4 @@
 #!/usr/bin/perl
-
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
 use strict;
 use warnings;
 
@@ -13,7 +10,7 @@ release - upload files to the CPAN and SourceForge.net
 
 =head1 SYNOPSIS
 
-	release [ LOCAL_FILE REMOTE_FILE ]
+	release [ LOCAL_FILE [ REMOTE_FILE ] ]
 	
 	# try a dry run without uploading anything
 	release -t
@@ -26,37 +23,43 @@ release - upload files to the CPAN and SourceForge.net
 
 =head1 DESCRIPTION
 
-This program automates Perl module releases.  It makes the distribution,
-tests it, checks that CVS is up to date, tags CVS, uploads it to
-the PAUSE anonymous FTP directory and to the incoming directory for
-SourceForge.net, claims it on PAUSE for your CPAN account, and releases
-it on SourceForge.net.
+This is the prototype program for using Module::Release. You should
+modify it to fit your needs.
+
+This program automates Perl module releases.  It makes the
+distribution, tests it, checks that source control is up to date, tags
+source control, uploads it to the PAUSE anonymous FTP directory and to
+the incoming directory for SourceForge.net, claims it on PAUSE for
+your CPAN account, and releases it on SourceForge.net.
+
+By default this script assumes that you use CVS, but recognizes SVN
+and switches when appropriate.
 
 =head2 Process
 
-The release script checks many things before it actually releases
-the file.  Some of these are annoying, but they are also the last
-line of defense against releasing bad distributions.
+The release script checks many things before it actually releases the
+file.  Some of these are annoying, but they are also the last line of
+defense against releasing bad distributions.
 
 =over 4
 
 =item Read the configuration data
 
-Look in the current working directory for C<.releaserc>.  See
-the Configuration section.  If release cannot find the
-configuration file, it dies.
+Look in the current working directory for C<.releaserc>.  See the
+Configuration section.  If release cannot find the configuration file,
+it dies.
 
 =item Test and make the distribution
 
 Run make realclean, perl Makefile.PL, make test, make dist, make
-disttest.  If testing fails, release dies.  make dist provides the name
-of the distribution if LOCAL_FILE is not provided on the command line.
+disttest.  If testing fails, release dies.  make dist provides the
+name of the distribution if LOCAL_FILE is not provided on the command
+line.
 
-=item Check that CVS is up-to-date
+=item Check that source control is up-to-date
 
-You can release a file without CVS being up-to-date, but this
-script also tags the repository with the version number of the
-release, so it insists on CVS being up-to-date.  It fails otherwise.
+If there are modified files, added files, or extra files so that
+source control complains, fail.
 
 =item Upload to PAUSE and SourceForge.net
 
@@ -70,17 +73,15 @@ CPAN account.
 
 =item Tag the repository
 
-Use the version number (in the distribution name) to tag
-the repository.  You should be able to checkout the code
-from any release.
+Use the version number (in the distribution name) to tag the
+repository.  You should be able to checkout the code from any release.
 
 =item Release to SourceForge.net
 
-The release name is the distribution name without the .tar.gz.
-The file name is the distribution name.  SourceForge.net divides
-things into projects (with project IDs) and packages within
-the project (with package IDs).  Specify these in the
-configuration file.
+The release name is the distribution name without the .tar.gz. The
+file name is the distribution name.  SourceForge.net divides things
+into projects (with project IDs) and packages within the project (with
+package IDs).  Specify these in the configuration file.
 
 =back
 
@@ -230,17 +231,17 @@ Andy Lester contributed to the module and script.
 
 use Getopt::Std;
 use Module::Release;
-use Module::Release::Subversion;
 
-my( $script_version ) = 
-	sprintf "%d.%02d", q$Revision$ =~ m/ (\d+) /xg;
+my $class = "Module::Release";
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
 getopts('hdt', \%opts) or $opts{h} = 1;
 
 if( $opts{h} ) 
 	{
-	print <<"USAGE";
+	print <<"USE";
 
 Use: release -hdt [ LOCAL_FILE [ REMOTE_FILE ] ]
 
@@ -256,11 +257,29 @@ The program works in the current directory, and looks for a .releaserc
 or releaserc file and the environment for its preferences.  See
 `perldoc $0`, for more information.
 
-USAGE
+USE
 
 	exit;
 	}
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+if( -d '.svn' )
+	{
+	$class = "Module::Release::Subversion";
+	
+	print STDERR "I see an .svn directory, so I'm loading $class"
+		if $release->debug;
+		
+	eval "use Module::Release::Subversion";
+	die "Could not load $class: $@\n" if $@;
+	}
+
+my( $script_version ) = 
+	sprintf "%1.%02d", q$Revision$ =~ m/ (\d+) /xg;
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %params;
 $params{local}  = shift @ARGV if @ARGV;
 
@@ -275,19 +294,20 @@ elsif( $params{local} )
 
 $params{debug} = 1 if $opts{d};
 
-my $release = Module::Release::Subversion->new( %params );
+my $release = $class->new( %params );
 
-print STDERR "release $script_version, using Module::Release "
-	.  Module::Release->VERSION . "\n" 
-		if $release->debug;
+print STDERR "release $script_version, using $class " .  $class->VERSION . "\n" 
+	if $release->debug;
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 $release->clean;
 $release->build_makefile;
 $release->test;
 $release->dist;
+$release->check_kwalitee;
 $release->dist_test;
 $release->check_cvs;
-
 
 my $Version = $release->dist_version;
 
@@ -295,6 +315,8 @@ print STDERR "dist version is  $Version\n" if $release->debug;
 
 exit if $opts{t};
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my $Changes = do {
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
@@ -332,13 +354,20 @@ my $Changes = do {
 	close $in;
 	close $out;
 
-	my $cvs_commit = `svn commit -m "* for version $Version" 2>&1`;
+	my $command = do {
+		if(    -d 'CVS' )  { 'cvs' }
+		elsif( -d '.svn' ) { 'svn' }
+		};
+		
+	my $cvs_commit = `$command commit -m "* for version $Version" 2>&1`;
 	
 	print $cvs_commit;
 	
 	$str;
 	};
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 $release->clean;
 $release->build_makefile;
 $release->dist;
