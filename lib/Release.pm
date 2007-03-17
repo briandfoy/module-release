@@ -19,7 +19,7 @@ Module::Release - Automate software releases
 
 use vars qw( $VERSION );
 
-$VERSION = 1.13;
+$VERSION = 1.14;
 
 use strict;
 use Carp;
@@ -260,9 +260,11 @@ sub new
 	# Set up the browser
 	$self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
 
-	# my $fh = File::Temp->new( UNLINK => 1 );
+	my $fh = File::Temp->new( UNLINK => 1 );
+	
+	$self->{cookie_fh} = $fh;  # to keep it around until we're done
 	$self->{cookies} = HTTP::Cookies->new(
-					    #file           => $fh->filename,
+					    file           => $fh->filename,
 					    hide_cookie2   => 1,
 					    autosave       => 1,
 					    );

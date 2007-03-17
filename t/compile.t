@@ -1,17 +1,18 @@
 # $Id$
 
-use Test::More tests => 3;
+use Test::More 'no_plan';
 
+eval "use Module::Release::Subversion";
+plan skip_all => "Module::Release::Subversion required for testing script" if $@;
+           
 my $file = 'blib/script/release';
 
 print "bail out! Script file is missing!" 
 	unless ok( -e $file, "File exists" );
 
-my $output = `$^X -c $file 2>&1`;
-
 print "bail out! Module::Release doesn't compile!" 
 	unless use_ok( 'Module::Release' );
 
-print "bail out! Script doesn't compile!" 
-	unless like( $output, qr/syntax OK$/, 'script compiles' );
-
+my $output = `$^X -c $file 2>&1`;
+		
+like( $output, qr/syntax OK$/, 'script compiles' );
