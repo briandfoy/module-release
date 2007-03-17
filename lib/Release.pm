@@ -17,21 +17,21 @@ Module::Release - Automate software releases
 
 =cut
 
+use strict;
 use vars qw( $VERSION );
 
 $VERSION = 1.14;
 
-use strict;
 use Carp;
-use Config;
 use CGI qw(-oldstyle_urls);
+use Config;
 use ConfigReader::Simple;
-use Exporter;
-use LWP::UserAgent;
+use File::Spec;
+use File::Temp;
 use HTTP::Cookies;
 use HTTP::Request;
+use LWP::UserAgent;
 use Net::FTP;
-use File::Spec;
 
 use constant DASHES => "-" x 73;
 
