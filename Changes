@@ -1,5 +1,9 @@
 $Id$
 
+1.14 - Fri Mar 16 18:51:26 2007
+	*  use a temp file for cookies
+	* don't test script if M::R::Subversion isn't installed
+
 1.13 - Thu Feb 22 10:16:18 2007
 	* Updated the distro for PAUSE indexing problems (my fault)
 	* release(1) now detects SVN and loads Module::Release::Subversion 
