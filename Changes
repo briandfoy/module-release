@@ -1,5 +1,9 @@
 $Id$
 
+1.15 - Tue May  1 17:07:07 2007
+	* Fixing up tests which seem to have plan problems
+	* No need to upgrade
+
 1.14 - Fri Mar 16 18:51:26 2007
 	*  use a temp file for cookies
 	* don't test script if M::R::Subversion isn't installed
