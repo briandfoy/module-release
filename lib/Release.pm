@@ -20,7 +20,7 @@ Module::Release - Automate software releases
 use strict;
 use vars qw( $VERSION );
 
-$VERSION = 1.15;
+$VERSION = 1.16;
 
 use Carp;
 use CGI qw(-oldstyle_urls);

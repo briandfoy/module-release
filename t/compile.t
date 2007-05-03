@@ -7,7 +7,7 @@ eval "use Module::Release::Subversion";
 my $file = 'blib/script/release';
 
 SKIP: {
-	skip "Need Module::Release::Subversion for this test", 3 unless
+	skip "Need Module::Release::Subversion for this test", 2 unless
 		( ! $@ and -e $file );
 	
 	use_ok( 'Module::Release' );
