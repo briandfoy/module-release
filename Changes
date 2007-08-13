@@ -1,5 +1,8 @@
 $Id$
 
+1.17 - Mon Aug 13 13:43:17 2007
+	* distro cleanups - no need to upgrade
+
 1.16 - Thu May  3 10:08:14 2007
 	* Fix for test suite problem
 
