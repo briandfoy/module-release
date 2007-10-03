@@ -264,7 +264,17 @@ USE
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-if( -d '.svn' )
+if( -d '.git' )
+	{
+	$class = "Module::Release::Git";
+	
+	print STDERR "I see an .git directory, so I'm loading $class"
+		if $opts{d};
+		
+	eval "use Module::Release::Git";
+	die "Could not load $class: $@\n" if $@;
+	}
+elsif( -d '.svn' )
 	{
 	$class = "Module::Release::Subversion";
 	
@@ -296,8 +306,7 @@ $params{debug} = 1 if $opts{d};
 
 my $release = $class->new( %params );
 
-print STDERR "release $script_version, using $class " .  $class->VERSION . "\n" 
-	if $release->debug;
+$release->_debug( "release $script_version, using $class " .  $class->VERSION . "\n" );
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -311,7 +320,7 @@ $release->check_cvs;
 
 my $Version = $release->dist_version;
 
-print STDERR "dist version is  $Version\n" if $release->debug;
+$release->_debug( "dist version is  $Version\n" );
 
 exit if $opts{t};
 
@@ -355,11 +364,12 @@ my $Changes = do {
 	close $out;
 
 	my $command = do {
-		if(    -d 'CVS' )  { 'cvs' }
-		elsif( -d '.svn' ) { 'svn' }
+		if(    -d 'CVS' )  { 'cvs commit -m' }
+		elsif( -d '.svn' ) { 'svn commit -m' }
+		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 		
-	my $cvs_commit = `$command commit -m "* for version $Version" 2>&1`;
+	my $cvs_commit = `$command "* for version $Version" 2>&1`;
 	
 	print $cvs_commit;
 	

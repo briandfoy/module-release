@@ -20,7 +20,7 @@ Module::Release - Automate software releases
 use strict;
 use vars qw( $VERSION );
 
-$VERSION = 1.17;
+$VERSION = 1.17_01;
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -30,6 +30,7 @@ use File::Spec;
 use File::Temp;
 use HTTP::Cookies;
 use HTTP::Request;
+use IO::Null;
 use LWP::UserAgent;
 use Net::FTP;
 
@@ -202,13 +203,17 @@ sub new
 			debug         => $ENV{RELEASE_DEBUG} || 0,
 			'local'       => undef,
 			remote        => undef,
+			stdout_fh     => \*STDOUT,
+			debug_fh      => \*STDERR,
+			null_fh       => IO::Null->new(),
 			%params,
 		   };
 
 	# Read the configuration
-	die "Could not find conf file $self->{conf}\n" unless -e $self->{conf};
+	$self->_die( "Could not find conf file $self->{conf}\n" )
+		unless -e $self->{conf};
 	my $config = $self->{config} = ConfigReader::Simple->new( $self->{conf} );
-	die "Could not get configuration data\n" unless ref $config;
+	$self->_die( "Could not get configuration data\n" ) unless ref $config;
 
 	# See whether we should be using a subclass
 	if( my $subclass = $config->release_subclass )
@@ -238,22 +243,22 @@ sub new
 		unless( length $config->$_() )
 			{
 			$ok = 0;
-			print "Missing configuration data: $_; Aborting!\n";
+			$self->_print( "Missing configuration data: $_; Aborting!\n" );
 			}
 		}
 	die "Missing configuration data" unless $ok;
 
 	if( !$self->{cpan} && !$self->{sf} )
 		{
-		die "Must upload to the CPAN or SourceForge.net; Aborting!\n";
+		$self->_die( "Must upload to the CPAN or SourceForge.net; Aborting!\n" );
 		}
 	elsif( !$self->{cpan} )
 		{
-		print "Uploading to SourceForge.net only\n";
+		$self->_print( "Uploading to SourceForge.net only\n" );
 		}
 	elsif( !$self->{sf} )
 		{
-		print "Uploading to the CPAN only\n";
+		$self->_print( "Uploading to the CPAN only\n" );
 		}
 
 
@@ -282,6 +287,18 @@ object;
 
 sub config { $_[0]->{config} }
 
+=item output_fh
+
+Return the output filehandle, or the null filehandle if we're running in
+quiet mode. What's quiet mode? I don't know yet. It's a future feature.
+It's STDOUT or nothing 
+
+=cut
+
+sub output_fh  { $_[0]->_quiet ? $_[0]->null_fh : $_[0]->output_fh }
+
+sub _quiet  { 0 }
+
 =item debug
 
 Get the value of the debugging flag.
@@ -294,12 +311,20 @@ Turn on debugging
 
 Turn off debugging
 
+=item debug_fh
+
+If debugging, return the debugging filehandle, otherwise the null filehandle.
+I haven't created a way to set the debugging filehandle just yet. It's STDERR
+or nothing.
+
 =cut
 
 sub debug_on  { $_[0]->{debug} = 1 }
 sub debug_off { $_[0]->{debug} = 0 }
 
 sub debug     { $_[0]->{debug} }
+
+sub debug_fh  { $_[0]->debug ? $_[0]->{debug_fh} : $_[0]->{null_fh} }
 
 =item ua
 
@@ -318,17 +343,17 @@ Run `make realclean`
 sub clean
 	{
 	my $self = shift;
-	print "Cleaning directory... ";
+	$self->_print( "Cleaning directory... " );
 
 	unless( -e $self->{Makefile} )
 		{
-		print " no $self->{Makefile}---skipping\n";
+		$self->_print( " no $self->{Makefile}---skipping\n" );
 		return;
 		}
 
 	$self->run( "$self->{make} realclean 2>&1" );
 
-	print "done\n";
+	$self->_print( "done\n" );
 	}
 
 =item build_makefile()
@@ -343,17 +368,17 @@ C<Makefile.PL>.
 sub build_makefile
 	{
 	my $self = shift;
-	print "Recreating make file... ";
+	$self->_print( "Recreating make file... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{'Makefile.PL'}---skipping\n";
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
 
 	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1" );
 
-	print "done\n";
+	$self->_print( "done\n" );
 	}
 
 =item test()
@@ -365,20 +390,20 @@ Run `make test`. If any tests fail, it dies.
 sub test
 	{
 	my $self = shift;
-	print "Checking make test... ";
+	$self->_print( "Checking make test... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{'Makefile.PL'}---skipping\n";
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
 
 	my $tests = $self->run( "$self->{make} test 2>&1" );
 
-	die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
+	$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
 		    unless $tests =~ /All tests successful/;
 
-	print "all tests pass\n";
+	$self->_print( "all tests pass\n" );
 	}
 
 =item dist()
@@ -391,11 +416,11 @@ name if not set on the command line.
 sub dist
 	{
 	my $self = shift;
-	print "Making dist... ";
+	$self->_print( "Making dist... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{'Makefile.PL'}---skipping\n";
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
 
@@ -403,16 +428,18 @@ sub dist
 
 	unless( $self->{local} )
 		{
-		print ", guessing local distribution name" if $self->debug;
+		$self->_print( ", guessing local distribution name" ) if $self->debug;
 		($self->{local}) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
 		$self->{local} .= '.gz';
 		$self->{remote} = $self->{local};
 		}
 
-	die "Couldn't guess distname from dist output\n"   unless $self->{local};
-	die "Local file '$self->{local}' does not exist\n" unless -f $self->{local};
+	$self->_die( "Couldn't guess distname from dist output\n" )
+		unless $self->{local};
+	$self->_die( "Local file '$self->{local}' does not exist\n" )
+		unless -f $self->{local};
 
-	print "done\n";
+	$self->_print( "done\n" );
 	}
 
 =item check_kwalitee()
@@ -425,21 +452,21 @@ it dies.
 sub check_kwalitee
 	{
 	my $self = shift;
-	print "Making dist... ";
+	$self->_print( "Making dist... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{'Makefile.PL'}---skipping\n";
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
 
 	# XXX: what if it's not .tar.gz?
 	my $messages = $self->run( "cpants_lint.pl *.tar.gz" );
 
-	die "Kwalitee is less than perfect:\n$messages\n"
+	$self->_die( "Kwalitee is less than perfect:\n$messages\n" )
 		unless $messages =~ m/a 'perfect' distribution!/;
 	
-	print "done\n";
+	$self->_print( "done\n" );
 	}
 	
 =item dist_test
@@ -452,20 +479,20 @@ sub dist_test
 	{
 	my $self = shift;
 
-	print "Checking disttest... ";
+	$self->_print( "Checking disttest... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{
-		print " no $self->{'Makefile.PL'}---skipping\n";
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
 
 	my $tests = $self->run( "$self->{make} disttest 2>&1" );
 
-	die "\nERROR: Tests failed!\n$tests\n\nAborting release\n"
+	$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
 		unless $tests =~ /All tests successful/;
 
-	print "all tests pass\n";
+	$self->_print( "all tests pass\n" );
 	}
 
 =item dist_version
@@ -478,7 +505,7 @@ sub dist_version
 	{
 	my $self = shift;
 
-	die "Can't get dist_version! It's not set (did you run dist first?)"
+	$self->_die( "Can't get dist_version! It's not set (did you run dist first?)" )
 		unless defined $self->{remote};
 
 	my( $major, $minor ) = $self->{remote}
@@ -546,7 +573,7 @@ sub _check_output_lines
 		$count += @$list;
 
 		local $" = "\n\t";
-		print "\n\t$message_hash->{$key}\n\t$rule\n\t@$list\n";
+		$self->_print( "\n\t$message_hash->{$key}\n\t$rule\n\t@$list\n" );
 		}
 
 
@@ -557,7 +584,7 @@ sub check_manifest
 	{
 	my $self = shift;
 
-	print "Checking state of MANIFEST... ";
+	$self->_print( "Checking state of MANIFEST... " );
 
 	my $manifest = $self->run( "make manifest 2>&1" );
 
@@ -568,10 +595,10 @@ sub check_manifest
 
 	my $count = $self->_check_output_lines( \%message, $manifest );
 
-	die "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n"
+	$self->_die( "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n" )
 		if $count;
 
-	print "MANIFEST up-to-date\n";
+	$self->_print( "MANIFEST up-to-date\n" );
 	}
 
 
@@ -587,14 +614,14 @@ sub check_cvs
 	my $self = shift;
 	return unless -d 'CVS';
 
-	print "Checking state of CVS... ";
+	$self->_print( "Checking state of CVS... " );
 
 	my $cvs_update = $self->run( "cvs -n update 2>&1" );
 
 	if( $? )
 		{
-		die sprintf("\nERROR: cvs failed with non-zero exit status: %d\n\n" .
-			"Aborting release\n", $? >> 8);
+		$self->_die( sprintf("\nERROR: cvs failed with non-zero exit status: %d\n\n" .
+			"Aborting release\n", $? >> 8) );
 		}
 
 	my %message    = (
@@ -608,10 +635,10 @@ sub check_cvs
 
 	my $count = $self->_check_output_lines( \%message, $cvs_update );
 
-	die "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n"
+	$self->_die( "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n" )
 		if $count;
 
-	print "CVS up-to-date\n";
+	$self->_print( "CVS up-to-date\n" );
 	}
 
 =item check_for_passwords
@@ -652,40 +679,41 @@ sub ftp_upload
 		$self->{release} =~ s/$match/$replace/ee;
 		}
 
-	print "Release name is $self->{release}\n";
-	print "Will use passive FTP transfers\n" if $self->{passive_ftp} && $self->debug;
+	$self->_print( "Release name is $self->{release}\n" );
+	$self->_print( "Will use passive FTP transfers\n" )
+		if $self->{passive_ftp} && $self->debug;
 
 	my $local_file = $self->{local};
 	my $local_size = -s $local_file;
 
 	foreach my $site ( @Sites )
 		{
-		print "Logging in to $site\n";
+		$self->_print( "Logging in to $site\n" );
 		my $ftp = Net::FTP->new(
 			$site,
 			Hash    => \*STDOUT,
 			Debug   => $self->debug,
 			Passive => $self->{passive_ftp}
-			) or die "Couldn't open FTP connection to $site: $@";
+			) or $self->_die( "Couldn't open FTP connection to $site: $@" );
 
 		my $email = ($config->cpan_user || "anonymous") . '@cpan.org';
 		$ftp->login( "anonymous", $email )
-			or die "Couldn't log in anonymously to $site";
+			or $self->_die( "Couldn't log in anonymously to $site" );
 
 		$ftp->binary;
 
 		$ftp->cwd( "/incoming" )
-			or die "Couldn't chdir to /incoming";
+			or $self->_die( "Couldn't chdir to /incoming" );
 
-		print "Putting $local_file\n";
+		$self->_print( "Putting $local_file\n" );
 		my $remote_file = $ftp->put( $self->{local}, $self->{remote} );
-		die "PUT failed: " . $ftp->message . "\n" 
+		$self->_die( "PUT failed: " . $ftp->message . "\n" )
 			if $remote_file ne $self->{remote};
 
 		my $remote_size = $ftp->size( $self->{remote} );
 
-		warn "WARNING: Uploaded file is $remote_size bytes, " .
-			"but local file is $local_size bytes"
+		$self->_print( "WARNING: Uploaded file is $remote_size bytes, " .
+			"but local file is $local_size bytes" )
 				if $remote_size != $local_size;
 
 		$ftp->quit;
@@ -707,7 +735,7 @@ sub pause_claim
 	my $ua  = LWP::UserAgent->new();
 
 	my $request = HTTP::Request->new( POST =>
-		    'https://pause.perl.org/pause/authenquery' );
+		   'https://pause.perl.org/pause/authenquery' );
 
 	$cgi->param( 'HIDDENNAME', $self->config->cpan_user );
 	$cgi->param( 'CAN_MULTIPART', 1 );
@@ -724,9 +752,9 @@ sub pause_claim
 
 	my $response = $ua->request( $request );
 
-	print "PAUSE upload ",
+	$self->_print( "PAUSE upload ",
 		$response->as_string =~ /Query succeeded/ ? "successful" : 'failed',
-		"\n";
+		"\n" );
 	}
 
 =item cvs_tag
@@ -741,16 +769,16 @@ sub cvs_tag
 	return unless -d 'CVS';
 
 	my $tag = $self->make_cvs_tag;
-	print "Tagging release with $tag\n";
+	$self->_print( "Tagging release with $tag\n" );
 
 	system 'cvs', 'tag', $tag;
 
 	if ( $? )
 		{ # already uploaded, so warn, don't die
-		warn sprintf(
+		$self->_print( sprintf(
 			"\nWARNING: cvs failed with non-zero exit status: %d\n",
 			$? >> 8
-		    );
+		    ) );
 		}
 
 	}
@@ -803,7 +831,7 @@ sub sf_login
 	my $self = shift;
 	return unless $self->{sf};
 
-	print "Logging in to SourceForge.net... ";
+	$self->_print("Logging in to SourceForge.net... " );
 
 	my $cgi = CGI->new();
 	my $request = HTTP::Request->new( POST =>
@@ -821,28 +849,28 @@ sub sf_login
 
 	$request->header( "Referer", "http://sourceforge.net/account/login.php" );
 
-	print STDERR $request->as_string, DASHES, "\n" if $self->debug;
+	$self->_debug( $request->as_string, DASHES, "\n" );
 
 	my $response = $self->ua->request( $request );
 	$self->{cookies}->extract_cookies( $response );
 
-	print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
+	$self->_debug( $response->headers_as_string, DASHES, "\n" );
 
 	REDIRECT: {
 	if( $response->code == 302 )
 		{
 		my $location = $response->header('Location');
-		print STDERR "Location is $location\n" if $self->debug;
+		$self->_debug( "Location is $location\n" );
 
  		my $request = HTTP::Request->new( POST => $location );
 		$request->content_type('application/x-www-form-urlencoded');
 		$request->content( $cgi->query_string );
 		$self->{cookies}->add_cookie_header( $request );
 
-		print STDERR $request->as_string, DASHES, "\n" if $self->debug;
+		$self->_debug( $request->as_string, DASHES, "\n" );
 		$response = $self->ua->request( $request );
 
-		print STDERR $response->headers_as_string, DASHES, "\n" if $self->debug;
+		$self->_debug( $response->headers_as_string, DASHES, "\n" );
 		$self->{cookies}->extract_cookies( $response );
 
 		redo REDIRECT;
@@ -853,18 +881,18 @@ sub sf_login
 	$content =~ s|.*<!-- begin SF.net content -->||s;
 	$content =~ s|Register New Project.*||s;
 
-	print STDERR $content if $self->debug;
+	$self->_debug( $content );
 
 	my $sf_user = $self->config->sf_user;
 
 	if( $content =~ m/welcome.*$sf_user/i )
 		{
-		print "Logged in!\n";
+		$self->_print( "Logged in!\n" );
 		return 1;
 		}
 	else
 		{
-		print "Not logged in! Aborting\n";
+		$self->_print( "Not logged in! Aborting\n" );
 		#return 0;
 		exit;
 		}
@@ -887,11 +915,11 @@ sub sf_qrs
 		);
 
 	$self->{cookies}->add_cookie_header( $request );
-	print $request->as_string, DASHES, "\n" if $self->debug;
+	$self->_debug( $request->as_string, DASHES, "\n" );
 
 	my $response = $self->{ua}->request( $request );
 
-	print $response->headers_as_string,  DASHES, "\n" if $self->debug;
+	$self->_debug( $response->headers_as_string,  DASHES, "\n" );
 	$self->{cookies}->extract_cookies( $response );
 	}
 
@@ -910,7 +938,7 @@ sub sf_release
 	my $date = sprintf "%04d-%02d-%02d",
 		$time[5] + 1900, $time[4] + 1, $time[3];
 
-	print "Connecting to SourceForge.net QRS... ";
+	$self->_print( "Connecting to SourceForge.net QRS... " );
 	my $cgi = CGI->new();
 	my $request = HTTP::Request->new(
 		POST => 'https://sourceforge.net/project/admin/qrs.php' );
@@ -938,17 +966,17 @@ sub sf_release
 		"https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=" .
 		$self->config->sf_group_id
 		);
-	print $request->as_string, "\n", DASHES, "\n" if $self->debug;
+	$self->_debug( $request->as_string, "\n", DASHES, "\n" );
 
 	my $response = $self->{ua}->request( $request );
-	print $response->headers_as_string, "\n", DASHES, "\n" if $self->debug;
+	$self->_debug( $response->headers_as_string, "\n", DASHES, "\n" );
 
 	my $content = $response->content;
 	$content =~ s|.*Database Admin.*?<H3><FONT.*?>\s*||s;
 	$content =~ s|\s*</FONT></H3>.*||s;
 
-	print "$content\n" if $self->debug;
-	print "File Released\n";
+	$self->_print( "$content\n" ) if $self->debug;
+	$self->_print( "File Released\n" );
 	}
 
 =item get_readme()
@@ -1013,7 +1041,8 @@ sub run
 
 	$self->_run_error_reset;
 
-	print "$command\n" if $self->debug;
+	$self->_print( "$command\n" ) if $self->debug;
+	
 	open my($fh), "$command |" or die $!;
 	$fh->autoflush;
 	
@@ -1026,8 +1055,7 @@ sub run
 	while (read $fh, $buffer, $readlen)
 		{
 		$output .= $_;
-		print if $self->debug;
-		print $buffer if $self->{debug};
+		$self->_debug( $_, $buffer );
 		$output .= $buffer;
 		}
 
@@ -1059,15 +1087,60 @@ sub getpass
 
 	return $pass if defined( $pass ) && length( $pass );
 
-	print "$field is not set.  Enter it now: ";
+	$self->_print( "$field is not set.  Enter it now: " );
 	$pass = <>;
 	chomp $pass;
 
 	return $pass if defined( $pass ) && length( $pass );
 
-	die "$field not supplied.  Aborting...\n";
+	$self->_debug( "$field not supplied.  Aborting...\n" );
 	}
 
+=back
+
+=head2 Methods for developers
+
+=over
+
+=item _print( LIST )
+
+Send the LIST to whatever is in output_fh, or to STDOUT. If you set
+output_fh to a null filehandle, output goes nowhere.
+
+=cut
+
+sub _print
+	{
+	my $self = shift;
+		
+	print { $self->output_fh || STDOUT } @_;
+	}
+
+=item _debug( LIST )
+
+Send the LIST to whatever is in debug_fh, or to STDERR. If you are
+debugging, debug_fh should return a null filehandle, 
+
+=cut
+
+sub _debug
+	{
+	my $self = shift;
+	
+	print { $self->debug_fh || STDERR } @_
+	}
+
+=item _debug
+
+=cut
+	
+sub _die
+	{
+	my $self = shift;
+	
+	die @_;
+	}
+	
 =back
 
 =head1 TO DO

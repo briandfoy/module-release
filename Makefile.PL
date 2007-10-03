@@ -8,7 +8,7 @@ WriteMakefile(
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
 	'ABSTRACT'     => 'Automate software releases',
 	'VERSION_FROM' => "lib/Release.pm",
-	'LICENSE'       => 'perl',
+	'LICENSE'      => 'perl',
 
 	'EXE_FILES'    =>  [ 'script/release' ],
 
@@ -17,6 +17,7 @@ WriteMakefile(
 		'ConfigReader::Simple' => 0,
 		'Net::FTP'             => 0,
 		'HTTP::Message'        => 0,
+		'IO::Null'             => 0,
 		'Crypt::SSLeay'        => 0,
 		'File::Temp'           => 0,
 		},
