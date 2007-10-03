@@ -30,5 +30,5 @@ WriteMakefile(
 		'script/release' => '$(INST_MAN1DIR)/release.1',
 		},
 
-	clean => { FILES => '*.bak release-*' },
+	clean => { FILES => '*.bak release-* Module-*' },
 	);
