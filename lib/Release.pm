@@ -230,12 +230,13 @@ sub new
 	# Figure out options
 	$self->{cpan} = $config->cpan_user eq '<none>' ? 0 : 1;
 	$self->{sf}   = $config->sf_user   eq '<none>' ? 0 : 1;
+	$self->{sf}   = defined $config->sf_user ? 1 : 0;
 
 	$self->{passive_ftp} =
 		($config->passive_ftp && $config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
 
-	my @required = qw( sf_user cpan_user );
-	push( @required, qw( sf_group_id sf_package_id ) ) if $self->{sf};
+	my @required = qw( cpan_user );
+	push( @required, qw( sf_user sf_group_id sf_package_id ) ) if $self->{sf};
 
 	my $ok = 1;
 	for( @required )
@@ -1113,7 +1114,7 @@ sub _print
 	{
 	my $self = shift;
 		
-	print { $self->output_fh || STDOUT } @_;
+	print { $self->output_fh || *STDOUT } @_;
 	}
 
 =item _debug( LIST )
@@ -1127,7 +1128,7 @@ sub _debug
 	{
 	my $self = shift;
 	
-	print { $self->debug_fh || STDERR } @_
+	print { $self->debug_fh || *STDERR } @_
 	}
 
 =item _debug
