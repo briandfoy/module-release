@@ -296,7 +296,17 @@ It's STDOUT or nothing
 
 =cut
 
-sub output_fh  { $_[0]->_quiet ? $_[0]->null_fh : $_[0]->output_fh }
+sub output_fh  { $_[0]->_quiet ? $_[0]->null_fh : $_[0]->{output_fh} }
+
+=item null_fh
+
+Return the null filehandle. So far that's something set up in C<new> and I 
+haven't provided a way to set it. Any subclass can make their C<null_fh>
+return whatever they like.
+
+=cut
+
+sub null_fh  { $_[0]->{null_fh} }
 
 sub _quiet  { 0 }
 
@@ -1042,7 +1052,7 @@ sub run
 
 	$self->_run_error_reset;
 
-	$self->_print( "$command\n" ) if $self->debug;
+	$self->_debug( "$command\n" );
 	
 	open my($fh), "$command |" or die $!;
 	$fh->autoflush;
@@ -1114,6 +1124,7 @@ sub _print
 	{
 	my $self = shift;
 		
+	print "Test: ", @_;
 	print { $self->output_fh || *STDOUT } @_;
 	}
 
