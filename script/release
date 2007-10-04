@@ -285,8 +285,7 @@ elsif( -d '.svn' )
 	die "Could not load $class: $@\n" if $@;
 	}
 
-my( $script_version ) = 
-	sprintf "%1.%02d", q$Revision$ =~ m/ (\d+) /xg;
+my( $script_version ) = 1.10;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -306,7 +305,8 @@ $params{debug} = 1 if $opts{d};
 
 my $release = $class->new( %params );
 
-$release->_debug( "release $script_version, using $class " .  $class->VERSION . "\n" );
+$release->_debug( "release $script_version, using $class " 
+	.  $class->VERSION . "\n" );
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -332,7 +332,7 @@ my $Changes = do {
 	
 	die "Changes file does not exist!\n" unless -e $changes;
 	
-	print "\n", "-" x 73, "\n", "Enter Changes section\n\n> ";
+	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
 	
 	my $str = $Version . " - " . localtime() . "\n";
 	
@@ -341,7 +341,7 @@ my $Changes = do {
 		$_ =~ s/^(\S)/\t$1/; # always indent
 		
 		$str .= $_;
-		print "> ";
+		$release->_print( "> " );
 		}
 		
 	$str .= "\n";
@@ -391,6 +391,6 @@ $release->sf_login;
 $release->sf_qrs;
 $release->sf_release;
 
-print "Done.\n";
+$release->_print( "Done.\n" );
 
 __END__

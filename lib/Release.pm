@@ -335,7 +335,7 @@ sub debug_off { $_[0]->{debug} = 0 }
 
 sub debug     { $_[0]->{debug} }
 
-sub debug_fh  { $_[0]->debug ? $_[0]->{debug_fh} : $_[0]->{null_fh} }
+sub debug_fh  { $_[0]->debug ? $_[0]->{debug_fh} : $_[0]->null_fh }
 
 =item ua
 
@@ -1070,7 +1070,7 @@ sub run
 		$output .= $buffer;
 		}
 
-	print DASHES, "\n" if $self->debug;
+	$self->_debug( DASHES, "\n" );
 
 	unless( close $fh )
 		{
@@ -1124,7 +1124,6 @@ sub _print
 	{
 	my $self = shift;
 		
-	print "Test: ", @_;
 	print { $self->output_fh || *STDOUT } @_;
 	}
 
