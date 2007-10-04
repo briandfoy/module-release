@@ -1,5 +1,15 @@
 $Id$
 
+1.17 - Wed Oct  3 21:52:02 2007
+	* The output and debugging filehandles come from methods now. 
+	This makes it easier to move the output around, or even turn
+	it off. I wanted this for Module::Release::Git. The interface
+	has some new features, but should be compatible with the older
+	stuff.
+	* Added some git support to release(1). This should refactor 
+	itself out in various ways, but I just need the support right 
+	now without going through all the work to make it nice nice.
+
 1.17 - Mon Aug 13 13:43:17 2007
 	* distro cleanups - no need to upgrade
 
