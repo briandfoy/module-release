@@ -1,6 +1,6 @@
 $Id$
 
-1.17 - Wed Oct  3 21:52:02 2007
+1.17_01 - Wed Oct  3 21:52:02 2007
 	* The output and debugging filehandles come from methods now. 
 	This makes it easier to move the output around, or even turn
 	it off. I wanted this for Module::Release::Git. The interface

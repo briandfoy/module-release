@@ -20,7 +20,7 @@ Module::Release - Automate software releases
 use strict;
 use vars qw( $VERSION );
 
-$VERSION = '1.17_10';
+$VERSION = 1.18;
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -964,8 +964,8 @@ sub sf_release
 	$cgi->param( 'file_name',       $self->{remote}                        );
 	$cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
 	$cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
-	$cgi->param( 'release_notes',   get_readme()                           );
-	$cgi->param( 'release_changes', get_changes()                          );
+	$cgi->param( 'release_notes',   $self->get_readme()                    );
+	$cgi->param( 'release_changes', $self->get_changes()                   );
 	$cgi->param( 'group_id',        $self->config->sf_group_id             );
 	$cgi->param( 'preformatted',    1                                      );
 	$cgi->param( 'submit',         'Release File'                          );
