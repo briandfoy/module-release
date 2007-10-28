@@ -1,5 +1,14 @@
 $Id$
 
+1.18 - Sat Oct 27 22:19:57 2007
+	* distro cleanups after moving from CVS to SVN
+	* Changes from Torsten Schoenfeld to make get_readme and get_changes
+	subclassable (that is, call them as methods like everything else)
+	* Require Perl 5.006. I haven't done anything intentional to not
+	use Perl 5.005, but I don't want to support that. With CPAN Testers
+	going back farther in time now, I have to draw the line somewhere
+	just to manage my time well. :)
+
 1.17_01 - Wed Oct  3 21:52:02 2007
 	* The output and debugging filehandles come from methods now. 
 	This makes it easier to move the output around, or even turn
