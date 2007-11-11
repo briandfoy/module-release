@@ -1,5 +1,6 @@
 Changes
 examples/README
+hack/git.pl
 lib/Release.pm
 Makefile.PL
 MANIFEST
@@ -7,6 +8,7 @@ README
 script/release
 script/sf_upload
 t/compile.t
+t/no_releaserc_can_die.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest

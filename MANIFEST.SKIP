@@ -1,6 +1,6 @@
-.cvsignore
-.releaserc
-.lwpcookies
+\.cvsignore
+\.releaserc
+\.lwpcookies
 Module-.*
 CVS
 blib
@@ -11,4 +11,6 @@ MANIFEST.SKIP
 \.\#
 \.old
 sf_login\.t
-\.svn\b
+\.svn\b.git
+\.svn
+\.svnignore
