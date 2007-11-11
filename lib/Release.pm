@@ -20,7 +20,10 @@ Module::Release - Automate software releases
 use strict;
 use vars qw( $VERSION );
 
-$VERSION = 1.18;
+use warnings;
+no warnings;
+
+$VERSION = 1.19;
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -209,6 +212,8 @@ sub new
 			%params,
 		   };
 
+	bless $self, $class;
+
 	# Read the configuration
 	$self->_die( "Could not find conf file $self->{conf}\n" )
 		unless -e $self->{conf};
@@ -225,7 +230,6 @@ sub new
 
 		return $subclass->new(@_) unless $subclass eq $class;
 		}
-	bless $self, $class;
 
 	# Figure out options
 	$self->{cpan} = $config->cpan_user eq '<none>' ? 0 : 1;
