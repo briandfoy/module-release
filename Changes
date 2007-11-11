@@ -1,5 +1,13 @@
 $Id$
 
+1.19 - Sun Nov 11 04:10:22 2007
+	* Sagar Shah noticed I tried to call _die() before I used bless().
+	Oops. Fixed.
+	* Require Perl 5.006 from now on.
+	* If you have older versions before I started using _die(), you don't
+	need to rush to get this version. If you got the latest to use 
+	Module::Release::Git, you need to upgrade.
+
 1.18 - Sat Oct 27 22:19:57 2007
 	* distro cleanups after moving from CVS to SVN
 	* Changes from Torsten Schoenfeld to make get_readme and get_changes
