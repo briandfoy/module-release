@@ -1,5 +1,10 @@
 $Id$
 
+1.20 - Tue Nov 20 07:45:51 2007
+	* fix dist_version to handle dev versions. Previously it was
+	ignoring the _\d+, so the version that showed up in changes
+	didn't have the _\d+.
+
 1.19 - Sun Nov 11 04:10:22 2007
 	* Sagar Shah noticed I tried to call _die() before I used bless().
 	Oops. Fixed.
