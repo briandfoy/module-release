@@ -23,7 +23,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = 1.20;
+$VERSION = '1.20';
 
 use Carp;
 use CGI qw(-oldstyle_urls);
