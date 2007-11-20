@@ -23,7 +23,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = 1.19;
+$VERSION = 1.20;
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -523,10 +523,11 @@ sub dist_version
 	$self->_die( "Can't get dist_version! It's not set (did you run dist first?)" )
 		unless defined $self->{remote};
 
-	my( $major, $minor ) = $self->{remote}
-		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
+	no warnings 'uninitialized';
+	my( $major, $minor, $dev ) = $self->{remote}
+		=~ /(\d+) \. (\d+)(_\d+)? (?:\. tar \. gz)? $/xg;
 
-	$self->dist_version_format( $major, $minor );
+	$self->dist_version_format( $major, $minor, $dev );
 	}
 
 =item dist_version_format
@@ -539,10 +540,11 @@ Return the distribution version ( set in dist() )
 
 sub dist_version_format
 	{
+	no warnings 'uninitialized';
 	my $self = shift;
-	my( $major, $minor ) = @_;
+	my( $major, $minor, $dev ) = @_;
 
-	sprintf "%d.%02d", $major, $minor;
+	sprintf "%d.%02d%s", $major, $minor, $dev;
 	}
 
 =item check_manifest

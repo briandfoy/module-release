@@ -4,3 +4,4 @@ pod_coverage.t
 #prereq.t
 #sf_login.t
 no_releaserc_can_die.t
+dist_version.t
