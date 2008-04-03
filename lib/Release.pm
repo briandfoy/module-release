@@ -467,7 +467,7 @@ it dies.
 sub check_kwalitee
 	{
 	my $self = shift;
-	$self->_print( "Making dist... " );
+	$self->_print( "Checking kwalitee... " );
 
 	unless( -e $self->{'Makefile.PL'} )
 		{

@@ -8,7 +8,6 @@ $Id$
 1.19 - Sun Nov 11 04:10:22 2007
 	* Sagar Shah noticed I tried to call _die() before I used bless().
 	Oops. Fixed.
-	* Require Perl 5.006 from now on.
 	* If you have older versions before I started using _die(), you don't
 	need to rush to get this version. If you got the latest to use 
 	Module::Release::Git, you need to upgrade.
@@ -39,7 +38,7 @@ $Id$
 	* Fix for test suite problem
 
 1.14 - Fri Mar 16 18:51:26 2007
-	*  use a temp file for cookies
+	* use a temp file for cookies
 	* don't test script if M::R::Subversion isn't installed
 
 1.13 - Thu Feb 22 10:16:18 2007
@@ -48,8 +47,6 @@ $Id$
 	to handle it (that's a separate distro, though).
 	* release(1) now uses Module::CPANTS::Analyze's cpants_lint.pl
 	to check kwalitee. That's also a separate distro.
-
-1.13 - Wed Feb 21 15:22:18 2007
 
 1.12 - Mon Sep 25 22:38:35 CDT 2006
 
