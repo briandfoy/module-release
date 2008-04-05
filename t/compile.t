@@ -12,7 +12,7 @@ SKIP: {
 	
 	use_ok( 'Module::Release' );
 	
-	my $output = `$^X -c $file 2>&1`;
+	my $output = `$^X -Mblib -c $file 2>&1`;
 			
 	like( $output, qr/syntax OK$/, 'script compiles' );
 	}

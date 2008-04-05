@@ -10,6 +10,7 @@ script/sf_upload
 t/compile.t
 t/dist_version.t
 t/no_releaserc_can_die.t
+t/perls.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest

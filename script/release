@@ -1,4 +1,8 @@
-#!/usr/bin/perl
+#!/usr/local/bin/perl
+
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
 use strict;
 use warnings;
 
@@ -15,25 +19,29 @@ release - upload files to the CPAN and SourceForge.net
 	# try a dry run without uploading anything
 	release -t
 	
-	# print a help message
+	# print a help message and exit
 	release -h
 	
 	# print debugging information
 	release -d 
 
+	# print release number and exit
+	release -v 
+
 =head1 DESCRIPTION
 
-This is the prototype program for using Module::Release. You should
-modify it to fit your needs.
+This is the prototype program for using C<Module::Release>. You should
+modify it to fit your needs. If it doesn't do what you want, you can
+change it however you like.
 
-This program automates Perl module releases.  It makes the
+This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
 source control, uploads it to the PAUSE anonymous FTP directory and to
 the incoming directory for SourceForge.net, claims it on PAUSE for
 your CPAN account, and releases it on SourceForge.net.
 
 By default this script assumes that you use CVS, but recognizes SVN
-and switches when appropriate.
+and git and switches when appropriate.
 
 =head2 Process
 
@@ -54,7 +62,8 @@ it dies.
 Run make realclean, perl Makefile.PL, make test, make dist, make
 disttest.  If testing fails, release dies.  make dist provides the
 name of the distribution if LOCAL_FILE is not provided on the command
-line.
+line. Too test the distribution against several perl binaries, see
+the C<perls> configuration setting.
 
 =item Check that source control is up-to-date
 
@@ -88,17 +97,27 @@ package IDs).  Specify these in the configuration file.
 =head2 Configuration
 
 The release script uses a configuration file in the current working
-directory.  The file name is F<.releaserc>.  Although most of the
-information is the same for all of your projects, the C<sf_package_id>
-is probably different.  You can get the C<sf_package_id> from the data
-in the Quick Release Form.
+directory.  The file name is F<.releaserc>.  
+
 
 release's own F<.releaserc> looks like this:
+
+    cpan_user BDFOY
+
+If you want to upload to Sourceforge, you need your Sourceforge login,
+the group (project) ID, and the package ID:
 
     sf_user comdog
     sf_group_id 36221
     sf_package_id 56559
-    cpan_user BDFOY
+
+If you would like to test with multiple perl binaries (version 1.21
+and later), list them as a colon-separated list in the C<perls>
+setting:
+
+	perls /usr/local/bin/perl5.6.2:/usr/local/bin/perl5.10.0
+
+release does not test the perls in any particular order.
 
 =over 4
 
@@ -197,7 +216,7 @@ make; otherwise, the perl used to run release will be used.
 
 =over 4
 
-=item * check make disttest (to catch MANIFEST errors) -- needs error catching and reporting
+=item * more plugins!
 
 =back
 
@@ -217,7 +236,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2007, brian d foy, All rights reserved.
+Copyright 2002-2008, brian d foy, All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -230,15 +249,26 @@ Andy Lester contributed to the module and script.
 =cut
 
 use Getopt::Std;
-use Module::Release;
+use Module::Release 1.21;
 
 my $class = "Module::Release";
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
-getopts('hdt', \%opts) or $opts{h} = 1;
+getopts('hdtv', \%opts) or $opts{h} = 1;
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+my( $script_version ) = 1.21;
+
+if( $opts{v} )
+	{
+	print "$0 version $script_version\n";
+	exit;
+	}
+	
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 if( $opts{h} ) 
 	{
 	print <<"USE";
@@ -262,7 +292,6 @@ USE
 	exit;
 	}
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 if( -d '.git' )
 	{
@@ -284,9 +313,6 @@ elsif( -d '.svn' )
 	eval "use Module::Release::Subversion";
 	die "Could not load $class: $@\n" if $@;
 	}
-
-my( $script_version ) = 1.10;
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %params;
@@ -310,12 +336,28 @@ $release->_debug( "release $script_version, using $class "
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-$release->clean;
-$release->build_makefile;
-$release->test;
-$release->dist;
 $release->check_kwalitee;
-$release->dist_test;
+
+{
+my $old_perl = $release->get_perl;
+
+foreach my $perl ( $release->perls )
+	{
+	$release->_print("============Testing with $perl\n");
+	$release->set_perl( $perl ) or next;
+	
+	$release->clean;
+	$release->build_makefile;
+	$release->test;
+	$release->dist;
+	$release->dist_test;
+	}
+
+$release->set_perl( $old_perl );
+}
+
+$release->_print("-" x 50, "\n");
+
 $release->check_cvs;
 
 my $Version = $release->dist_version;
@@ -323,7 +365,6 @@ my $Version = $release->dist_version;
 $release->_debug( "dist version is  $Version\n" );
 
 exit if $opts{t};
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my $Changes = do {

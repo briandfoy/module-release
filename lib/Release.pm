@@ -23,7 +23,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 20 );
+$VERSION = sprintf "%d.%02d", qw( 1 21 );
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -38,6 +38,8 @@ use LWP::UserAgent;
 use Net::FTP;
 
 use constant DASHES => "-" x 73;
+
+my %Loaded_mixins = ( __PACKAGE__ );
 
 =head1 DESCRIPTION
 
@@ -79,7 +81,7 @@ The name of the program to run for the C<make> steps
 
 =item PERL
 
-Use this value as the perl interpreter, otherwise use the value in C<$^X>
+Use this value as the perl interpreter, otherwise use the value in C<$^X>.
 
 =item RELEASE_DEBUG
 
@@ -209,6 +211,7 @@ sub new
 			stdout_fh     => \*STDOUT,
 			debug_fh      => \*STDERR,
 			null_fh       => IO::Null->new(),
+			perls         => { "$^X" => 1 },
 			%params,
 		   };
 
@@ -255,7 +258,7 @@ sub new
 
 	if( !$self->{cpan} && !$self->{sf} )
 		{
-		$self->_die( "Must upload to the CPAN or SourceForge.net; Aborting!\n" );
+		$self->_die( "Must upload to CPAN or SourceForge.net; Aborting!\n" );
 		}
 	elsif( !$self->{cpan} )
 		{
@@ -263,7 +266,7 @@ sub new
 		}
 	elsif( !$self->{sf} )
 		{
-		$self->_print( "Uploading to the CPAN only\n" );
+		$self->_print( "Uploading to CPAN only\n" );
 		}
 
 
@@ -280,6 +283,16 @@ sub new
 					    );
 	$self->{cookies}->clear;
 
+	if( $config->perls )
+		{
+		my @paths = split /:/, $config->perls;
+		
+		foreach my $path ( @paths )
+			{
+			$self->add_a_perl( $path );
+			}
+		}
+		
 	return $self;
 	}
 
@@ -292,6 +305,167 @@ object;
 
 sub config { $_[0]->{config} }
 
+=item set_perl
+
+Set the current path for the perl binary that C<Module::Release> should
+use for general tasks. This is not related to the list of perls used to 
+test multiple binaries unless you use one of those binaries to set a new
+value.
+
+If PATH looks like a perl binary, C<set_perl> uses it as the new setting
+for perl and returns the previous value.
+
+=cut
+
+sub set_perl
+	{
+	my( $self, $path ) = @_;
+	
+	unless( my $version = $self->_looks_like_perl( $path ) )
+		{
+		carp "Does not look like a perl [$path]";
+		return;
+		}
+		
+	my $old_perl = $self->{perl};
+	
+	$self->{perl} = $path;
+	
+	$old_perl;
+	}
+
+sub _looks_like_perl
+	{
+	my( $self, $path ) = @_;
+	
+	
+	my $version = `$path -e 'print \$\]'`;
+	}
+	
+=item get_perl
+
+Returns the current path for the perl binary that C<Module::Release> should
+use for general tasks. This is not related to the list of perls used to 
+test multiple binaries.
+
+=cut
+
+sub get_perl { $_[0]->{perl} }
+	
+=item perls
+
+Return the list of perl binaries Module::Release will use to test the 
+distribution.
+
+=cut
+
+sub perls
+	{
+	my $self = shift;
+	
+	return keys %{ $self->{perls} };
+	}
+	
+=item add_a_perl( PATH )
+
+Add a perl binary to the list of perls to use for testing. If PATH
+is not executable or cannot run C<print $]>, this method returns
+nothing and does not add PATH. Otherwise, it returns true. If the
+same path was already in the list, it returns true but does not
+create a duplicate.
+
+=cut
+
+sub add_a_perl
+	{
+	my( $self, $path ) = @_;
+	
+	return 1 if exists $self->{perls}{$path};
+	
+	unless( -x $path )
+		{
+		carp "$path is not executable";
+		return;
+		}
+	
+	my $version = $self->_looks_like_perl( $path );
+	
+	unless( $version )
+		{
+		carp "$path does not appear to be Perl!";
+		return;
+		}
+		
+	return $self->{perls}{$path} = $version;
+	}
+
+=item remove_a_perl( PATH )
+
+Delete PATH from the list of perls used for testing
+
+=cut
+
+sub remove_a_perl
+	{
+	my( $self, $path ) = @_;
+	
+	return delete $self->{perls}{$path}
+	}
+
+=item reset_perls
+
+Reset the list of perl interpreters to just the one running C<release>.
+
+=cut
+
+sub reset_perls
+	{
+	my $self = shift;
+	
+	return $self->{perls} = [ $^X ];
+	}
+
+=item load_mixin( MODULE )
+
+EXPERIMENTAL!!
+
+Load MODULE through require (so no importing), without caring what it does.
+My intent is that MODULE adds methods to the C<Module::Release> namespace
+so a release object can see it. This should probably be some sort of 
+delegation.
+
+Added in 1.21
+
+=cut
+
+sub load_mixin
+	{
+	my( $self, $module ) = shift;
+	
+	eval "require $module";
+	
+	if( $@ )
+		{
+		carp "Could not load [$module]! $@";
+		return;
+		}
+		
+	++$Loaded_mixins{ $module };
+	}
+
+=item loaded_mixins
+
+Returns a list of the loaded mixins
+
+Added in 1.21
+
+=cut
+
+sub loaded_mixins
+	{
+	keys %Loaded_mixins;
+	}
+	
 =item output_fh
 
 Return the output filehandle, or the null filehandle if we're running in
