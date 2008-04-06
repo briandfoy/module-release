@@ -1,5 +1,10 @@
 $Id$
 
+1.22 - Sun Apr  6 13:13:30 2008
+	* BUG FIX: Move kwalitee testing after normal testing, adn have
+	the kwalitee tests make their own dist to ensure that they
+	have it.
+
 1.21 - Sat Apr  5 14:54:20 2008
 	* NEW FEATURE: Now test with multiple perls!
 
