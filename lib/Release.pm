@@ -23,7 +23,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 21 );
+$VERSION = sprintf "%d.%02d", qw( 1 22 );
 
 use Carp;
 use CGI qw(-oldstyle_urls);

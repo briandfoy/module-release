@@ -249,7 +249,7 @@ Andy Lester contributed to the module and script.
 =cut
 
 use Getopt::Std;
-use Module::Release 1.21;
+use Module::Release 1.22;
 
 my $class = "Module::Release";
 
@@ -260,7 +260,7 @@ getopts('hdtv', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = 1.21;
+my( $script_version ) = 1.22;
 
 if( $opts{v} )
 	{
@@ -336,8 +336,6 @@ $release->_debug( "release $script_version, using $class "
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-$release->check_kwalitee;
-
 {
 my $old_perl = $release->get_perl;
 
@@ -356,13 +354,24 @@ foreach my $perl ( $release->perls )
 $release->set_perl( $old_perl );
 }
 
-$release->_print("-" x 50, "\n");
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+{
+$release->_print("============Testing for kwalitee\n");
+$release->clean;
+$release->build_makefile;
+$release->dist;
+$release->check_kwalitee;
+}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+$release->_print("============Checking source repository\n");
 
 $release->check_cvs;
 
 my $Version = $release->dist_version;
 
 $release->_debug( "dist version is  $Version\n" );
+
 
 exit if $opts{t};
 
