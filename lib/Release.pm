@@ -1004,7 +1004,7 @@ Runs touch on all of the files in MANIFEST.
 
 sub touch_all_in_manifest
 	{
-	my( $self );
+	my( $self ) = shift;
 
 	my $manifest = $self->manifest;
 	
