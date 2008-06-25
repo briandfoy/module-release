@@ -856,7 +856,6 @@ to re-run your release script.
 
 =cut
 
-
 # _check_output_lines - for command output with one message per line.
 # The message hash identifies the first part of the line and serves
 # as a category for the message. If a line doesn't matter, don't put
@@ -916,6 +915,28 @@ sub check_manifest
 	$self->_print( "MANIFEST up-to-date\n" );
 	}
 
+=item manifest
+
+Return the name of the manifes file, probably F<MANIFEST>.
+
+=cut
+
+sub manifest { 'MANIFEST' }
+
+=item files_in_manifest
+
+Return the filenames in the manifest file. In list context it returns
+a list. In scalar context, it returns an array reference.
+
+=cut
+
+sub files_in_manifest
+	{
+	open my($fh), "<", $_[0]->manifest
+		or croak "files_in_manifest: could not open manifest file: $!";
+		
+	map { chomp; $_ } <$fh>;
+	}
 
 =item check_cvs
 
@@ -1002,19 +1023,7 @@ Runs touch on all of the files in MANIFEST.
 
 =cut
 
-sub touch_all_in_manifest
-	{
-	my( $self ) = shift;
-
-	my $manifest = $self->manifest;
-	
-	open my( $fh ), "<", $manifest 
-       	or carp "Could not open file [$manifest] for reading: $!";
-
-	chomp( my @files = <$fh> );
-
-	$self->touch( @files );
-	}
+sub touch_all_in_manifest { $_[0]->touch( $_[0]->files_in_manifest ) }
 
 =back
 
