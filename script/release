@@ -21,6 +21,9 @@ release - upload files to the CPAN and SourceForge.net
 	
 	# print a help message and exit
 	release -h
+
+	# skip kwalitee testing (e.g. a script distro)
+	release -k
 	
 	# print debugging information
 	release -d 
@@ -216,6 +219,8 @@ make; otherwise, the perl used to run release will be used.
 
 =over 4
 
+=item * break out functional groups into modules.
+
 =item * more plugins!
 
 =back
@@ -246,34 +251,37 @@ Ken Williams turned the original release(1) script into a module.
 
 Andy Lester contributed to the module and script. 
 
+H. Merijn Brand submitted patches to work with 5.005.
+
 =cut
 
 use Getopt::Std;
-use Module::Release 1.22;
+use Module::Release 1.25;
 
 my $class = "Module::Release";
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
-getopts('hdtv', \%opts) or $opts{h} = 1;
+getopts('hdtvk', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = 1.22;
+my( $script_version ) = 1.25;
 
 if( $opts{v} )
 	{
 	print "$0 version $script_version\n";
 	exit;
 	}
+
 	
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 if( $opts{h} ) 
 	{
 	print <<"USE";
 
-Use: release -hdt [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -hdtv [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
@@ -282,7 +290,8 @@ both) if not supplied.
 	-h   This help 
 	-d   Print extra debugging information 
 	-t   Just make and test distribution, don't tag/upload
-
+	-v   Print the script version number and exit
+	
 The program works in the current directory, and looks for a .releaserc
 or releaserc file and the environment for its preferences.  See
 `perldoc $0`, for more information.
@@ -292,29 +301,36 @@ USE
 	exit;
 	}
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-if( -d '.git' )
-	{
-	$class = "Module::Release::Git";
-	
-	print STDERR "I see an .git directory, so I'm loading $class"
-		if $opts{d};
-		
-	eval "use Module::Release::Git";
-	die "Could not load $class: $@\n" if $@;
-	}
-elsif( -d '.svn' )
-	{
-	$class = "Module::Release::Subversion";
-	
-	print STDERR "I see an .svn directory, so I'm loading $class"
-		if $opts{d};
-		
-	eval "use Module::Release::Subversion";
-	die "Could not load $class: $@\n" if $@;
-	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# load whatever will handle source control
+{
+my @vcs = (
+	[ '.git' => "Module::Release::Git" ],
+	[ '.svn' => "Module::Release::SVN" ],
+	[ '.cvs' => "Module::Release::CVS" ],
+	);
+	
+foreach my $vcs ( @vcs )
+	{
+	next unless -d $vcs->[0];
+	
+	my $module = $vcs->[1];
+	
+	print STDERR "I see an .git directory, so I'm loading $module"
+		if $opts{d};
+		
+	eval "use $module";
+	die "Could not load $module: $@\n" if $@;
+	
+	last;
+	}
+	
+}
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# get the release object
 my %params;
 $params{local}  = shift @ARGV if @ARGV;
 
@@ -336,6 +352,7 @@ $release->_debug( "release $script_version, using $class "
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# test with a bunch of perls
 {
 my $old_perl = $release->get_perl;
 
@@ -346,6 +363,7 @@ foreach my $perl ( $release->perls )
 	
 	$release->clean;
 	$release->build_makefile;
+	$release->make;
 	$release->test;
 	$release->dist;
 	$release->dist_test;
@@ -354,16 +372,22 @@ foreach my $perl ( $release->perls )
 $release->set_perl( $old_perl );
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-{
-$release->_print("============Testing for kwalitee\n");
-$release->clean;
-$release->build_makefile;
-$release->dist;
-$release->check_kwalitee;
-}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# check kwalitee
+unless( $opts{k} )
+	{
+	$release->_print("============Testing for kwalitee\n");
+	$release->clean;
+	$release->build_makefile;
+	$release->make;
+	$release->dist;
+	$release->check_kwalitee;
+	}
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# check source repository (but do not commit)
 $release->_print("============Checking source repository\n");
 
 $release->check_cvs;
@@ -373,7 +397,17 @@ my $Version = $release->dist_version;
 $release->_debug( "dist version is  $Version\n" );
 
 
-exit if $opts{t};
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# exit if this is a dry run. Everything following this changes
+# things or uploads. Don't leave anything behind.
+
+if ($opts{t}) 
+	{
+	$release->distclean;
+	unlink glob( "*.tar*" );
+	exit;
+	}
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my $Changes = do {
@@ -428,18 +462,36 @@ my $Changes = do {
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Build the release in preparation for uploading
 $release->clean;
+$release->touch_all_in_manifest;
 $release->build_makefile;
+$release->make;
 $release->dist;
 
 $release->check_for_passwords;
-$release->ftp_upload;
-$release->pause_claim;
+
+if( $release->should_upload_to_pause )
+	{
+	$release->_print("============Uploading to PAUSE\n");
+	$release->ftp_upload( $release->pause_ftp_site );
+	$release->pause_claim;
+	}
+	
+if( $release->should_upload_to_sourceforge )
+	{
+	$release->_print("============Uploading to Sourceforge\n");
+	$release->ftp_upload( $release->sourceforge_ftp_site );
+	$release->sf_login;
+	$release->sf_qrs;
+	$release->sf_release;
+	}
+
 $release->cvs_tag;
 
-$release->sf_login;
-$release->sf_qrs;
-$release->sf_release;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+$release->clean;
 
 $release->_print( "Done.\n" );
 

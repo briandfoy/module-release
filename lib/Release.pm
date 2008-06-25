@@ -23,7 +23,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 22 );
+$VERSION = sprintf "%d.%02d", qw( 1 25 );
 
 use Carp;
 use CGI qw(-oldstyle_urls);
@@ -110,7 +110,7 @@ C<ConfigReader::Simple> to get these values:
 
 =over 4
 
-=item release_subclass
+=item release_subclass (DEPRECATED)
 
 The subclass of C<Module::Release> that you want to use. This allows
 you to specify the subclass via a F<.releaserc> file; otherwise you
@@ -203,6 +203,7 @@ sub new
 			'Makefile.PL' => 'Makefile.PL',
 			'Makefile'    => 'Makefile',
 			make          => $Config{make},
+			manifest      => 'MANIFEST',
 			perl          => $ENV{PERL} || $^X,
 			conf          => $conf,
 			debug         => $ENV{RELEASE_DEBUG} || 0,
@@ -212,6 +213,9 @@ sub new
 			debug_fh      => \*STDERR,
 			null_fh       => IO::Null->new(),
 			perls         => { "$^X" => 1 },
+			
+			pause_ftp_site       => 'pause.perl.org',
+			sourceforge_ftp_site => 'upload.sourceforge.org',
 			%params,
 		   };
 
@@ -296,135 +300,6 @@ sub new
 	return $self;
 	}
 
-=item config
-
-Get the configuration object. By default this is a C<ConfigReader::Simple>
-object;
-
-=cut
-
-sub config { $_[0]->{config} }
-
-=item set_perl
-
-Set the current path for the perl binary that C<Module::Release> should
-use for general tasks. This is not related to the list of perls used to 
-test multiple binaries unless you use one of those binaries to set a new
-value.
-
-If PATH looks like a perl binary, C<set_perl> uses it as the new setting
-for perl and returns the previous value.
-
-=cut
-
-sub set_perl
-	{
-	my( $self, $path ) = @_;
-	
-	unless( my $version = $self->_looks_like_perl( $path ) )
-		{
-		carp "Does not look like a perl [$path]";
-		return;
-		}
-		
-	my $old_perl = $self->{perl};
-	
-	$self->{perl} = $path;
-	
-	$old_perl;
-	}
-
-sub _looks_like_perl
-	{
-	my( $self, $path ) = @_;
-	
-	
-	my $version = `$path -e 'print \$\]'`;
-	}
-	
-=item get_perl
-
-Returns the current path for the perl binary that C<Module::Release> should
-use for general tasks. This is not related to the list of perls used to 
-test multiple binaries.
-
-=cut
-
-sub get_perl { $_[0]->{perl} }
-	
-=item perls
-
-Return the list of perl binaries Module::Release will use to test the 
-distribution.
-
-=cut
-
-sub perls
-	{
-	my $self = shift;
-	
-	return keys %{ $self->{perls} };
-	}
-	
-=item add_a_perl( PATH )
-
-Add a perl binary to the list of perls to use for testing. If PATH
-is not executable or cannot run C<print $]>, this method returns
-nothing and does not add PATH. Otherwise, it returns true. If the
-same path was already in the list, it returns true but does not
-create a duplicate.
-
-=cut
-
-sub add_a_perl
-	{
-	my( $self, $path ) = @_;
-	
-	return 1 if exists $self->{perls}{$path};
-	
-	unless( -x $path )
-		{
-		carp "$path is not executable";
-		return;
-		}
-	
-	my $version = $self->_looks_like_perl( $path );
-	
-	unless( $version )
-		{
-		carp "$path does not appear to be Perl!";
-		return;
-		}
-		
-	return $self->{perls}{$path} = $version;
-	}
-
-=item remove_a_perl( PATH )
-
-Delete PATH from the list of perls used for testing
-
-=cut
-
-sub remove_a_perl
-	{
-	my( $self, $path ) = @_;
-	
-	return delete $self->{perls}{$path}
-	}
-
-=item reset_perls
-
-Reset the list of perl interpreters to just the one running C<release>.
-
-=cut
-
-sub reset_perls
-	{
-	my $self = shift;
-	
-	return $self->{perls} = [ $^X ];
-	}
-
 =item load_mixin( MODULE )
 
 EXPERIMENTAL!!
@@ -465,6 +340,204 @@ sub loaded_mixins
 	{
 	keys %Loaded_mixins;
 	}
+
+=back
+
+=head2 Methods for configuation and settings
+
+=over 4
+
+=item config
+
+Get the configuration object. By default this is a C<ConfigReader::Simple>
+object;
+
+=cut
+
+sub config { $_[0]->{config} }
+
+=item pause_ftp_site
+
+Return the hostname for PAUSE uploads.
+
+=cut
+
+sub pause_ftp_site
+	{
+	$_[0]->{pause_ftp_site};
+	}
+
+=item should_upload_to_pause
+
+Returns true is the object thinks it should upload a distro to PAUSE.
+
+=cut
+
+sub should_upload_to_pause
+	{
+	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
+	}
+
+=item sourceforge_ftp_site
+
+Return the hostname for SourceForge uploads.
+
+=cut
+
+sub sourceforge_ftp_site
+	{
+	$_[0]->{sourceforge_ftp_site};
+	}
+
+=item should_upload_to_sourceforge
+
+Returns true is the object thinks it should upload a distro to SourceForge.
+
+=cut
+
+sub should_upload_to_sourceforge
+	{
+	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
+	}
+	
+=back
+
+=head2 Methods for multiple perl testing
+
+=over 4
+
+=item set_perl
+
+Set the current path for the perl binary that C<Module::Release> should
+use for general tasks. This is not related to the list of perls used to 
+test multiple binaries unless you use one of those binaries to set a new
+value.
+
+If PATH looks like a perl binary, C<set_perl> uses it as the new setting
+for perl and returns the previous value.
+
+Added in 1.21.
+
+=cut
+
+sub set_perl
+	{
+	my( $self, $path ) = @_;
+	
+	unless( my $version = $self->_looks_like_perl( $path ) )
+		{
+		carp "Does not look like a perl [$path]";
+		return;
+		}
+		
+	my $old_perl = $self->{perl};
+	
+	$self->{perl} = $path;
+	
+	$old_perl;
+	}
+
+sub _looks_like_perl
+	{
+	my( $self, $path ) = @_;
+	
+	
+	my $version = `$path -e 'print \$\]'`;
+	}
+	
+=item get_perl
+
+Returns the current path for the perl binary that C<Module::Release> should
+use for general tasks. This is not related to the list of perls used to 
+test multiple binaries.
+
+Added in 1.21.
+
+=cut
+
+sub get_perl { $_[0]->{perl} }
+	
+=item perls
+
+Return the list of perl binaries Module::Release will use to test the 
+distribution.
+
+Added in 1.21.
+
+=cut
+
+sub perls
+	{
+	my $self = shift;
+	
+	return keys %{ $self->{perls} };
+	}
+	
+=item add_a_perl( PATH )
+
+Add a perl binary to the list of perls to use for testing. If PATH
+is not executable or cannot run C<print $]>, this method returns
+nothing and does not add PATH. Otherwise, it returns true. If the
+same path was already in the list, it returns true but does not
+create a duplicate.
+
+Added in 1.21.
+
+=cut
+
+sub add_a_perl
+	{
+	my( $self, $path ) = @_;
+	
+	return 1 if exists $self->{perls}{$path};
+	
+	unless( -x $path )
+		{
+		carp "$path is not executable";
+		return;
+		}
+	
+	my $version = $self->_looks_like_perl( $path );
+	
+	unless( $version )
+		{
+		carp "$path does not appear to be Perl!";
+		return;
+		}
+		
+	return $self->{perls}{$path} = $version;
+	}
+
+=item remove_a_perl( PATH )
+
+Delete PATH from the list of perls used for testing
+
+Added in 1.21.
+
+=cut
+
+sub remove_a_perl
+	{
+	my( $self, $path ) = @_;
+	
+	return delete $self->{perls}{$path}
+	}
+
+=item reset_perls
+
+Reset the list of perl interpreters to just the one running C<release>.
+
+Added in 1.21.
+
+=cut
+
+sub reset_perls
+	{
+	my $self = shift;
+	
+	return $self->{perls} = [ $^X ];
+	}
+
 	
 =item output_fh
 
@@ -523,6 +596,12 @@ Get the value of the web user agent.
 
 sub ua { $_[0]->{ua} }
 
+=back
+
+=head2 Methods for building
+
+=over 4
+
 =item clean
 
 Run `make realclean`
@@ -545,6 +624,29 @@ sub clean
 	$self->_print( "done\n" );
 	}
 
+=item distclean
+
+Run `make distclean`
+
+=cut
+
+sub distclean
+       {
+       my $self = shift;
+       $self->_print( "Cleaning directory... " );
+
+       unless( -e $self->{Makefile} )
+               {
+               $self->_print( " no $self->{Makefile}---skipping\n" );
+               return;
+               }
+
+       $self->run( "$self->{make} distclean 2>&1" );
+
+       $self->_print( "done\n" );
+       }
+
+
 =item build_makefile()
 
 Runs `perl Makefile.PL 2>&1`.
@@ -566,6 +668,28 @@ sub build_makefile
 		}
 
 	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1" );
+
+	$self->_print( "done\n" );
+	}
+
+=item make()
+
+Run a plain old `make`.
+
+=cut
+
+sub make
+	{
+	my $self = shift;
+	$self->_print( "Running make... " );
+
+	unless( -e $self->{'Makefile.PL'} )
+		{
+		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
+		return;
+		}
+
+	my $tests = $self->run( "$self->{make} 2>&1" );
 
 	$self->_print( "done\n" );
 	}
@@ -777,7 +901,7 @@ sub check_manifest
 
 	$self->_print( "Checking state of MANIFEST... " );
 
-	my $manifest = $self->run( "make manifest 2>&1" );
+	my $manifest = $self->run( "$self->{make} manifest 2>&1" );
 
 	my %message    = (
 		"Removed from MANIFEST:"  => 'These files were removed from MANIFEST',
@@ -786,7 +910,7 @@ sub check_manifest
 
 	my $count = $self->_check_output_lines( \%message, $manifest );
 
-	$self->_die( "\nERROR: Manifest was not up-to-date ($count files): Won't release.\n" )
+	$self->_die( "\nERROR: Manifest was not up-to-date ($count files).\n" )
 		if $count;
 
 	$self->_print( "MANIFEST up-to-date\n" );
@@ -795,42 +919,108 @@ sub check_manifest
 
 =item check_cvs
 
-Run `cvs update` and report the state of the repository. If something
-isn't checked in or imported, die.
+=item cvs_tag
+
+=item make_cvs_tag
+
+This is a placeholder method which should be implemented in a mixin
+module. Try installing Module::Release::CVS, Module::Release::SVN,
+or Module::Release::Git and then loading them in your script. The
+default C<release> script does this for you by checking for the 
+special directories for those source systems. 
+
+Previous to version 1.24, these methods were implemented in this
+module to support CVS. They are now in Module::Release::CVS as a
+separate module.
 
 =cut
 
 sub check_cvs
 	{
-	my $self = shift;
-	return unless -d 'CVS';
-
-	$self->_print( "Checking state of CVS... " );
-
-	my $cvs_update = $self->run( "cvs -n update 2>&1" );
-
-	if( $? )
-		{
-		$self->_die( sprintf("\nERROR: cvs failed with non-zero exit status: %d\n\n" .
-			"Aborting release\n", $? >> 8) );
-		}
-
-	my %message    = (
-		C   => 'These files have conflicts',
-		M   => 'These files have not been checked in',
-		U   => 'These files need to be updated',
-		P   => 'These files need to be patched',
-		A   => 'These files were added but not checked in',
-		'?' => q|I don't know about these files|,
-		);
-
-	my $count = $self->_check_output_lines( \%message, $cvs_update );
-
-	$self->_die( "\nERROR: CVS is not up-to-date ($count files): Can't release files!\n" )
-		if $count;
-
-	$self->_print( "CVS up-to-date\n" );
+	carp "check_cvs must be implemented in a mixin class";
 	}
+
+
+sub cvs_tag
+	{
+	carp "cvs_tag must be implemented in a mixin class";
+	}
+
+sub make_cvs_tag
+	{
+	carp "make_cvs_tag must be implemented in a mixin class";
+	}
+
+=item touch( FILES )
+
+Set the modification times of each file in FILES to the current time. It
+tries to open the file for writing and immediately closing it, as well as
+using utime. It checks that the access and modification times were
+updated.
+
+Returns the number of files which it successfully touched.
+
+=cut
+
+sub touch
+	{
+	my( $self, @files ) = @_;
+	
+	my $time = time;
+	
+	my $count = 0;
+	foreach my $file ( @files )
+		{
+		unless( -f $file )
+			{
+			carp "$file is not a plain file\n";
+			next;
+			}
+			
+       	open my( $fh ), ">>", $file 
+       		or carp "Could not open file [$file] for writing: $!";
+        close $file;
+ 
+ 		utime( $time, $time, $file );
+ 		
+ 		# check that it actually worked
+ 		unless( 2 == grep { $_ == $time } (stat $file)[8,9] )
+ 			{
+			carp "$file is not a plain file\n";
+			next;
+ 			}
+ 
+		$count++;
+        }
+
+	$count;
+	}
+
+=item touch_all_in_manifest
+
+Runs touch on all of the files in MANIFEST.
+
+=cut
+
+sub touch_all_in_manifest
+	{
+	my( $self );
+
+	my $manifest = $self->manifest;
+	
+	open my( $fh ), "<", $manifest 
+       	or carp "Could not open file [$manifest] for reading: $!";
+
+	chomp( my @files = <$fh> );
+
+	$self->touch( @files );
+	}
+
+=back
+
+=head2 Methods for uploading
+
+=over 4
 
 =item check_for_passwords
 
@@ -855,7 +1045,7 @@ Upload the files to the FTP servers
 sub ftp_upload
 	{
 	my $self = shift;
-	my @Sites;
+	my @Sites = @_;
 	push @Sites, 'pause.perl.org' if $self->{cpan};
 	push @Sites, 'upload.sourceforge.net' if $self->{sf};
 
@@ -946,50 +1136,6 @@ sub pause_claim
 	$self->_print( "PAUSE upload ",
 		$response->as_string =~ /Query succeeded/ ? "successful" : 'failed',
 		"\n" );
-	}
-
-=item cvs_tag
-
-Tag the release in local CVS. The tag name comes from C<make_cvs_tag>.
-
-=cut
-
-sub cvs_tag
-	{
-	my $self = shift;
-	return unless -d 'CVS';
-
-	my $tag = $self->make_cvs_tag;
-	$self->_print( "Tagging release with $tag\n" );
-
-	system 'cvs', 'tag', $tag;
-
-	if ( $? )
-		{ # already uploaded, so warn, don't die
-		$self->_print( sprintf(
-			"\nWARNING: cvs failed with non-zero exit status: %d\n",
-			$? >> 8
-		    ) );
-		}
-
-	}
-
-=item make_cvs_tag
-
-By default, examines the name of the remote file
-(i.e. F<Foo-Bar-0.04.tar.gz>) and constructs a CVS tag like
-C<RELEASE_0_04> from it.  Override this method if you want to use a
-different tagging scheme.
-
-=cut
-
-sub make_cvs_tag
-	{
-	my $self = shift;
-	my( $major, $minor ) = $self->{remote}
-		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
-
-	return "RELEASE_${major}_${minor}";
 	}
 
 # SourceForge.net seems to know our path through the system
