@@ -1,5 +1,13 @@
 $Id$
 
+1.25 - Wed Jun 25 12:30:41 2008
+	* New features from the Oslo QA Hackathon
+   + test with multiple perls
+   + touch files before creating the dist
+   + move source control code into separate modules
+	* The previous versions didn't get into CPAN because there
+	was something odd with PAUSE during the hackathon
+
 1.25 - Wed Jun 25 12:26:39 2008
 	* New features from the Oslo QA Hackathon
    + test with multiple perls
