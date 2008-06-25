@@ -1,5 +1,13 @@
 $Id$
 
+1.25 - Wed Jun 25 11:56:36 2008
+	* All the new features from the Oslo QA Hackathon
+    + test releases with multiple perls
+    + all source control bits are now seperate modules
+    + there's a new touch() method to touch all
+       files before doing anything to ensure their
+       timestamps are current
+
 1.22 - Sun Apr  6 13:13:30 2008
 	* BUG FIX: Move kwalitee testing after normal testing, adn have
 	the kwalitee tests make their own dist to ensure that they

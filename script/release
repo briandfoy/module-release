@@ -320,7 +320,7 @@ foreach my $vcs ( @vcs )
 	print STDERR "I see an .git directory, so I'm loading $module"
 		if $opts{d};
 		
-	eval "use $module";
+	eval { eval "use $module" };
 	die "Could not load $module: $@\n" if $@;
 	
 	last;
