@@ -1,16 +1,8 @@
 $Id$
 
-1.25 - Wed Jun 25 12:48:44 2008
-	* New features from the Oslo QA Hackathon
-   + test with multiple perls
-   + touch files before creating the dist
-   + move source control code into separate modules
-	* The previous versions didn't get into CPAN because there
-	was something odd with PAUSE during the hackathon
-
 
 1.22 - Sun Apr  6 13:13:30 2008
-	* BUG FIX: Move kwalitee testing after normal testing, adn have
+	* BUG FIX: Move kwalitee testing after normal testing, and have
 	the kwalitee tests make their own dist to ensure that they
 	have it.
 

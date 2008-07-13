@@ -32,5 +32,9 @@ WriteMakefile(
 		'script/release' => '$(INST_MAN1DIR)/release.1',
 		},
 
+	'MAN3PODS'     => {
+		'script/release' => '$(INST_MAN3DIR)/Module::Release.3',
+		},
+
 	clean => { FILES => '*.bak release-* Module-*' },
 	);
