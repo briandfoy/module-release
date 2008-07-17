@@ -23,23 +23,13 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 25 );
+$VERSION = sprintf "%d.%02d", qw( 1 26 );
 
 use Carp;
-use CGI qw(-oldstyle_urls);
-use Config;
-use ConfigReader::Simple;
 use File::Spec;
-use File::Temp;
-use HTTP::Cookies;
-use HTTP::Request;
-use IO::Null;
-use LWP::UserAgent;
-use Net::FTP;
+use Scalar::Util qw(blessed);
 
-use constant DASHES => "-" x 73;
-
-my %Loaded_mixins = ( __PACKAGE__ );
+my %Loaded_mixins = ( );
 
 =head1 DESCRIPTION
 
@@ -141,42 +131,6 @@ Your SourceForge account (i.e. login) name.
 
 Set this to a true value to enable passive FTP.
 
-=item sf_group_id
-
-The Group ID of your SourceForge project. This is a numeric ID given to
-the project usually, and you can see it in the URLs when you browse
-the SourceForge files area.
-
-=item sf_package_id
-
-The Package ID of your SourceForge package. This is a numeric ID given to
-a particular file release, and you can see it in the URLs when you browse
-the SourceForge files area.
-
-=item sf_release_match
-
-This is a regular expression. Given the file release name that
-C<Module::Release> picks (e.g. "Foo-Bar-1.15.tgz"), you can run a
-substitution on it. The replacement string is in C<sf_release_replace>.
-
-=item sf_release_replace
-
-This is a regular expression. Given the file release name that
-C<Module::Release> picks (e.g. "Foo-Bar-1.15.tgz"), you can run a
-substitution on it. The regex portion is in C<sf_release_match>.
-
-=item sf_type_id 5002
-
-The distribution type (e.g. "gzipped source") of the package, by numeric
-ID that you have to look up on your own from the SourceForge form. The
-default is 5002 (".gz source").
-
-=item sf_processor_id
-
-The processor type (e.g. Intel Pentium) of the package, by numeric
-ID that you have to look up on your own from the SourceForge form.
-The default is 8000 ("Any").
-
 =back
 
 =head2 Methods
@@ -187,96 +141,199 @@ If you don't like what any of these methods do, override them in a subclass.
 
 =item new()
 
-Create a Module::Release object.  Any arguments passed are assumed to
-be key-value pairs that override the default values.
+Create the bare bones C<Module::Release> object so you can read the 
+configuration file. If you can read the configuration file, check for
+the C<release_subclass> directive. If the C<release_subclass> is there,
+C<new> calls the subclass's C<new> and returns the result. Otehrwise,
+this C<new> calls C<init> to set up the object.
 
+If you make a subclass, you're responsible for everything, including
+reading the configuration and adding it to your object.
 
 =cut
 
 sub new
 	{
-	my ($class, %params) = @_;
+	my( $class, %params ) = @_;
 
-	my $conf = -e ".releaserc" ? ".releaserc" : "releaserc";
+	my $self = bless {}, $class;
 
-	my $self = {
+	# NOTE: I have to read the configuration to see if I should
+	# call the subclass, but I haven't called init yet.
+	# Don't set up anything in _read_configuration!
+	my $config = $self->_read_configuration;
+
+	if( $config->release_subclass )
+		{
+		$self->_die( "release_subclass is the same class! Don't do that!" )
+			if $config->release_subclass eq $class;
+		my $subclass_self = $self->_handle_subclass( 
+			$config->release_subclass, %params );
+			
+		return $subclass_self;
+		}
+	
+	$self->init( $config, %params );
+		
+	return $self;
+	}
+
+
+=item init()
+
+Set up the C<Module::Release> object.
+
+=cut
+
+sub init
+	{
+	my( $self, $config, %params ) = @_;
+		
+	$self->_set_defaults( %params );	
+
+	# $config comes in as a parameter
+	$self->_process_configuration( $config );
+	
+	$self->_set_up_web_client;
+		
+	1;
+	}
+
+sub _select_config_file_name { -e ".releaserc" ? ".releaserc" : "releaserc" }
+	
+sub _set_defaults
+	{
+	require Config;
+	require IO::Null;
+	
+	my( $self, %params ) = @_;
+		
+	my $defaults = {
 			'Makefile.PL' => 'Makefile.PL',
 			'Makefile'    => 'Makefile',
-			make          => $Config{make},
+			make          => $Config::Config{make},
 			manifest      => 'MANIFEST',
-			perl          => $ENV{PERL} || $^X,
-			conf          => $conf,
 			debug         => $ENV{RELEASE_DEBUG} || 0,
 			'local'       => undef,
 			remote        => undef,
 			stdout_fh     => \*STDOUT,
 			debug_fh      => \*STDERR,
 			null_fh       => IO::Null->new(),
-			perls         => { "$^X" => 1 },
+			quiet         => 0,
 			
 			pause_ftp_site       => 'pause.perl.org',
-			sourceforge_ftp_site => 'upload.sourceforge.org',
 			%params,
-		   };
-
-	bless $self, $class;
-
-	# Read the configuration
-	$self->_die( "Could not find conf file $self->{conf}\n" )
-		unless -e $self->{conf};
-	my $config = $self->{config} = ConfigReader::Simple->new( $self->{conf} );
-	$self->_die( "Could not get configuration data\n" ) unless ref $config;
-
-	# See whether we should be using a subclass
-	if( my $subclass = $config->release_subclass )
+		   };	
+	
+	foreach my $key ( keys %$defaults )
 		{
-		unless( eval { $subclass->can( 'new' ) } )
-			{
-			require File::Spec->catfile( split '::', $subclass ) . '.pm';
-			}
-
-		return $subclass->new(@_) unless $subclass eq $class;
+		$self->{$key} = $defaults->{$key};
 		}
 
+	$self->set_perl( $^X );
+	$self->add_a_perl( $^X );
+	
+	1;
+	}
+
+sub _read_configuration
+	{
+	require ConfigReader::Simple;
+
+	# NOTE: I have to read the configuration to see if I should
+	# call the subclass, but I haven't called init yet.
+	# Don't set up anything in _read_configuration!
+	my $self = shift;
+	
+	my $conf_file = $self->_select_config_file_name;
+
+	# Read the configuration
+	$self->_die( "Could not find conf file $conf_file\n" )
+		unless -e $conf_file;
+	my $config = $self->{config} = ConfigReader::Simple->new( $conf_file );
+	$self->_die( "Could not get configuration data\n" ) unless ref $config;	
+	
+	$config;
+	}
+	
+sub _process_configuration
+	{
+	my $self = shift;
+		
 	# Figure out options
-	$self->{cpan} = $config->cpan_user eq '<none>' ? 0 : 1;
-	$self->{sf}   = $config->sf_user   eq '<none>' ? 0 : 1;
-	$self->{sf}   = defined $config->sf_user ? 1 : 0;
+	$self->{cpan} = $self->config->cpan_user eq '<none>' ? 0 : 1;
 
 	$self->{passive_ftp} =
-		($config->passive_ftp && $config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
+		($self->config->passive_ftp && $self->config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
 
-	my @required = qw( cpan_user );
-	push( @required, qw( sf_user sf_group_id sf_package_id ) ) if $self->{sf};
+	my @required = qw(  );
 
 	my $ok = 1;
 	for( @required )
 		{
-		unless( length $config->$_() )
+		unless( length $self->config->$_() )
 			{
 			$ok = 0;
-			$self->_print( "Missing configuration data: $_; Aborting!\n" );
+			$self->_warn( "Missing configuration data: $_; Aborting!\n" );
 			}
 		}
-	die "Missing configuration data" unless $ok;
+	$self->_die( "Missing configuration data" ) unless $ok;
 
-	if( !$self->{cpan} && !$self->{sf} )
+	
+	if( $self->config->perls )
 		{
-		$self->_die( "Must upload to CPAN or SourceForge.net; Aborting!\n" );
+		my @paths = split /:/, $self->config->perls;
+		
+		foreach my $path ( @paths )
+			{
+			$self->add_a_perl( $path );
+			}
 		}
-	elsif( !$self->{cpan} )
+	}
+
+sub _handle_subclass
+	{
+	my( $self, $subclass, %params ) = @_;
+		
+		
+	# This is a bit tricky. We have to be able to use the subclass, but
+	# we don't know if it is defined or not. It might be in a .pm file
+	# we haven't loaded, it might be in another file the user already 
+	# loaded, or the user might have defined it inline inside
+	# the script. We'll try loading it if it fails can()
+	unless( eval { $subclass->can( 'new' ) } )
 		{
-		$self->_print( "Uploading to SourceForge.net only\n" );
-		}
-	elsif( !$self->{sf} )
-		{
-		$self->_print( "Uploading to CPAN only\n" );
+		# I don't care if this fails because loading the file
+		# might not be the problem
+		eval { require File::Spec->catfile( split '::', $subclass ) . '.pm' };
 		}
 
+	# If it's not defined by now, we're screwed and we give up
+	$self->_die( "$subclass does not have a new()!" )
+		unless eval { $subclass->can( 'new' ) };
+	
+	my $new_self = eval { $subclass->new( %params ) };
+	my $at = $@;
+	
+	return $new_self if blessed $new_self;
+	
+	$self->_die( "Could not create object with $subclass: $at!" );
+	}
+	
+sub _set_up_web_client
+	{
+	require File::Temp;
+	require HTTP::Cookies;
+	require LWP::UserAgent;
 
+	my $self = shift;
+	
+	
 	# Set up the browser
 	$self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
 
+	{
+	local $SIG{__WARN__} = sub {};
 	my $fh = File::Temp->new( UNLINK => 1 );
 	
 	$self->{cookie_fh} = $fh;  # to keep it around until we're done
@@ -286,20 +343,11 @@ sub new
 					    autosave       => 1,
 					    );
 	$self->{cookies}->clear;
-
-	if( $config->perls )
-		{
-		my @paths = split /:/, $config->perls;
-		
-		foreach my $path ( @paths )
-			{
-			$self->add_a_perl( $path );
-			}
-		}
-		
-	return $self;
 	}
-
+	
+	return 1;
+	}
+	
 =item load_mixin( MODULE )
 
 EXPERIMENTAL!!
@@ -315,15 +363,13 @@ Added in 1.21
 
 sub load_mixin
 	{
-	my( $self, $module ) = shift;
+	my( $self, $module ) = @_;
 	
-	eval "require $module";
+	return 1 if $self->mixin_loaded( $module );
 	
-	if( $@ )
-		{
-		carp "Could not load [$module]! $@";
-		return;
-		}
+	eval "use $module";
+	
+	$self->_die( "Could not load [$module]! $@" ) if $@;
 		
 	++$Loaded_mixins{ $module };
 	}
@@ -336,11 +382,16 @@ Added in 1.21
 
 =cut
 
-sub loaded_mixins
-	{
-	keys %Loaded_mixins;
-	}
+sub loaded_mixins { keys %Loaded_mixins }
 
+=item mixin_loaded( MODULE )
+
+Returns true if the mixin class is loaded
+
+=cut
+
+sub mixin_loaded { exists $Loaded_mixins{ $_[1] } }
+	
 =back
 
 =head2 Methods for configuation and settings
@@ -378,27 +429,6 @@ sub should_upload_to_pause
 	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
 	}
 
-=item sourceforge_ftp_site
-
-Return the hostname for SourceForge uploads.
-
-=cut
-
-sub sourceforge_ftp_site
-	{
-	$_[0]->{sourceforge_ftp_site};
-	}
-
-=item should_upload_to_sourceforge
-
-Returns true is the object thinks it should upload a distro to SourceForge.
-
-=cut
-
-sub should_upload_to_sourceforge
-	{
-	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
-	}
 	
 =back
 
@@ -426,8 +456,7 @@ sub set_perl
 	
 	unless( my $version = $self->_looks_like_perl( $path ) )
 		{
-		carp "Does not look like a perl [$path]";
-		return;
+		$self->_die( "Does not look like a perl [$path]" );
 		}
 		
 	my $old_perl = $self->{perl};
@@ -442,7 +471,9 @@ sub _looks_like_perl
 	my( $self, $path ) = @_;
 	
 	
-	my $version = `$path -e 'print \$\]'`;
+	my $version = `$path -e 'print \$\]' 2>&1`;
+	
+	$version =~ m/^\d+\.[\d_]+$/ ? $version : ();
 	}
 	
 =item get_perl
@@ -493,7 +524,7 @@ sub add_a_perl
 	
 	unless( -x $path )
 		{
-		carp "$path is not executable";
+		$self->_warn( "$path is not executable" );
 		return;
 		}
 	
@@ -501,7 +532,7 @@ sub add_a_perl
 	
 	unless( $version )
 		{
-		carp "$path does not appear to be Perl!";
+		$self->_warn( "$path does not appear to be perl!" );
 		return;
 		}
 		
@@ -535,7 +566,9 @@ sub reset_perls
 	{
 	my $self = shift;
 	
-	return $self->{perls} = [ $^X ];
+	$self->{perls} = {};
+	
+	return $self->{perls}{$^X} = $];
 	}
 
 	
@@ -559,7 +592,7 @@ return whatever they like.
 
 sub null_fh  { $_[0]->{null_fh} }
 
-sub _quiet  { 0 }
+sub _quiet   { $_[0]->{quiet} }
 
 =item debug
 
@@ -933,7 +966,7 @@ a list. In scalar context, it returns an array reference.
 sub files_in_manifest
 	{
 	open my($fh), "<", $_[0]->manifest
-		or croak "files_in_manifest: could not open manifest file: $!";
+		or $_[0]->_die( "files_in_manifest: could not open manifest file: $!" );
 		
 	map { chomp; $_ } <$fh>;
 	}
@@ -958,18 +991,18 @@ separate module.
 
 sub check_cvs
 	{
-	carp "check_cvs must be implemented in a mixin class";
+	$_[0]->_die( "check_cvs must be implemented in a mixin class" );
 	}
 
 
 sub cvs_tag
 	{
-	carp "cvs_tag must be implemented in a mixin class";
+	$_[0]->_die( "cvs_tag must be implemented in a mixin class" );
 	}
 
 sub make_cvs_tag
 	{
-	carp "make_cvs_tag must be implemented in a mixin class";
+	$_[0]->_die( "make_cvs_tag must be implemented in a mixin class" );
 	}
 
 =item touch( FILES )
@@ -994,12 +1027,12 @@ sub touch
 		{
 		unless( -f $file )
 			{
-			carp "$file is not a plain file\n";
+			$self->_warn( "$file is not a plain file" );
 			next;
 			}
 			
        	open my( $fh ), ">>", $file 
-       		or carp "Could not open file [$file] for writing: $!";
+       		or $self->_warn( "Could not open file [$file] for writing: $!" );
         close $file;
  
  		utime( $time, $time, $file );
@@ -1007,7 +1040,7 @@ sub touch
  		# check that it actually worked
  		unless( 2 == grep { $_ == $time } (stat $file)[8,9] )
  			{
-			carp "$file is not a plain file\n";
+			$self->_warn( "$file is not a plain file" );
 			next;
  			}
  
@@ -1042,7 +1075,6 @@ sub check_for_passwords
 	my $self = shift;
 
 	$self->{cpan_pass} = $self->getpass( "CPAN_PASS" ) if $self->{cpan};
-	$self->{sf_pass}   = $self->getpass( "SF_PASS" )   if $self->{sf};
 	}
 
 =item ftp_upload
@@ -1053,6 +1085,8 @@ Upload the files to the FTP servers
 
 sub ftp_upload
 	{
+	require Net::FTP;
+
 	my $self = shift;
 	my @Sites = @_;
 	push @Sites, 'pause.perl.org' if $self->{cpan};
@@ -1118,6 +1152,9 @@ Claim the file in PAUSE
 
 sub pause_claim
 	{
+	require HTTP::Request;
+	require CGI; CGI->import( qw(-oldstyle_urls) );
+
 	my $self = shift;
 	return unless $self->{cpan};
 
@@ -1147,183 +1184,7 @@ sub pause_claim
 		"\n" );
 	}
 
-# SourceForge.net seems to know our path through the system
-# Hit all the pages, collect the right cookies, etc
 
-=item sf_user( [ SF_USER ] )
-
-Set or GET the SourceForge user name
-
-=cut
-
-sub sf_user
-	{
-	my $self = shift;
-	my $user = shift;
-
-	$self->config->set( 'sf_user', $user ) if defined $user;
-
-	return $self->config->sf_user;
-	}
-
-=item sf_login
-
-Authenticate with Sourceforge
-
-=cut
-
-sub sf_login
-	{
-	my $self = shift;
-	return unless $self->{sf};
-
-	$self->_print("Logging in to SourceForge.net... " );
-
-	my $cgi = CGI->new();
-	my $request = HTTP::Request->new( POST =>
-		'https://sourceforge.net/account/login.php' );
-	$self->{cookies}->add_cookie_header( $request );
-
-	$cgi->param( 'return_to',      ''                     );
-	$cgi->param( 'form_loginname', $self->config->sf_user );
-	$cgi->param( 'form_pw',        $self->{sf_pass}       );
-	$cgi->param( 'persistent_login',    1                      );
-	$cgi->param( 'login',          'Login'       );
-
-	$request->content_type('application/x-www-form-urlencoded');
-	$request->content( $cgi->query_string );
-
-	$request->header( "Referer", "http://sourceforge.net/account/login.php" );
-
-	$self->_debug( $request->as_string, DASHES, "\n" );
-
-	my $response = $self->ua->request( $request );
-	$self->{cookies}->extract_cookies( $response );
-
-	$self->_debug( $response->headers_as_string, DASHES, "\n" );
-
-	REDIRECT: {
-	if( $response->code == 302 )
-		{
-		my $location = $response->header('Location');
-		$self->_debug( "Location is $location\n" );
-
- 		my $request = HTTP::Request->new( POST => $location );
-		$request->content_type('application/x-www-form-urlencoded');
-		$request->content( $cgi->query_string );
-		$self->{cookies}->add_cookie_header( $request );
-
-		$self->_debug( $request->as_string, DASHES, "\n" );
-		$response = $self->ua->request( $request );
-
-		$self->_debug( $response->headers_as_string, DASHES, "\n" );
-		$self->{cookies}->extract_cookies( $response );
-
-		redo REDIRECT;
-		}
-	}
-
-	my $content = $response->content;
-	$content =~ s|.*<!-- begin SF.net content -->||s;
-	$content =~ s|Register New Project.*||s;
-
-	$self->_debug( $content );
-
-	my $sf_user = $self->config->sf_user;
-
-	if( $content =~ m/welcome.*$sf_user/i )
-		{
-		$self->_print( "Logged in!\n" );
-		return 1;
-		}
-	else
-		{
-		$self->_print( "Not logged in! Aborting\n" );
-		#return 0;
-		exit;
-		}
-	}
-
-=item sf_qrs()
-
-Visit the Quick Release System form
-
-=cut
-
-sub sf_qrs
-	{
-	my $self = shift;
-	return unless $self->{sf};
-
-	my $request = HTTP::Request->new( GET =>
-		'https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=' .
-		$self->config->sf_group_id
-		);
-
-	$self->{cookies}->add_cookie_header( $request );
-	$self->_debug( $request->as_string, DASHES, "\n" );
-
-	my $response = $self->{ua}->request( $request );
-
-	$self->_debug( $response->headers_as_string,  DASHES, "\n" );
-	$self->{cookies}->extract_cookies( $response );
-	}
-
-=item sf_release()
-
-Release the file to Sourceforge
-
-=cut
-
-sub sf_release
-	{
-	my $self = shift;
-	return unless $self->{sf};
-
-	my @time = localtime();
-	my $date = sprintf "%04d-%02d-%02d",
-		$time[5] + 1900, $time[4] + 1, $time[3];
-
-	$self->_print( "Connecting to SourceForge.net QRS... " );
-	my $cgi = CGI->new();
-	my $request = HTTP::Request->new(
-		POST => 'https://sourceforge.net/project/admin/qrs.php' );
-
-	$self->{cookies}->add_cookie_header( $request );
-
-	$cgi->param( 'MAX_FILE_SIZE',   1_000_000                              );
-	$cgi->param( 'package_id',      $self->config->sf_package_id           );
-	$cgi->param( 'release_name',    $self->{release}                       );
-	$cgi->param( 'release_date',    $date                                  );
-	$cgi->param( 'status_id',       1                                      );
-	$cgi->param( 'file_name',       $self->{remote}                        );
-	$cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
-	$cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
-	$cgi->param( 'release_notes',   $self->get_readme()                    );
-	$cgi->param( 'release_changes', $self->get_changes()                   );
-	$cgi->param( 'group_id',        $self->config->sf_group_id             );
-	$cgi->param( 'preformatted',    1                                      );
-	$cgi->param( 'submit',         'Release File'                          );
-
-	$request->content_type('application/x-www-form-urlencoded');
-	$request->content( $cgi->query_string );
-
-	$request->header( "Referer",
-		"https://sourceforge.net/project/admin/qrs.php?package_id=&group_id=" .
-		$self->config->sf_group_id
-		);
-	$self->_debug( $request->as_string, "\n", DASHES, "\n" );
-
-	my $response = $self->{ua}->request( $request );
-	$self->_debug( $response->headers_as_string, "\n", DASHES, "\n" );
-
-	my $content = $response->content;
-	$content =~ s|.*Database Admin.*?<H3><FONT.*?>\s*||s;
-	$content =~ s|\s*</FONT></H3>.*||s;
-
-	$self->_print( "$content\n" ) if $self->debug;
-	$self->_print( "File Released\n" );
-	}
 
 =item get_readme()
 
@@ -1405,12 +1266,12 @@ sub run
 		$output .= $buffer;
 		}
 
-	$self->_debug( DASHES, "\n" );
+	$self->_debug( $self->_dashes, "\n" );
 
 	unless( close $fh )
 		{
 		$self->_run_error_set;
-		carp "Command [$command] had problems" if $self->debug;
+		$self->_debug(  "Command [$command] had problems" );
 		}
 
 	return $output;
@@ -1462,10 +1323,22 @@ sub _print
 	print { $self->output_fh || *STDOUT } @_;
 	}
 
+=item _dashes()
+
+Use this for a string representing a line in the output. Since it's a
+method you can override it if you like. 
+
+=cut
+
+sub _dashes
+	{
+	"-" x 73;
+	}
+	
 =item _debug( LIST )
 
 Send the LIST to whatever is in debug_fh, or to STDERR. If you are
-debugging, debug_fh should return a null filehandle, 
+debugging, debug_fh should return a null filehandle.
 
 =cut
 
@@ -1476,7 +1349,7 @@ sub _debug
 	print { $self->debug_fh || *STDERR } @_
 	}
 
-=item _debug
+=item _die( LIST )
 
 =cut
 	
@@ -1484,7 +1357,18 @@ sub _die
 	{
 	my $self = shift;
 	
-	die @_;
+	croak @_;
+	}
+
+=item _warn( LIST )
+
+=cut
+	
+sub _warn
+	{
+	my $self = shift;
+	
+	carp @_ unless $self->_quiet;
 	}
 	
 =back
@@ -1523,7 +1407,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2002-2007 brian d foy.  All rights reserved.
+Copyright (c) 2002-2008 brian d foy.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

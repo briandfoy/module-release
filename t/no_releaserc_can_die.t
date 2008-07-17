@@ -11,14 +11,21 @@ Reported by Sagar Shah.
 
 use Test::More 'no_plan';
 
-chdir( 't' );
+BEGIN {
+	use Cwd;
+	use File::Spec;
+	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	require $file;
+	}
 
+unlink '.releaserc';
 ok( ! (-e '.releaserc'), 'The releaserc file is missing (good)' );
 
 my $class = 'Module::Release';
 
 use_ok( $class );
 
-ok( ! eval{ $class->new() }, 'new() does not die (good)' );
+ok( ! eval{ close STDERR; $class->new() }, 'new() does not die (good)' );
+
 like( $@, qr/Could not find conf file releaserc/, 
-	'Die with the right error message' );
+	'Missing conf file dies with the right error message' );

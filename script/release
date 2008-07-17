@@ -256,7 +256,7 @@ H. Merijn Brand submitted patches to work with 5.005.
 =cut
 
 use Getopt::Std;
-use Module::Release 1.25;
+use Module::Release 1.26;
 
 my $class = "Module::Release";
 
@@ -281,14 +281,15 @@ if( $opts{h} )
 	{
 	print <<"USE";
 
-Use: release -hdtv [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -hdktv [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
 both) if not supplied.
 
 	-h   This help 
-	-d   Print extra debugging information 
+	-d   Print extra debugging information
+	-k   Skip kwalitee check
 	-t   Just make and test distribution, don't tag/upload
 	-v   Print the script version number and exit
 	
@@ -300,34 +301,6 @@ USE
 
 	exit;
 	}
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# load whatever will handle source control
-{
-my @vcs = (
-	[ '.git' => "Module::Release::Git" ],
-	[ '.svn' => "Module::Release::SVN" ],
-	[ '.cvs' => "Module::Release::CVS" ],
-	);
-	
-foreach my $vcs ( @vcs )
-	{
-	next unless -d $vcs->[0];
-	
-	my $module = $vcs->[1];
-	
-	print STDERR "I see an .git directory, so I'm loading $module"
-		if $opts{d};
-		
-	eval { eval "use $module" };
-	die "Could not load $module: $@\n" if $@;
-	
-	last;
-	}
-	
-}
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # get the release object
@@ -349,6 +322,35 @@ my $release = $class->new( %params );
 
 $release->_debug( "release $script_version, using $class " 
 	.  $class->VERSION . "\n" );
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# load whatever will handle source control
+{
+my @vcs = (
+	[ '.git' => "Module::Release::Git" ],
+	[ '.svn' => "Module::Release::SVN" ],
+	[ 'CVS'  => "Module::Release::CVS" ],
+	);
+	
+foreach my $vcs ( @vcs )
+	{
+	next unless -d $vcs->[0];
+	
+	my $module = $vcs->[1];
+	
+	$release->_debug( "I see an $vcs->[0] directory, so I'm loading $module\n" );
+		
+	$release->load_mixin( $module );
+	
+	die "Could not load $module: $@\n" if $@;
+	
+	last;
+	}
+	
+}
+
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -401,7 +403,7 @@ $release->_debug( "dist version is  $Version\n" );
 # exit if this is a dry run. Everything following this changes
 # things or uploads. Don't leave anything behind.
 
-if ($opts{t}) 
+if( $opts{t} ) 
 	{
 	$release->distclean;
 	unlink glob( "*.tar*" );
@@ -476,15 +478,6 @@ if( $release->should_upload_to_pause )
 	$release->_print("============Uploading to PAUSE\n");
 	$release->ftp_upload( $release->pause_ftp_site );
 	$release->pause_claim;
-	}
-	
-if( $release->should_upload_to_sourceforge )
-	{
-	$release->_print("============Uploading to Sourceforge\n");
-	$release->ftp_upload( $release->sourceforge_ftp_site );
-	$release->sf_login;
-	$release->sf_qrs;
-	$release->sf_release;
 	}
 
 $release->cvs_tag;

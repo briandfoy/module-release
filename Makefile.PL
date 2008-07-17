@@ -26,6 +26,7 @@ WriteMakefile(
 
 	'PM'           => {
 		'lib/Release.pm' => '$(INST_LIBDIR)/Release.pm',
+		'lib/SVN.pm'     => '$(INST_LIBDIR)/Release/SVN.pm',
 		},
 
 	'MAN1PODS'     => {
@@ -33,7 +34,8 @@ WriteMakefile(
 		},
 
 	'MAN3PODS'     => {
-		'script/release' => '$(INST_MAN3DIR)/Module::Release.3',
+		'lib/Release.pm' => '$(INST_MAN3DIR)/Module::Release.3',
+		'lib/SVN.pm'     => '$(INST_MAN3DIR)/Module::Release::SVN.3',
 		},
 
 	clean => { FILES => '*.bak release-* Module-*' },
