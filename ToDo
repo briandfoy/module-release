@@ -1,0 +1,5 @@
+* make ua_agent_name settable
+
+* move PAUSE stuff to its own file
+
+* dist_test should be disttest

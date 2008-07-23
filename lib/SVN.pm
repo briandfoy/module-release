@@ -15,7 +15,7 @@ Module::Release::SVN - Use Subversion with Module::Release
 
 =head1 SYNOPSIS
 
-The release script automatically loads this module if it sees a 
+The release script automatically loads this module if it sees a
 F<.svn> directory. The module exports check_cvs, cvs_tag, and make_cvs_tag.
 
 =head1 DESCRIPTION
@@ -41,7 +41,7 @@ Check the state of the Git repository.
 
 =cut
 
-sub check_cvs 
+sub check_cvs
 	{
 	my $self = shift;
 
@@ -68,9 +68,9 @@ sub check_cvs
 		);
 
 	my @svn_states = keys %message;
-	
+
 	my %svn_state;
-	foreach my $state (@svn_states) 
+	foreach my $state (@svn_states)
 		{
 		$svn_state{$state} = [ $svn_update =~ /$state\s+(.*)/gm ];
 		}
@@ -78,14 +78,14 @@ sub check_cvs
 	my $count;
 	my $question_count;
 
-	foreach my $key ( sort keys %svn_state ) 
+	foreach my $key ( sort keys %svn_state )
 		{
 		my $list = $svn_state{$key};
 		next unless @$list;
 
 		$count          += @$list unless $key eq qr/^\?......./;
 		$question_count += @$list if     $key eq qr/^\?......./;
-	
+
 		local $" = "\n\t";
 		$self->_print( "\n\t$message{$key}\n", "-" x 50, "\n\t@$list\n" );
 		}
@@ -95,13 +95,13 @@ sub check_cvs
 
 =pod
 
-	if($question_count) 
+	if($question_count)
 		{
     	$self->_print "\nWARNING: Subversion is not up-to-date ($question_count files unknown); ",
       "continue anwyay? [Ny] " ;
 		die "Exiting\n" unless <> =~ /^[yY]/;
 		}
-		
+
 =cut
 
 	$self->_print( "Subversion up-to-date\n" );
@@ -113,78 +113,78 @@ Tag the release in Subversion.
 
 =cut
 
-sub cvs_tag 
+sub cvs_tag
 	{
 	require URI;
-	
+
 	my $self = shift;
 
 	my $svn_info = $self->run('svn info .');
 
-	if($?) 
+	if($?)
 		{
 		$self->_warn(
 			sprintf(
-				"\nWARNING: 'svn info .' failed with non-zero exit status: %d\n", 
+				"\nWARNING: 'svn info .' failed with non-zero exit status: %d\n",
 				$? >> 8 )
 			);
-			
+
 		return;
 		}
 
 	$svn_info =~ /^URL: (.*)$/m;
 	my $trunk_url = URI->new( $1 );
-	
+
 	my @tag_url = $trunk_url->path_segments;
-	if(! grep /^trunk$/, @tag_url ) 
+	if(! grep /^trunk$/, @tag_url )
 		{
 		$self->_warn(
 			"\nWARNING: Current SVN URL:\n  $trunk_url\ndoes not contain a 'trunk' component\n",
 			"Aborting tagging.\n"
 			);
-			
+
 		return;
 		}
-	
-	foreach( @tag_url ) 
-		{		
-		if($_ eq 'trunk') 
-			{		
+
+	foreach( @tag_url )
+		{
+		if($_ eq 'trunk')
+			{
 			$_ = 'tags';
 			last;
 			}
 		}
-	
+
 	my $tag_url = $trunk_url->clone;
-	
+
 	$tag_url->path_segments( @tag_url );
-	
+
 	# Make sure the top-level path exists
 	#
 	# Can't use $self->run() because of a bug where $fh isn't closed, which
 	# stops $? from being properly propogated.  Reported to brian d foy as
 	# part of RT#6489
 	$self->run( "svn list $tag_url 2>&1" );
-	if( $? ) 
+	if( $? )
 		{
 		$self->_warn(
 			sprintf("\nWARNING:\n  svn list $tag_url\nfailed with non-zero exit status: %d\n", $? >> 8),
 			"Assuming tagging directory does not exist in repo.  Please create it.\n",
 			"Aborting tagging.\n"
 			);
-			
+
 		return;
 		}
-	
+
 	my $tag = $self->make_cvs_tag;
 
 	push @tag_url, $tag;
 	$tag_url->path_segments(@tag_url);
 	$self->_print( "Tagging release to $tag_url\n" );
-	
+
 	$self->run( 'svn copy $trunk_url $tag_url' );
-	
-	if ( $? ) 
+
+	if ( $? )
 		{
 		# already uploaded, and tagging is not (?) essential, so warn, don't die
 		$self->_warn(
@@ -193,7 +193,7 @@ sub cvs_tag
 				$? >> 8 )
 			);
 		}
-	
+
 	}
 
 =item make_cvs_tag

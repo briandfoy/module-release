@@ -21,12 +21,16 @@ WriteMakefile(
 		'HTTP::Message'        => 0,
 		'IO::Null'             => 0,
 		'Crypt::SSLeay'        => 0,
-		'File::Temp'           => 0,
+		'Test::Output'         => 0,
 		},
 
 	'PM'           => {
 		'lib/Release.pm' => '$(INST_LIBDIR)/Release.pm',
 		'lib/SVN.pm'     => '$(INST_LIBDIR)/Release/SVN.pm',
+		'lib/FTP.pm'     => '$(INST_LIBDIR)/Release/FTP.pm',
+		'lib/PAUSE.pm'   => '$(INST_LIBDIR)/Release/PAUSE.pm',
+		'lib/Kwalitee.pm'   => '$(INST_LIBDIR)/Release/Kwalitee.pm',
+		#map { "lib/$_.pm" => "\$(INST_LIBDIR)/Release/$_.pm" } qw( SVN PAUSE FTP ),
 		},
 
 	'MAN1PODS'     => {

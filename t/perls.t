@@ -99,6 +99,7 @@ is( scalar @perls, 1, "There are no perls" );
 is( $perls[0], $^X, "The reset perl is the one in \$^X" );
 
 # Adding something not executable shouldn't do anything
+$mock->turn_quiet_on;
 $mock->add_a_perl( 'README' );
 @perls = $mock->perls;
 is( scalar @perls, 1, "There are no perls" );

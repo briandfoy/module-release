@@ -73,6 +73,7 @@ my $method = 'pause_ftp_site';
 
 my $release = $class->new;
 isa_ok( $release, $class );
+$release->load_mixin( 'Module::Release::PAUSE' );
 
 can_ok( $release, $method );
 

@@ -3,6 +3,7 @@ use warnings;
 
 use Cwd;
 use File::Spec;
+use File::Path;
 
 my $old_dir = cwd;
 my $conf    = ".releaserc";
@@ -15,6 +16,7 @@ mkdir $dir, 0755 unless -d $dir;
 ok( -d $dir, "Test directory is there" );
 
 ok( chdir( $dir ), "Changed into $dir" );
+END { chdir $old_dir; rmtree [ $dir ], 0, 1; }
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -32,8 +34,4 @@ ok( -e $conf, "$conf exists" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Clean up
-END {
-	unlink $conf;
-	chdir $old_dir;
-	}
 

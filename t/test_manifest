@@ -8,7 +8,13 @@ abstract.t
 new.t
 defaults.t
 no_releaserc_can_die.t
+output.t
 make_targets.t
 dist_version.t
 perls.t
 mixins.t
+user_agent.t
+touch.t
+touch-utime-fails.t
+run.t
+t/kwalitee/check_kwalitee.t

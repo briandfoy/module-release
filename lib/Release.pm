@@ -141,7 +141,7 @@ If you don't like what any of these methods do, override them in a subclass.
 
 =item new()
 
-Create the bare bones C<Module::Release> object so you can read the 
+Create the bare bones C<Module::Release> object so you can read the
 configuration file. If you can read the configuration file, check for
 the C<release_subclass> directive. If the C<release_subclass> is there,
 C<new> calls the subclass's C<new> and returns the result. Otehrwise,
@@ -167,14 +167,14 @@ sub new
 		{
 		$self->_die( "release_subclass is the same class! Don't do that!" )
 			if $config->release_subclass eq $class;
-		my $subclass_self = $self->_handle_subclass( 
+		my $subclass_self = $self->_handle_subclass(
 			$config->release_subclass, %params );
-			
+
 		return $subclass_self;
 		}
-	
+
 	$self->init( $config, %params );
-		
+
 	return $self;
 	}
 
@@ -186,45 +186,45 @@ Set up the C<Module::Release> object.
 =cut
 
 sub init
-	{
+	{	
 	my( $self, $config, %params ) = @_;
-		
-	$self->_set_defaults( %params );	
+
+	$self->_set_defaults( %params );
 
 	# $config comes in as a parameter
 	$self->_process_configuration( $config );
-	
-	$self->_set_up_web_client;
-		
+
+	# defer $self->_set_up_web_client;
+
 	1;
 	}
 
 sub _select_config_file_name { -e ".releaserc" ? ".releaserc" : "releaserc" }
-	
+
 sub _set_defaults
 	{
 	require Config;
 	require IO::Null;
-	
+
 	my( $self, %params ) = @_;
-		
+
 	my $defaults = {
 			'Makefile.PL' => 'Makefile.PL',
 			'Makefile'    => 'Makefile',
 			make          => $Config::Config{make},
 			manifest      => 'MANIFEST',
 			debug         => $ENV{RELEASE_DEBUG} || 0,
-			'local'       => undef,
-			remote        => undef,
-			stdout_fh     => \*STDOUT,
-			debug_fh      => \*STDERR,
+			local_file    => undef,
+			remote_file   => undef,
+			output_fh     => *STDOUT{IO},
+			debug_fh      => *STDERR{IO},
 			null_fh       => IO::Null->new(),
 			quiet         => 0,
-			
+
 			pause_ftp_site       => 'pause.perl.org',
 			%params,
-		   };	
-	
+		   };
+
 	foreach my $key ( keys %$defaults )
 		{
 		$self->{$key} = $defaults->{$key};
@@ -232,7 +232,7 @@ sub _set_defaults
 
 	$self->set_perl( $^X );
 	$self->add_a_perl( $^X );
-	
+
 	1;
 	}
 
@@ -244,22 +244,22 @@ sub _read_configuration
 	# call the subclass, but I haven't called init yet.
 	# Don't set up anything in _read_configuration!
 	my $self = shift;
-	
+
 	my $conf_file = $self->_select_config_file_name;
 
 	# Read the configuration
 	$self->_die( "Could not find conf file $conf_file\n" )
 		unless -e $conf_file;
 	my $config = $self->{config} = ConfigReader::Simple->new( $conf_file );
-	$self->_die( "Could not get configuration data\n" ) unless ref $config;	
-	
+	$self->_die( "Could not get configuration data\n" ) unless ref $config;
+
 	$config;
 	}
-	
+
 sub _process_configuration
 	{
 	my $self = shift;
-		
+
 	# Figure out options
 	$self->{cpan} = $self->config->cpan_user eq '<none>' ? 0 : 1;
 
@@ -279,11 +279,11 @@ sub _process_configuration
 		}
 	$self->_die( "Missing configuration data" ) unless $ok;
 
-	
+
 	if( $self->config->perls )
 		{
 		my @paths = split /:/, $self->config->perls;
-		
+
 		foreach my $path ( @paths )
 			{
 			$self->add_a_perl( $path );
@@ -294,11 +294,11 @@ sub _process_configuration
 sub _handle_subclass
 	{
 	my( $self, $subclass, %params ) = @_;
-		
-		
+
+
 	# This is a bit tricky. We have to be able to use the subclass, but
 	# we don't know if it is defined or not. It might be in a .pm file
-	# we haven't loaded, it might be in another file the user already 
+	# we haven't loaded, it might be in another file the user already
 	# loaded, or the user might have defined it inline inside
 	# the script. We'll try loading it if it fails can()
 	unless( eval { $subclass->can( 'new' ) } )
@@ -311,50 +311,23 @@ sub _handle_subclass
 	# If it's not defined by now, we're screwed and we give up
 	$self->_die( "$subclass does not have a new()!" )
 		unless eval { $subclass->can( 'new' ) };
-	
+
 	my $new_self = eval { $subclass->new( %params ) };
 	my $at = $@;
-	
+
 	return $new_self if blessed $new_self;
-	
+
 	$self->_die( "Could not create object with $subclass: $at!" );
 	}
-	
-sub _set_up_web_client
-	{
-	require File::Temp;
-	require HTTP::Cookies;
-	require LWP::UserAgent;
 
-	my $self = shift;
-	
-	
-	# Set up the browser
-	$self->{ua}      = LWP::UserAgent->new( agent => 'Mozilla/4.5' );
 
-	{
-	local $SIG{__WARN__} = sub {};
-	my $fh = File::Temp->new( UNLINK => 1 );
-	
-	$self->{cookie_fh} = $fh;  # to keep it around until we're done
-	$self->{cookies} = HTTP::Cookies->new(
-					    file           => $fh->filename,
-					    hide_cookie2   => 1,
-					    autosave       => 1,
-					    );
-	$self->{cookies}->clear;
-	}
-	
-	return 1;
-	}
-	
 =item load_mixin( MODULE )
 
 EXPERIMENTAL!!
 
 Load MODULE through require (so no importing), without caring what it does.
 My intent is that MODULE adds methods to the C<Module::Release> namespace
-so a release object can see it. This should probably be some sort of 
+so a release object can see it. This should probably be some sort of
 delegation.
 
 Added in 1.21
@@ -364,13 +337,13 @@ Added in 1.21
 sub load_mixin
 	{
 	my( $self, $module ) = @_;
-	
+
 	return 1 if $self->mixin_loaded( $module );
-	
+
 	eval "use $module";
-	
+
 	$self->_die( "Could not load [$module]! $@" ) if $@;
-		
+
 	++$Loaded_mixins{ $module };
 	}
 
@@ -391,7 +364,7 @@ Returns true if the mixin class is loaded
 =cut
 
 sub mixin_loaded { exists $Loaded_mixins{ $_[1] } }
-	
+
 =back
 
 =head2 Methods for configuation and settings
@@ -407,29 +380,34 @@ object;
 
 sub config { $_[0]->{config} }
 
-=item pause_ftp_site
+=item local_file( FILENAME )
 
-Return the hostname for PAUSE uploads.
-
-=cut
-
-sub pause_ftp_site
-	{
-	$_[0]->{pause_ftp_site};
-	}
-
-=item should_upload_to_pause
-
-Returns true is the object thinks it should upload a distro to PAUSE.
+Returns or sets the name of the local distribution file. You can use
+the literal argument C<undef> to clear the value.
 
 =cut
 
-sub should_upload_to_pause
+sub local_file
 	{
-	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
+	$_[0]->{local_file} = $_[1] if @_ > 1;
+
+	$_[0]->{local_file};
 	}
 
-	
+=item remote_file
+
+Returns the name of the file on the remote side. You can use the
+literal argument C<undef> to clear the value.
+
+=cut
+
+sub remote_file
+	{
+	$_[0]->{remote_file} = $_[1] if @_ > 1;
+
+	$_[0]->{remote_file};
+	}
+
 =back
 
 =head2 Methods for multiple perl testing
@@ -439,7 +417,7 @@ sub should_upload_to_pause
 =item set_perl
 
 Set the current path for the perl binary that C<Module::Release> should
-use for general tasks. This is not related to the list of perls used to 
+use for general tasks. This is not related to the list of perls used to
 test multiple binaries unless you use one of those binaries to set a new
 value.
 
@@ -453,33 +431,33 @@ Added in 1.21.
 sub set_perl
 	{
 	my( $self, $path ) = @_;
-	
+
 	unless( my $version = $self->_looks_like_perl( $path ) )
 		{
 		$self->_die( "Does not look like a perl [$path]" );
 		}
-		
-	my $old_perl = $self->{perl};
-	
+
+	my $old_perl = $self->get_perl;
+
 	$self->{perl} = $path;
-	
+
 	$old_perl;
 	}
 
 sub _looks_like_perl
 	{
 	my( $self, $path ) = @_;
-	
-	
+
+
 	my $version = `$path -e 'print \$\]' 2>&1`;
-	
+
 	$version =~ m/^\d+\.[\d_]+$/ ? $version : ();
 	}
-	
+
 =item get_perl
 
 Returns the current path for the perl binary that C<Module::Release> should
-use for general tasks. This is not related to the list of perls used to 
+use for general tasks. This is not related to the list of perls used to
 test multiple binaries.
 
 Added in 1.21.
@@ -487,10 +465,10 @@ Added in 1.21.
 =cut
 
 sub get_perl { $_[0]->{perl} }
-	
+
 =item perls
 
-Return the list of perl binaries Module::Release will use to test the 
+Return the list of perl binaries Module::Release will use to test the
 distribution.
 
 Added in 1.21.
@@ -500,10 +478,10 @@ Added in 1.21.
 sub perls
 	{
 	my $self = shift;
-	
+
 	return keys %{ $self->{perls} };
 	}
-	
+
 =item add_a_perl( PATH )
 
 Add a perl binary to the list of perls to use for testing. If PATH
@@ -519,23 +497,23 @@ Added in 1.21.
 sub add_a_perl
 	{
 	my( $self, $path ) = @_;
-	
+
 	return 1 if exists $self->{perls}{$path};
-	
+
 	unless( -x $path )
 		{
 		$self->_warn( "$path is not executable" );
 		return;
 		}
-	
+
 	my $version = $self->_looks_like_perl( $path );
-	
+
 	unless( $version )
 		{
 		$self->_warn( "$path does not appear to be perl!" );
 		return;
 		}
-		
+
 	return $self->{perls}{$path} = $version;
 	}
 
@@ -550,7 +528,7 @@ Added in 1.21.
 sub remove_a_perl
 	{
 	my( $self, $path ) = @_;
-	
+
 	return delete $self->{perls}{$path}
 	}
 
@@ -565,26 +543,31 @@ Added in 1.21.
 sub reset_perls
 	{
 	my $self = shift;
-	
+
 	$self->{perls} = {};
-	
+
 	return $self->{perls}{$^X} = $];
 	}
 
-	
+
 =item output_fh
 
-Return the output filehandle, or the null filehandle if we're running in
-quiet mode. What's quiet mode? I don't know yet. It's a future feature.
-It's STDOUT or nothing 
+If quiet is off, return the value of output_fh. If output_fh is not
+set, return STDOUT. If quiet is on, return the value of null_fh.
 
 =cut
 
-sub output_fh  { $_[0]->_quiet ? $_[0]->null_fh : $_[0]->{output_fh} }
+sub output_fh  {
+	$_[0]->quiet
+		?
+	$_[0]->null_fh
+		:
+	( $_[0]->{output_fh} || *STDOUT{IO} )
+	}
 
 =item null_fh
 
-Return the null filehandle. So far that's something set up in C<new> and I 
+Return the null filehandle. So far that's something set up in C<new> and I
 haven't provided a way to set it. Any subclass can make their C<null_fh>
 return whatever they like.
 
@@ -592,42 +575,103 @@ return whatever they like.
 
 sub null_fh  { $_[0]->{null_fh} }
 
-sub _quiet   { $_[0]->{quiet} }
+=item quiet
+
+Get the value of queit mode (true or false).
+
+=item turn_quiet_on
+
+Turn on quiet mode
+
+=item turn_quiet_off
+
+Turn off quiet mode
+
+=cut
+
+sub turn_quiet_on  { $_[0]->{quiet} = 1 }
+sub turn_quiet_off { $_[0]->{quiet} = 0 }
+
+sub quiet          { $_[0]->{quiet} }
 
 =item debug
 
-Get the value of the debugging flag.
+Get the value of the debugging flag (true or false).
 
-=item debug_on
+=item turn_debug_on
 
 Turn on debugging
 
-=item debug_off
+=item turn_debug_off
 
 Turn off debugging
 
 =item debug_fh
 
-If debugging, return the debugging filehandle, otherwise the null filehandle.
-I haven't created a way to set the debugging filehandle just yet. It's STDERR
-or nothing.
+If debugging is on, return the value of debug_fh. If debug_fh is not
+set, return STDERR. If debugging is off, return the value of null_fh.
 
 =cut
 
-sub debug_on  { $_[0]->{debug} = 1 }
-sub debug_off { $_[0]->{debug} = 0 }
+sub turn_debug_on  { $_[0]->{debug} = 1 }
+sub turn_debug_off { $_[0]->{debug} = 0 }
 
-sub debug     { $_[0]->{debug} }
+sub debug          { $_[0]->{debug} }
 
-sub debug_fh  { $_[0]->debug ? $_[0]->{debug_fh} : $_[0]->null_fh }
+sub debug_fh  {
+	$_[0]->debug
+		?
+	( $_[0]->{debug_fh} || *STDERR{IO} )
+		:
+	$_[0]->null_fh
+	}
 
 =item ua
 
-Get the value of the web user agent.
+Get the value of the web user agent. When called for the first time, it
+creates the web user agent using the class named in C<ua_class_name>.
 
 =cut
 
-sub ua { $_[0]->{ua} }
+sub ua
+	{
+	unless( defined $_[0]->{ua} )
+		{
+		eval { eval "require " . $_[0]->ua_class_name };
+		$_[0]->_set_up_web_client;
+		}
+
+	$_[0]->{ua};
+	}
+
+=item ua_class_name
+
+The name of the class to use for the web user agent. This is
+C<LWP::UserAgent>.
+
+=cut
+
+sub ua_class_name { 'LWP::UserAgent' }
+
+=item ua_agent_name
+
+The name to advertise for the web user agent. This is C<Mozilla/4.5>
+for no particular reason. There isn't a way to set it just yet.
+
+=cut
+
+sub ua_agent_name { 'Mozilla/4.5' }
+
+sub _set_up_web_client
+	{
+	$_[0]->{ua} = $_[0]->ua_class_name->new(
+		agent => $_[0]->ua_agent_name
+		);
+
+	$_[0]->{ua}->cookie_jar( {} );
+
+	return 1;
+	}
 
 =back
 
@@ -664,20 +708,20 @@ Run `make distclean`
 =cut
 
 sub distclean
-       {
-       my $self = shift;
-       $self->_print( "Cleaning directory... " );
+	{
+	my $self = shift;
+	$self->_print( "Cleaning directory... " );
 
-       unless( -e $self->{Makefile} )
-               {
-               $self->_print( " no $self->{Makefile}---skipping\n" );
-               return;
-               }
+	unless( -e $self->{Makefile} )
+		{
+		$self->_print( " no $self->{Makefile}---skipping\n" );
+		return;
+		}
 
-       $self->run( "$self->{make} distclean 2>&1" );
+	$self->run( "$self->{make} distclean 2>&1" );
 
-       $self->_print( "done\n" );
-       }
+	$self->_print( "done\n" );
+	}
 
 
 =item build_makefile()
@@ -716,9 +760,9 @@ sub make
 	my $self = shift;
 	$self->_print( "Running make... " );
 
-	unless( -e $self->{'Makefile.PL'} )
+	unless( -e $self->{'Makefile'} )
 		{
-		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
+		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
 
@@ -738,9 +782,9 @@ sub test
 	my $self = shift;
 	$self->_print( "Checking make test... " );
 
-	unless( -e $self->{'Makefile.PL'} )
+	unless( -e $self->{'Makefile'} )
 		{
-		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
+		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
 
@@ -764,72 +808,53 @@ sub dist
 	my $self = shift;
 	$self->_print( "Making dist... " );
 
-	unless( -e $self->{'Makefile.PL'} )
+	unless( -e $self->{'Makefile'} )
 		{
-		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
+		$self->_debug( "no Makefle, so skipping" );
+		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
 
 	my $messages = $self->run( "$self->{make} dist 2>&1 < /dev/null" );
+	$self->_debug( "messages are [$messages]" );
 
-	unless( $self->{local} )
+	# If the distro isn't already set, try to guess it
+	unless( $self->local_file )
 		{
-		$self->_print( ", guessing local distribution name" ) if $self->debug;
-		($self->{local}) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
-		$self->{local} .= '.gz';
-		$self->{remote} = $self->{local};
+		$self->_print( ", guessing local distribution name" );
+		my( $guess ) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
+		$self->_debug( "guessed [$guess]" );
+		$self->local_file( $guess );
+
+		$self->_die( "Couldn't guess distname from dist output\n" )
+			unless $self->local_file;
+
+		$self->local_file( $self->local_file() . '.gz' );
+		$self->remote_file( $self->local_file );
 		}
 
-	$self->_die( "Couldn't guess distname from dist output\n" )
-		unless $self->{local};
-	$self->_die( "Local file '$self->{local}' does not exist\n" )
-		unless -f $self->{local};
+	# local_file should exist now
+	$self->_die( "Local file '$self->{local_file}' does not exist\n" )
+		unless -f $self->local_file;
 
 	$self->_print( "done\n" );
 	}
 
-=item check_kwalitee()
-
-Run `cpants_lints.pl distname.tgz`. If it doesn't see "a 'perfect' distribution"
-it dies. 
-
-=cut
-
-sub check_kwalitee
-	{
-	my $self = shift;
-	$self->_print( "Checking kwalitee... " );
-
-	unless( -e $self->{'Makefile.PL'} )
-		{
-		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
-		return;
-		}
-
-	# XXX: what if it's not .tar.gz?
-	my $messages = $self->run( "cpants_lint.pl *.tar.gz" );
-
-	$self->_die( "Kwalitee is less than perfect:\n$messages\n" )
-		unless $messages =~ m/a 'perfect' distribution!/;
-	
-	$self->_print( "done\n" );
-	}
-	
-=item dist_test
+=item disttest
 
 Run `make disttest`. If the tests fail, it dies.
 
 =cut
 
-sub dist_test
+sub disttest
 	{
 	my $self = shift;
 
-	$self->_print( "Checking disttest... " );
+	$self->_print( "Checking make disttest... " );
 
-	unless( -e $self->{'Makefile.PL'} )
+	unless( -e $self->{'Makefile'} )
 		{
-		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
+		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
 
@@ -839,6 +864,21 @@ sub dist_test
 		unless $tests =~ /All tests successful/;
 
 	$self->_print( "all tests pass\n" );
+	}
+
+=item dist_test
+
+This was the old name for the method, but was inconsistent with
+other method names. It still works, but is deprecated and will
+give a warning.
+
+=cut
+
+sub dist_test
+	{
+	$_[0]->_warn( "dist_test is deprecated. Use disttest instead." );
+
+	goto &disttest;
 	}
 
 =item dist_version
@@ -967,7 +1007,7 @@ sub files_in_manifest
 	{
 	open my($fh), "<", $_[0]->manifest
 		or $_[0]->_die( "files_in_manifest: could not open manifest file: $!" );
-		
+
 	map { chomp; $_ } <$fh>;
 	}
 
@@ -980,8 +1020,8 @@ sub files_in_manifest
 This is a placeholder method which should be implemented in a mixin
 module. Try installing Module::Release::CVS, Module::Release::SVN,
 or Module::Release::Git and then loading them in your script. The
-default C<release> script does this for you by checking for the 
-special directories for those source systems. 
+default C<release> script does this for you by checking for the
+special directories for those source systems.
 
 Previous to version 1.24, these methods were implemented in this
 module to support CVS. They are now in Module::Release::CVS as a
@@ -1019,9 +1059,9 @@ Returns the number of files which it successfully touched.
 sub touch
 	{
 	my( $self, @files ) = @_;
-	
+
 	my $time = time;
-	
+
 	my $count = 0;
 	foreach my $file ( @files )
 		{
@@ -1030,22 +1070,22 @@ sub touch
 			$self->_warn( "$file is not a plain file" );
 			next;
 			}
-			
-       	open my( $fh ), ">>", $file 
-       		or $self->_warn( "Could not open file [$file] for writing: $!" );
-        close $file;
- 
- 		utime( $time, $time, $file );
- 		
- 		# check that it actually worked
- 		unless( 2 == grep { $_ == $time } (stat $file)[8,9] )
- 			{
-			$self->_warn( "$file is not a plain file" );
+
+		open my( $fh ), ">>", $file
+			or $self->_warn( "Could not open file [$file] for writing: $!" );
+		close $file;
+
+		utime( $time, $time, $file );
+
+		# check that it actually worked
+		unless( 2 == grep { $_ == $time } (stat $file)[8,9] )
+			{
+			$self->_warn( "$file did not set utimes." );
 			next;
- 			}
- 
+			}
+
 		$count++;
-        }
+		}
 
 	$count;
 	}
@@ -1075,113 +1115,6 @@ sub check_for_passwords
 	my $self = shift;
 
 	$self->{cpan_pass} = $self->getpass( "CPAN_PASS" ) if $self->{cpan};
-	}
-
-=item ftp_upload
-
-Upload the files to the FTP servers
-
-=cut
-
-sub ftp_upload
-	{
-	require Net::FTP;
-
-	my $self = shift;
-	my @Sites = @_;
-	push @Sites, 'pause.perl.org' if $self->{cpan};
-	push @Sites, 'upload.sourceforge.net' if $self->{sf};
-
-	( $self->{release} ) = $self->{remote} =~ m/^(.*?)(?:\.tar\.gz)?$/g;
-
-	my $config = $self->config;
-	# set your own release name if you want to ...
-	if( $config->sf_release_match && $config->sf_release_replace )
-		{
-		my $match   = $config->sf_release_match;
-		my $replace = $config->sf_release_replace;
-		$self->{release} =~ s/$match/$replace/ee;
-		}
-
-	$self->_print( "Release name is $self->{release}\n" );
-	$self->_print( "Will use passive FTP transfers\n" )
-		if $self->{passive_ftp} && $self->debug;
-
-	my $local_file = $self->{local};
-	my $local_size = -s $local_file;
-
-	foreach my $site ( @Sites )
-		{
-		$self->_print( "Logging in to $site\n" );
-		my $ftp = Net::FTP->new(
-			$site,
-			Hash    => \*STDOUT,
-			Debug   => $self->debug,
-			Passive => $self->{passive_ftp}
-			) or $self->_die( "Couldn't open FTP connection to $site: $@" );
-
-		my $email = ($config->cpan_user || "anonymous") . '@cpan.org';
-		$ftp->login( "anonymous", $email )
-			or $self->_die( "Couldn't log in anonymously to $site" );
-
-		$ftp->binary;
-
-		$ftp->cwd( "/incoming" )
-			or $self->_die( "Couldn't chdir to /incoming" );
-
-		$self->_print( "Putting $local_file\n" );
-		my $remote_file = $ftp->put( $self->{local}, $self->{remote} );
-		$self->_die( "PUT failed: " . $ftp->message . "\n" )
-			if $remote_file ne $self->{remote};
-
-		my $remote_size = $ftp->size( $self->{remote} );
-
-		$self->_print( "WARNING: Uploaded file is $remote_size bytes, " .
-			"but local file is $local_size bytes" )
-				if $remote_size != $local_size;
-
-		$ftp->quit;
-		}
-	}
-
-=item pause_claim
-
-Claim the file in PAUSE
-
-=cut
-
-sub pause_claim
-	{
-	require HTTP::Request;
-	require CGI; CGI->import( qw(-oldstyle_urls) );
-
-	my $self = shift;
-	return unless $self->{cpan};
-
-	my $cgi = CGI->new();
-	my $ua  = LWP::UserAgent->new();
-
-	my $request = HTTP::Request->new( POST =>
-		   'https://pause.perl.org/pause/authenquery' );
-
-	$cgi->param( 'HIDDENNAME', $self->config->cpan_user );
-	$cgi->param( 'CAN_MULTIPART', 1 );
-	$cgi->param( 'pause99_add_uri_upload', $self->{remote} );
-	$cgi->param( 'SUBMIT_pause99_add_uri_upload', 'Upload the checked file' );
-	$cgi->param( 'pause99_add_uri_sub', 'pause99_add_uri_subdirtext' );
-
-	$request->content_type('application/x-www-form-urlencoded');
-
- 	$request->content( $cgi->query_string );
-
- 	$request->authorization_basic(
-		$self->config->cpan_user, $self->{cpan_pass} );
-
-	my $response = $ua->request( $request );
-
-	$self->_print( "PAUSE upload ",
-		$response->as_string =~ /Query succeeded/ ? "successful" : 'failed',
-		"\n" );
 	}
 
 
@@ -1249,10 +1182,11 @@ sub run
 	$self->_run_error_reset;
 
 	$self->_debug( "$command\n" );
+	$self->_die( "Didn't get a command!" ) unless defined $command;
 	
-	open my($fh), "$command |" or die $!;
+	open my($fh), "$command |" or $self->_die( $! );
 	$fh->autoflush;
-	
+
 	my $output = '';
 	my $buffer = '';
 	local $| = 1;
@@ -1271,7 +1205,7 @@ sub run
 	unless( close $fh )
 		{
 		$self->_run_error_set;
-		$self->_debug(  "Command [$command] had problems" );
+		$self->_die(  "Command [$command] didn't close cleanly" );
 		}
 
 	return $output;
@@ -1316,25 +1250,17 @@ output_fh to a null filehandle, output goes nowhere.
 
 =cut
 
-sub _print
-	{
-	my $self = shift;
-		
-	print { $self->output_fh || *STDOUT } @_;
-	}
+sub _print { print { $_[0]->output_fh } @_[1..$#_] }
 
 =item _dashes()
 
 Use this for a string representing a line in the output. Since it's a
-method you can override it if you like. 
+method you can override it if you like.
 
 =cut
 
-sub _dashes
-	{
-	"-" x 73;
-	}
-	
+sub _dashes { "-" x 73 }
+
 =item _debug( LIST )
 
 Send the LIST to whatever is in debug_fh, or to STDERR. If you are
@@ -1342,35 +1268,20 @@ debugging, debug_fh should return a null filehandle.
 
 =cut
 
-sub _debug
-	{
-	my $self = shift;
-	
-	print { $self->debug_fh || *STDERR } @_
-	}
+sub _debug { print { $_[0]->debug_fh } @_[1..$#_] }
 
 =item _die( LIST )
 
 =cut
-	
-sub _die
-	{
-	my $self = shift;
-	
-	croak @_;
-	}
+
+sub _die { croak @_[1..$#_] }
 
 =item _warn( LIST )
 
 =cut
-	
-sub _warn
-	{
-	my $self = shift;
-	
-	carp @_ unless $self->_quiet;
-	}
-	
+
+sub _warn { carp @_[1..$#_] unless $_[0]->quiet }
+
 =back
 
 =head1 TO DO
