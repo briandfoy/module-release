@@ -988,13 +988,23 @@ sub check_manifest
 	$self->_print( "MANIFEST up-to-date\n" );
 	}
 
-=item manifest
+=item manifest_name
 
 Return the name of the manifes file, probably F<MANIFEST>.
 
+=item manifest
+
+This is the old name for manifest_name. It still works but is
+deprecated.
+
 =cut
 
-sub manifest { 'MANIFEST' }
+sub manifest_name { 'MANIFEST' }
+
+sub manifest { 
+	$_[0]->_warn( "manifests is deprecated. Use manifest_name" );
+	&manifest_name 
+	}
 
 =item files_in_manifest
 
@@ -1005,7 +1015,7 @@ a list. In scalar context, it returns an array reference.
 
 sub files_in_manifest
 	{
-	open my($fh), "<", $_[0]->manifest
+	open my($fh), "<", $_[0]->manifest_name
 		or $_[0]->_die( "files_in_manifest: could not open manifest file: $!" );
 
 	map { chomp; $_ } <$fh>;

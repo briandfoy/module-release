@@ -16,5 +16,6 @@ mixins.t
 user_agent.t
 touch.t
 touch-utime-fails.t
+manifest.t
 run.t
 t/kwalitee/check_kwalitee.t
