@@ -64,8 +64,8 @@ Returns true is the object thinks it should upload a distro to PAUSE.
 
 sub should_upload_to_pause
 	{
-	$_[0]->_debug( "CPAN user: $_[0]->{cpan_user} | CPAN pass: $_[0]->{cpan_pass}" );
-	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
+	$_[0]->_debug( "CPAN user: " . $_[0]->config->cpan_user . " | CPAN pass: $_[0]->{cpan_pass}\n" );
+	$_[0]->config->cpan_user && $_[0]->{cpan_pass}
 	}
 
 =item pause_claim
