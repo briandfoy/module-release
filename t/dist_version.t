@@ -26,7 +26,7 @@ like( $at, qr/\QIt's not set/, "Without remote set, get right error message" );
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # How does the formatting work?
 {
-my $mock = bless { remote => 'Foo-1.12_03.tar.gz' }, $class;
+my $mock = bless { remote_file => 'Foo-1.12_03.tar.gz' }, $class;
 
 {
 my $got = $mock->dist_version_format( 1, 12, "_03" );
@@ -42,7 +42,7 @@ my $got = $mock->dist_version;
 is( $got, '1.12_03', 'Development version stays in there' );
 }
 {
-my $mock = bless { remote => 'Foo-3.45.tar.gz' }, $class;
+my $mock = bless { remote_file => 'Foo-3.45.tar.gz' }, $class;
 my $got = $mock->dist_version;
 is( $got, '3.45', "Without development version it's fine" );
 }

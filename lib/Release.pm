@@ -902,10 +902,10 @@ sub dist_version
 	my $self = shift;
 
 	$self->_die( "Can't get dist_version! It's not set (did you run dist first?)" )
-		unless defined $self->{remote};
+		unless defined $self->remote_file;
 
 	no warnings 'uninitialized';
-	my( $major, $minor, $dev ) = $self->{remote}
+	my( $major, $minor, $dev ) = $self->remote_file
 		=~ /(\d+) \. (\d+)(_\d+)? (?:\. tar \. gz)? $/xg;
 
 	$self->dist_version_format( $major, $minor, $dev );

@@ -235,7 +235,7 @@ sub sf_release
 	$cgi->param( 'release_name',    $self->{release}                       );
 	$cgi->param( 'release_date',    $date                                  );
 	$cgi->param( 'status_id',       1                                      );
-	$cgi->param( 'file_name',       $self->{remote}                        );
+	$cgi->param( 'file_name',       $self->remote_file                     );
 	$cgi->param( 'type_id',         $self->config->sf_type_id || 5002      );
 	$cgi->param( 'processor_id',    $self->config->sf_processor_id || 8000 );
 	$cgi->param( 'release_notes',   $self->get_readme()                    );

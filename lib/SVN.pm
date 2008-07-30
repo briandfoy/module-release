@@ -208,7 +208,7 @@ different tagging scheme, or don't even call it.
 sub make_cvs_tag
 	{
 	my $self = shift;
-	my( $major, $minor ) = $self->{remote}
+	my( $major, $minor ) = $self->remote_file
 		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
 
 	return "RELEASE_${major}_${minor}";
