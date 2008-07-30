@@ -364,7 +364,7 @@ if( $opts{t} )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-unless( $opts{d} )
+unless( $release->debug )
 	{
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
@@ -429,17 +429,16 @@ $release->dist;
 
 $release->check_for_passwords;
 
-$release->_debug( "This is where I should release stuff" );
-$release->_debug( Dumper( $release ) ); use Data::Dumper;
+$release->_debug( "This is where I should release stuff\n" );
 if( $release->should_upload_to_pause )
 	{
-	$release->_print("This is where I should release stuff" );
+	$release->_print("Now uploading to PAUSE\n" );
 	$release->_print("============Uploading to PAUSE\n");
 	$release->ftp_upload( $release->pause_ftp_site );
 	$release->pause_claim;
 	}
 
-$release->cvs_tag;
+$release->cvs_tag unless $release->debug;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
