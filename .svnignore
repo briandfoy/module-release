@@ -9,3 +9,4 @@ blib
 pm_to_blib
 cover_db
 t/test_dir
+.releaserc
