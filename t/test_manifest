@@ -18,4 +18,4 @@ touch.t
 touch-utime-fails.t
 manifest.t
 run.t
-t/kwalitee/check_kwalitee.t
+kwalitee/check_kwalitee.t

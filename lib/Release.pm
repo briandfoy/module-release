@@ -1008,8 +1008,7 @@ sub manifest {
 
 =item files_in_manifest
 
-Return the filenames in the manifest file. In list context it returns
-a list. In scalar context, it returns an array reference.
+Return the filenames in the manifest file as a list.
 
 =cut
 
@@ -1069,7 +1068,7 @@ Returns the number of files which it successfully touched.
 sub touch
 	{
 	my( $self, @files ) = @_;
-
+	
 	my $time = time;
 
 	my $count = 0;
@@ -1201,7 +1200,7 @@ sub run
 	my $buffer = '';
 	local $| = 1;
 
-	my $readlen = $self->{debug} ? 1 : 256;
+	my $readlen = $self->debug ? 1 : 256;
 
 	while (read $fh, $buffer, $readlen)
 		{

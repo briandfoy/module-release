@@ -31,7 +31,7 @@ Return the hostname for PAUSE uploads.
 
 sub pause_ftp_site
 	{
-	$_[0]->{pause_ftp_site};
+	$_[0]->{pause_ftp_site} || 'pause.perl.org';
 	}
 
 =item should_upload_to_pause
