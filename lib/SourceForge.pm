@@ -83,10 +83,11 @@ The default is 8000 ("Any").
 
 =back
 
-=over 4
-
 # SourceForge.net seems to know our path through the system
 # Hit all the pages, collect the right cookies, etc
+
+=over 4
+
 
 =item sf_user( [ SF_USER ] )
 
