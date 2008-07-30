@@ -10,7 +10,7 @@ use warnings;
 
 =head1 NAME
 
-release - upload files to the CPAN and SourceForge.net
+release - give your Perl distros to the world
 
 =head1 SYNOPSIS
 
@@ -39,9 +39,8 @@ change it however you like.
 
 This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
-source control, uploads it to the PAUSE anonymous FTP directory and to
-the incoming directory for SourceForge.net, claims it on PAUSE for
-your CPAN account, and releases it on SourceForge.net.
+source control, uploads it to the PAUSE anonymous FTP directory and
+claims it on PAUSE.
 
 By default this script assumes that you use CVS, but recognizes SVN
 and git and switches when appropriate.
@@ -73,10 +72,9 @@ the C<perls> configuration setting.
 If there are modified files, added files, or extra files so that
 source control complains, fail.
 
-=item Upload to PAUSE and SourceForge.net
+=item Upload to PAUSE
 
-Simply drop the distribution in the incoming/ directory of these
-servers.
+Simply drop the distribution in the incoming/ directory of PAUSE
 
 =item Claim the file on PAUSE
 
@@ -87,13 +85,6 @@ CPAN account.
 
 Use the version number (in the distribution name) to tag the
 repository.  You should be able to checkout the code from any release.
-
-=item Release to SourceForge.net
-
-The release name is the distribution name without the .tar.gz. The
-file name is the distribution name.  SourceForge.net divides things
-into projects (with project IDs) and packages within the project (with
-package IDs).  Specify these in the configuration file.
 
 =back
 
@@ -107,13 +98,6 @@ release's own F<.releaserc> looks like this:
 
     cpan_user BDFOY
 
-If you want to upload to Sourceforge, you need your Sourceforge login,
-the group (project) ID, and the package ID:
-
-    sf_user comdog
-    sf_group_id 36221
-    sf_package_id 56559
-
 If you would like to test with multiple perl binaries (version 1.21
 and later), list them as a colon-separated list in the C<perls>
 setting:
@@ -125,42 +109,6 @@ release does not test the perls in any particular order.
 =over 4
 
 =item cpan_user
-
-=item sf_user
-
-If C<cpan_user> or C<sf_user> is set to C<< <none> >>, the program will
-skip releasing for that system.  You must release for at least one system.
-
-=item sf_group_id
-
-=item sf_package_id
-
-=item sf_processor_id
-
-=item sf_type_id
-
-=item sf_release_match
-
-=item sf_release_replace
-
-To find C<sf_package_id> and C<sf_group_id>, go to the Add/Edit
-Release page for your project.  The link for "[Add Release]" might
-look something like this (this is the link for the F<release> package
-itself):
-
-    https://sourceforge.net/project/admin/newrelease.php?package_id=56559&group_id=36221
-
-so C<sf_package_id> is 56559 and C<sf_group_id> is 36221.
-
-C<sf_processor_id> and C<sf_type_id> are optional, and default to "Any"
-and "Source .gz".  See the HTML in a file release form on SourceForge.net
-for other options.
-
-C<sf_release_match> and C<sf_release_replace> are for defining the release
-name, if you don't like the default.  For example, the default would
-set the name for this program to something like "release-0.10".
-But if you want the name to be only the version number, set
-C<sf_release_match=^.+-([\d.]+)$> and C<sf_release_replace=$1>.
 
 =item passive_ftp
 
@@ -196,11 +144,9 @@ C<release_subclass> to C<Module::Release::KWILLIAMS>.
 
 =item * CPAN_PASS
 
-=item * SF_PASS
-
-release reads the C<CPAN_PASS> and C<SF_PASS> environment variables to
-set the passwords for PAUSE and SourceForge.net, respectively.  Of course,
-you don't need to set the password for a system you're not uploading to.
+release reads the C<CPAN_PASS> environment variable to set the
+password for PAUSE.  Of course, you don't need to set the password for
+a system you're not uploading to.
 
 =item * RELEASE_DEBUG
 
@@ -417,7 +363,8 @@ if( $opts{t} )
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my $Changes = do {
+unless( $opts{d} )
+	{
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
 	
@@ -465,7 +412,11 @@ my $Changes = do {
 	print $cvs_commit;
 	
 	$str;
-	};
+	}
+else
+	{
+	$release->_print( "Skipping Changes file since you're debugging" );
+	}
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -478,8 +429,10 @@ $release->dist;
 
 $release->check_for_passwords;
 
+$release->_print( "This is where I should release stuff" );
 if( $release->should_upload_to_pause )
 	{
+	$release->_print("This is where I should release stuff" );
 	$release->_print("============Uploading to PAUSE\n");
 	$release->ftp_upload( $release->pause_ftp_site );
 	$release->pause_claim;

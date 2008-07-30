@@ -19,3 +19,4 @@ touch-utime-fails.t
 manifest.t
 run.t
 kwalitee/check_kwalitee.t
+pause/pause.t

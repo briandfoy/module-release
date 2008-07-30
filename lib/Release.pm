@@ -380,6 +380,63 @@ object;
 
 sub config { $_[0]->{config} }
 
+=item get_web_user_agent
+
+Get a web user agent that follows the LWP::UserAgent API. The first time
+you call this it also sets up the web client by calling C<setup_web_client>.
+
+=cut
+
+sub get_web_user_agent { $_[0]->{web_user_agent} || $_[0]->setup_web_user_agent }
+
+=item setup_web_user_agent( ARGS )
+
+Create a web user agent and store it in the object. Get a reference to it
+by saving the result or calling C<get_web_user_agent>. If you call this
+method again, it replaces the internal web user agent (and anything you've
+done to it since you first set it up). It passes any arguments to the 
+constructor of the user agent class.
+
+It calls C<web_user_agent_name> to set the initial agent name, and sets
+up an empty, in-memory cookie jar.
+
+=cut
+
+sub setup_web_user_agent 
+	{
+	my $self = shift;
+	
+	my $class = $self->web_user_agent_class;
+	my $rc = eval { eval "require $class" };
+	unless( $rc ) { $self->_die( "Could not load $class: $@" ) };
+	
+	my $ua = $self->web_user_agent_class->new( 
+		agent => $self->web_user_agent_name,
+		@_ 
+		);
+
+	$ua->cookie_jar( {} );
+
+	$self->{web_user_agent} = $ua;
+	}
+
+=item web_user_agent_class
+
+The package name to use to build a web user agent object.
+
+=cut
+
+sub web_user_agent_class { 'LWP::UserAgent' }
+
+=item web_user_agent_name
+
+The user agent name to use with web requests. Let's just call that 
+C<Mozilla> for now.
+
+=cut
+
+sub web_user_agent_name { 'Mozilla' }
+
 =item local_file( FILENAME )
 
 Returns or sets the name of the local distribution file. You can use
@@ -624,53 +681,6 @@ sub debug_fh  {
 	( $_[0]->{debug_fh} || *STDERR{IO} )
 		:
 	$_[0]->null_fh
-	}
-
-=item ua
-
-Get the value of the web user agent. When called for the first time, it
-creates the web user agent using the class named in C<ua_class_name>.
-
-=cut
-
-sub ua
-	{
-	unless( defined $_[0]->{ua} )
-		{
-		eval { eval "require " . $_[0]->ua_class_name };
-		$_[0]->_set_up_web_client;
-		}
-
-	$_[0]->{ua};
-	}
-
-=item ua_class_name
-
-The name of the class to use for the web user agent. This is
-C<LWP::UserAgent>.
-
-=cut
-
-sub ua_class_name { 'LWP::UserAgent' }
-
-=item ua_agent_name
-
-The name to advertise for the web user agent. This is C<Mozilla/4.5>
-for no particular reason. There isn't a way to set it just yet.
-
-=cut
-
-sub ua_agent_name { 'Mozilla/4.5' }
-
-sub _set_up_web_client
-	{
-	$_[0]->{ua} = $_[0]->ua_class_name->new(
-		agent => $_[0]->ua_agent_name
-		);
-
-	$_[0]->{ua}->cookie_jar( {} );
-
-	return 1;
 	}
 
 =back
@@ -1123,7 +1133,9 @@ sub check_for_passwords
 	{
 	my $self = shift;
 
-	$self->{cpan_pass} = $self->getpass( "CPAN_PASS" ) if $self->{cpan};
+	$self->{cpan_pass} = $self->get_env_var( "CPAN_PASS" ) if $self->{cpan};
+	
+	$self->_debug( "CPAN pass is $self->{cpan_pass}" );
 	}
 
 
@@ -1220,13 +1232,13 @@ sub run
 	return $output;
 	}
 
-=item getpass
+=item get_env_var
 
-Get a password from the user if it isn't found.
+Get an environment variable or prompt for it
 
 =cut
 
-sub getpass
+sub get_env_var
 	{
 	my ($self, $field) = @_;
 
