@@ -437,7 +437,7 @@ while( $release->should_upload_to_pause )
 	$release->_print("============Uploading to PAUSE\n");
 	last if $release->debug;
 	
-	$release->ftp_upload( $release->pause_ftp_site );
+	$release->ftp_upload( hostname => $release->pause_ftp_site );
 	$release->pause_claim;
 	last;
 	}
