@@ -59,7 +59,7 @@ foreach my $sub ( @constant_subs )
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set and unset the pause_ftp_site for things that should fail
 my $site = $release->pause_ftp_site;
-ok( $site, "pause_ftp_site returns something true" );
+ok( $site, "pause_ftp_site returns something true [$site]" );
 
 stderr_like
 	{ $release->set_pause_ftp_site }
@@ -85,6 +85,7 @@ stderr_like
 is( $release->pause_ftp_site, $site, 
 	"pause_ftp_site stays the same after set failure" );
 
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set and unset the pause_ftp_site for things that should work
 
@@ -94,6 +95,48 @@ foreach my $site ( qw( foo.bar.com pause.perl.org brian.buster.org ) )
 	is( $release->pause_ftp_site, $site, "pause_ftp_site returns $site" );
 	}
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check that we should upload to PAUSE
+# First, set both CPAN user and password
+{
+$release->config->set( 'cpan_user', 'Buster' );
+$release->config->set( 'cpan_pass', 'Foo'    );
+ok( $release->config->cpan_user, "cpan_user is true" );
+ok( $release->config->cpan_pass, "cpan_pass is true" );
+
+ok( $release->should_upload_to_pause, "Should upload to PAUSE" );
+}
+
+# Next, unset both CPAN user and password
+{
+$release->config->set( 'cpan_user', undef );
+$release->config->set( 'cpan_pass', undef );
+ok( ! defined $release->config->cpan_user, "cpan_user is undefined" );
+ok( ! defined $release->config->cpan_pass, "cpan_pass is undefined" );
+
+ok( ! $release->should_upload_to_pause, "Shouldn't upload to PAUSE when neither user nor password set" );
+}
+
+# Then, set just CPAN password
+{
+$release->config->set( 'cpan_user', undef );
+$release->config->set( 'cpan_pass', 'Foo' );
+ok( ! defined $release->config->cpan_user, "cpan_user is undefined" );
+ok(           $release->config->cpan_pass, "cpan_pass is true" );
+
+ok( ! $release->should_upload_to_pause, "Shouldn't upload to PAUSE when user not set" );
+}
+
+
+# Finally, set CPAN user but unset CPAN password
+{
+$release->config->set( 'cpan_user', 'Buster' );
+$release->config->set( 'cpan_pass', undef );
+ok(           $release->config->cpan_user, "cpan_user is true" );
+ok( ! defined $release->config->cpan_pass, "cpan_pass is undefined" );
+
+ok( ! $release->should_upload_to_pause, "Shouldn't upload to PAUSE when password not set" );
+}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Get the FTP site, either by configuration or default
@@ -132,6 +175,7 @@ sub new { bless {}, $_[0] }
 sub AUTOLOAD  { 1 }
 sub perls     { () }
 sub cpan_user { 'LOCAL' }
+sub cpan_pass { 'BUSTER' }
 }
 
 {
@@ -170,10 +214,27 @@ sub as_string { 'Query succeeded' }
 
 }
 
-# First, test that it works when it sees 'Query succeeded'
+# First, test it when we should not upload because the CPAN user
+# isn't set, etc:
+{
+no warnings 'redefine';
+local *Module::Release::NullClass::cpan_user = sub { () };
+
+my $release = Module::Release::MockClaim->new;
+isa_ok( $release, 'Module::Release::MockClaim' );
+
+ok( ! $release->should_upload_to_pause, "Shouldn't upload to PAUSE when cpan_user not set" );
+
+ok( ! defined $release->pause_claim, "pause_claim returns nothing when it shouldn't upload" );
+}
+
+
+# Now, test that it works when it sees 'Query succeeded'
 {
 my $release = Module::Release::MockClaim->new;
 isa_ok( $release, 'Module::Release::MockClaim' );
+
+ok( $release->should_upload_to_pause, "Should upload to PAUSE" );
 
 like( Module::Release::NullClass->as_string, qr/Query succeeded/, "Mock as_string looks good" );
 
@@ -190,6 +251,8 @@ local *Module::Release::NullClass::as_string = sub { 'foo' };
 
 my $release = Module::Release::MockClaim->new;
 isa_ok( $release, 'Module::Release::MockClaim' );
+
+ok( $release->should_upload_to_pause, "Should upload to PAUSE" );
 
 unlike( Module::Release::NullClass->as_string, qr/succeeded/, "Mock as_string looks good" );
 

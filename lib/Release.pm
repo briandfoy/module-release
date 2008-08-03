@@ -221,7 +221,6 @@ sub _set_defaults
 			null_fh       => IO::Null->new(),
 			quiet         => 0,
 
-			pause_ftp_site       => 'pause.perl.org',
 			%params,
 		   };
 
@@ -1145,17 +1144,18 @@ sub touch_all_in_manifest { $_[0]->touch( $_[0]->files_in_manifest ) }
 
 =item check_for_passwords
 
-Get passwords for CPAN or SourceForge.
+Get passwords for CPAN.
 
 =cut
 
 sub check_for_passwords
 	{
-	my $self = shift;
-
-	$self->{cpan_pass} = $self->get_env_var( "CPAN_PASS" ) if $self->{cpan};
-	
-	$self->_debug( "CPAN pass is $self->{cpan_pass}" );
+	if( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  )
+		{
+		$_[0]->config->set( 'cpan_pass', $pass ); 
+		}
+		
+	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass );
 	}
 
 

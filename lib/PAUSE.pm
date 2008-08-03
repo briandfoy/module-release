@@ -64,8 +64,10 @@ Returns true is the object thinks it should upload a distro to PAUSE.
 
 sub should_upload_to_pause
 	{
-	$_[0]->_debug( "CPAN user: " . $_[0]->config->cpan_user . " | CPAN pass: $_[0]->{cpan_pass}\n" );
-	$_[0]->config->cpan_user && $_[0]->{cpan_pass}
+	no warnings 'uninitialized';
+	$_[0]->_debug(    "CPAN user: " . $_[0]->config->cpan_user . 
+		           " | CPAN pass: " . $_[0]->config->cpan_pass . "\n" );
+	$_[0]->config->cpan_user && $_[0]->config->cpan_pass
 	}
 
 =item pause_claim
@@ -79,7 +81,7 @@ sub pause_claim
 	require HTTP::Request;
 
 	my $self = shift;
-	return unless $self->{cpan};
+	return unless $self->should_upload_to_pause;
 
 	my $ua  = $self->get_web_user_agent;
 
@@ -90,7 +92,7 @@ sub pause_claim
 	$request->content( $self->pause_claim_content );
 
 	$request->authorization_basic(
-		$self->config->cpan_user, $self->{cpan_pass} );
+		$self->config->cpan_user, $self->config->cpan_pass );
 
 	my $response = $ua->request( $request );
 
