@@ -831,7 +831,7 @@ sub dist
 	# If the distro isn't already set, try to guess it
 	unless( $self->local_file )
 		{
-		$self->_print( ", guessing local distribution name" );
+		$self->_debug( ", guessing local distribution name" );
 		my( $guess ) = $messages =~ /^\s*gzip.+?\b'?(\S+\.tar)'?\s*$/m;
 		$self->_debug( "guessed [$guess]" );
 		$self->local_file( $guess );
@@ -1012,7 +1012,7 @@ deprecated.
 sub manifest_name { 'MANIFEST' }
 
 sub manifest { 
-	$_[0]->_warn( "manifests is deprecated. Use manifest_name" );
+	$_[0]->_warn( "manifest is deprecated. Use manifest_name" );
 	&manifest_name 
 	}
 
@@ -1024,10 +1024,30 @@ Return the filenames in the manifest file as a list.
 
 sub files_in_manifest
 	{
-	open my($fh), "<", $_[0]->manifest_name
-		or $_[0]->_die( "files_in_manifest: could not open manifest file: $!" );
-
-	map { chomp; $_ } <$fh>;
+	my $self = shift;
+	
+	require ExtUtils::Manifest;
+	
+	# I want to use ExtUtils::Manifest so it automatically
+	# follows the right MANIFEST rules, but I have to adapt
+	# it's output to my output. Annoying, for sure.
+	my $hash = do {
+		local $SIG{'__WARN__'} = sub { 
+			my $message = shift;
+			if( $message =~ m/Debug: (.*)/ )
+				{
+				$self->_debug( $1 );
+				}
+			else
+				{
+				$self->_die( "files_in_manifest: could not open file\n" );
+				}
+			};
+			
+		ExtUtils::Manifest::maniread( $self->manifest_name );
+		};
+	
+	sort keys %$hash;
 	}
 
 =item check_cvs

@@ -319,7 +319,7 @@ foreach my $perl ( $release->perls )
 	$release->make;
 	$release->test;
 	$release->dist;
-	$release->dist_test;
+	$release->disttest;
 	}
 
 $release->set_perl( $old_perl );
