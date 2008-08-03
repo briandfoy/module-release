@@ -64,29 +64,36 @@ ok( defined $at, "check_kwalitee dies with no distro file" );
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check with the distro file
+# Check with the distro file that passes
 {
+local $run_output = "a 'perfect' distribution!";
+
 open my( $fh ), ">", $test_tar;
 close $fh;
 ok( -e $test_tar, "Created test distribution" );
-}
 
-__END__
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Run returns nothing, should die
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Run returns "a 'prefect' distribution"
-{
-local $run_output = "a 'perfect' distribution";
-ok( -e $test_tar, "$test_tar file exists" );
 $release->local_file( $test_tar );
-is( $release->local_file, $test_tar, "Local file was set to $test_tar" );
+is( $release->local_file, $test_tar, "local_file has the right value" );
+
+$release->turn_quiet_off;
 
 stdout_like
 	{ $release->check_kwalitee }
-	qr/done/,
-	"kwalitee passes and we reach 'done'"
-
+	qr/done/i,
+	"Good kwalitee reports 'Done'";
 }
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check with the distro file that passes
+{
+$release->turn_quiet_on;
+local $run_output = "You suck!";
+
+ok( -e $test_tar, "Test distribution exists" );
+
+my $rc = eval { $release->check_kwalitee; 1 };
+my $at = $@;
+ok( defined $at, "check_kwalitee dies when kwalitee doesn't pass" );
+like( $at, qr/suck/, "CPANTS reports that I suck" );
+}
+

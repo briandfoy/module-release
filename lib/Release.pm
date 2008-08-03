@@ -23,7 +23,9 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 26 );
+#$VERSION = sprintf "%d.%02d", qw( 1 26 );
+
+$VERSION = 2.00_01;
 
 use Carp;
 use File::Spec;
