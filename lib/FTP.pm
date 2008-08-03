@@ -45,7 +45,7 @@ module):
 
 sub ftp_upload
 	{
-	my $self = shift;
+	my( $self, $site ) = @_;
 	
 	my %defaults = map { my $m = "default_ftp_$_"; $_, $self->$m() } qw(
 		upload_dir
@@ -54,7 +54,10 @@ sub ftp_upload
 		hostname
 		);
 	
-	my %params = ( %defaults, @_ );
+	my %params = ( 
+		%defaults, 
+		defined $site ? ( hostname => $site ) : () 
+		);
 
 	$self->_print( "Logging in to $params{hostname}\n" );
 		
