@@ -68,13 +68,13 @@ like( $at, qr/No such file/, "Error message with bad command" );
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Pass it a bad command
+# Pass it a cammand that exits with 255 (which should be bad)
+# This use to die, but now it just warns
 {
-
-my $message = eval { $release->run( qq|$^X -e 'exit 255'| ) };
-my $at = $@;
-ok( defined $at, "perl dying dies" );
-like( $at, qr/didn't close cleanly/, "Error message with bad close" );
+stderr_like
+	{ eval { $release->run( qq|$^X -e 'exit 255'| ) } }
+	qr/didn't close cleanly/, 
+	"Error message with bad close";
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
