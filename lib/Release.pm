@@ -25,7 +25,7 @@ no warnings;
 
 #$VERSION = sprintf "%d.%02d", qw( 1 26 );
 
-$VERSION = '2.00_01';
+$VERSION = '2.00_02';
 
 use Carp;
 use File::Spec;
