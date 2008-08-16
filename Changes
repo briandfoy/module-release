@@ -1,5 +1,8 @@
 $Id$
 
+2.00_03 - Fri Aug 15 16:45:23 2008
+	* Distro cleanup, no big whoop
+
 2.00_02 - Sat Aug  9 03:41:07 2008
 	* The beginning of the new Module::Release. Lots of stuff 
 	moved into separate modules to act as mixins. There is a
