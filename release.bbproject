@@ -83,6 +83,98 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
+				AAAAAAF0AAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
+				AAAAAADBcTjpSCsAAAH5IG4HcmVsZWFzZQAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAfkhF8TfStZURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAABnNjcmlwdAAQAAgA
+				AMFxjUkAAAARAAgAAMTfkSYAAAABABQB+SBuAfkAJwAJ
+				dDAAB9huAABvGQACADVMZW9wYXJkOlVzZXJzOmJyaWFu
+				OkRldjpNb2R1bGUtUmVsZWFzZTpzY3JpcHQ6cmVsZWFz
+				ZQAADgAQAAcAcgBlAGwAZQBhAHMAZQAPABAABwBMAGUA
+				bwBwAGEAcgBkABIALVVzZXJzL2JyaWFuL0Rldi9Nb2R1
+				bGUtUmVsZWFzZS9zY3JpcHQvcmVsZWFzZQAAEwABLwAA
+				FQACAAz//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/brian/Dev/Module-Release/script/release</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAF4AAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
+				AAAAAADBcTjpSCsAAAH5ACcLTWFrZWZpbGUuUEwAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAfkhQMTfStVURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAADk1vZHVsZS1SZWxl
+				YXNlABAACAAAwXGNSQAAABEACAAAxN+RJQAAAAEAEAH5
+				ACcACXQwAAfYbgAAbxkAAgAyTGVvcGFyZDpVc2Vyczpi
+				cmlhbjpEZXY6TW9kdWxlLVJlbGVhc2U6TWFrZWZpbGUu
+				UEwADgAYAAsATQBhAGsAZQBmAGkAbABlAC4AUABMAA8A
+				EAAHAEwAZQBvAHAAYQByAGQAEgAqVXNlcnMvYnJpYW4v
+				RGV2L01vZHVsZS1SZWxlYXNlL01ha2VmaWxlLlBMABMA
+				AS8AABUAAgAM//8AAA==
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/brian/Dev/Module-Release/Makefile.PL</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFuAAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
+				AAAAAADBcTjpSCsAAAH5ACcITUFOSUZFU1QAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAArvHzcU1aPBURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAADk1vZHVsZS1SZWxl
+				YXNlABAACAAAwXGNSQAAABEACAAAxTW9UAAAAAEAEAH5
+				ACcACXQwAAfYbgAAbxkAAgAvTGVvcGFyZDpVc2Vyczpi
+				cmlhbjpEZXY6TW9kdWxlLVJlbGVhc2U6TUFOSUZFU1QA
+				AA4AEgAIAE0AQQBOAEkARgBFAFMAVAAPABAABwBMAGUA
+				bwBwAGEAcgBkABIAJ1VzZXJzL2JyaWFuL0Rldi9Nb2R1
+				bGUtUmVsZWFzZS9NQU5JRkVTVAAAEwABLwAAFQACAAz/
+				/wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/brian/Dev/Module-Release/MANIFEST</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAGAAAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
+				AAAAAADBcTjpSCsAAAH5ACcNTUFOSUZFU1QuU0tJUAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAfkgX8TfStVURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAADk1vZHVsZS1SZWxl
+				YXNlABAACAAAwXGNSQAAABEACAAAxN+RJQAAAAEAEAH5
+				ACcACXQwAAfYbgAAbxkAAgA0TGVvcGFyZDpVc2Vyczpi
+				cmlhbjpEZXY6TW9kdWxlLVJlbGVhc2U6TUFOSUZFU1Qu
+				U0tJUAAOABwADQBNAEEATgBJAEYARQBTAFQALgBTAEsA
+				SQBQAA8AEAAHAEwAZQBvAHAAYQByAGQAEgAsVXNlcnMv
+				YnJpYW4vRGV2L01vZHVsZS1SZWxlYXNlL01BTklGRVNU
+				LlNLSVAAEwABLwAAFQACAAz//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/brian/Dev/Module-Release/MANIFEST.SKIP</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<dict>
+				<key>AliasData</key>
+				<data>
 				AAAAAAF6AAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
 				AAAAAADBcTjpSCsAAAH5IGcLS3dhbGl0ZWUucG0AAAAA
 				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -120,52 +212,6 @@
 				</data>
 				<key>FileURL</key>
 				<string>file://localhost/Users/brian/Dev/Module-Release/lib/FTP.pm</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAF0AAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
-				AAAAAADBcTjpSCsAAAH5IG4HcmVsZWFzZQAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAfkhF8TfStZURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAABnNjcmlwdAAQAAgA
-				AMFxjUkAAAARAAgAAMTfkSYAAAABABQB+SBuAfkAJwAJ
-				dDAAB9huAABvGQACADVMZW9wYXJkOlVzZXJzOmJyaWFu
-				OkRldjpNb2R1bGUtUmVsZWFzZTpzY3JpcHQ6cmVsZWFz
-				ZQAADgAQAAcAcgBlAGwAZQBhAHMAZQAPABAABwBMAGUA
-				bwBwAGEAcgBkABIALVVzZXJzL2JyaWFuL0Rldi9Nb2R1
-				bGUtUmVsZWFzZS9zY3JpcHQvcmVsZWFzZQAAEwABLwAA
-				FQACAAz//wAA
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/brian/Dev/Module-Release/script/release</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAFuAAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
-				AAAAAADBcTjpSCsAAAH5ACcITUFOSUZFU1QAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAArvHzcU1aPBURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAADk1vZHVsZS1SZWxl
-				YXNlABAACAAAwXGNSQAAABEACAAAxTW9UAAAAAEAEAH5
-				ACcACXQwAAfYbgAAbxkAAgAvTGVvcGFyZDpVc2Vyczpi
-				cmlhbjpEZXY6TW9kdWxlLVJlbGVhc2U6TUFOSUZFU1QA
-				AA4AEgAIAE0AQQBOAEkARgBFAFMAVAAPABAABwBMAGUA
-				bwBwAGEAcgBkABIAJ1VzZXJzL2JyaWFuL0Rldi9Nb2R1
-				bGUtUmVsZWFzZS9NQU5JRkVTVAAAEwABLwAAFQACAAz/
-				/wAA
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/brian/Dev/Module-Release/MANIFEST</string>
 				<key>TypeID</key>
 				<string>_CFileLocator</string>
 				<key>Version</key>
@@ -303,29 +349,6 @@
 				</data>
 				<key>FileURL</key>
 				<string>file://localhost/Users/brian/Dev/Module-Release/t/test_manifest</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAGAAAIAAAdMZW9wYXJkAAAAAAAAAAAAAAAAAAAA
-				AAAAAADBcTjpSCsAAAH5ACcNTUFOSUZFU1QuU0tJUAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAfkgX8TfStVURVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAADk1vZHVsZS1SZWxl
-				YXNlABAACAAAwXGNSQAAABEACAAAxN+RJQAAAAEAEAH5
-				ACcACXQwAAfYbgAAbxkAAgA0TGVvcGFyZDpVc2Vyczpi
-				cmlhbjpEZXY6TW9kdWxlLVJlbGVhc2U6TUFOSUZFU1Qu
-				U0tJUAAOABwADQBNAEEATgBJAEYARQBTAFQALgBTAEsA
-				SQBQAA8AEAAHAEwAZQBvAHAAYQByAGQAEgAsVXNlcnMv
-				YnJpYW4vRGV2L01vZHVsZS1SZWxlYXNlL01BTklGRVNU
-				LlNLSVAAEwABLwAAFQACAAz//wAA
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/brian/Dev/Module-Release/MANIFEST.SKIP</string>
 				<key>TypeID</key>
 				<string>_CFileLocator</string>
 				<key>Version</key>

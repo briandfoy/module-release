@@ -22,6 +22,8 @@ WriteMakefile(
 		'IO::Null'             => 0,
 		'Crypt::SSLeay'        => 0,
 		'Test::Output'         => 0,
+		'URI'                  => 0,
+		'HTTP::Request'        => 0,
 		},
 
 	'PM'           => {

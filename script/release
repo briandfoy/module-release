@@ -364,6 +364,9 @@ my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default 
+{
+no warning 'uninitialized';
+
 $ENV{AUTOMATED_TESTING} = ( 
 	grep { defined } ( 
 		$opts{a}, $release->config->automated_testing, 
@@ -371,7 +374,7 @@ $ENV{AUTOMATED_TESTING} = (
 	)[0];
 $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
-	
+}	
 	
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
