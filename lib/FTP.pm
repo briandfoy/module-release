@@ -4,6 +4,7 @@ package Module::Release::FTP;
 use strict;
 use warnings;
 use base qw(Exporter);
+use vars qw($VERSION);
 
 our @EXPORT = qw( 
 	ftp_upload ftp_passive_on ftp_passive_off ftp_passive 
@@ -12,7 +13,7 @@ our @EXPORT = qw(
 	default_ftp_password default_ftp_upload_dir
 	);
 
-our $VERSION = '0.10_02';
+$VERSION = '2.00_05';
 
 =head1 NAME
 
@@ -190,9 +191,9 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-So far this is in a private git repository. It's only private because I'm
-lazy. I can send it to you if you like, and I promise to set up something
-public Real Soon Now.
+This source is in Github:
+
+	git://github.com/briandfoy/module-release.git
 
 =head1 AUTHOR
 

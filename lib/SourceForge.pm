@@ -17,7 +17,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = sprintf "%d.%02d", qw( 1 25 );
+$VERSION = '2.00_05';
 
 =head1 DESCRIPTION
 
@@ -278,21 +278,15 @@ module form.
 Andy Lester handled the maintenance while I was on my Big Camping
 Trip. He applied patches from many authors.
 
-Andreas Koenig suggested changes to make it work better with PAUSE.
+Andreas KE<ouml>nig suggested changes to make it work better with PAUSE.
 
 Chris Nandor helped with figuring out the broken SourceForge stuff.
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases. This
-source now lives in the "Module/Release" section of the repository,
-and older sources live in the "release" section.
+This source is in Github:
 
-	http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	git://github.com/briandfoy/module-release.git
 
 =head1 AUTHOR
 

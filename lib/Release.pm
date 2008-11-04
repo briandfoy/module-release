@@ -18,14 +18,12 @@ Module::Release - Automate software releases
 =cut
 
 use strict;
-use vars qw( $VERSION );
 
 use warnings;
 no warnings;
+use vars qw($VERSION);
 
-#$VERSION = sprintf "%d.%02d", qw( 1 26 );
-
-$VERSION = '2.00_03';
+$VERSION = '2.00_05';
 
 use Carp;
 use File::Spec;
@@ -341,6 +339,8 @@ sub load_mixin
 
 	return 1 if $self->mixin_loaded( $module );
 
+	no warnings 'redefine';
+	
 	eval "use $module";
 
 	$self->_die( "Could not load [$module]! $@" ) if $@;
@@ -1306,7 +1306,7 @@ sub _dashes { "-" x 73 }
 
 =item _debug( LIST )
 
-Send the LIST to whatever is in debug_fh, or to STDERR. If you are
+Send the LIST to whatever is in debug_fh, or to STDERR. If you aren't
 debugging, debug_fh should return a null filehandle.
 
 =cut
@@ -1339,21 +1339,15 @@ module form.
 Andy Lester handled the maintenance while I was on my Big Camping
 Trip. He applied patches from many authors.
 
-Andreas Koenig suggested changes to make it work better with PAUSE.
+Andreas KE<ouml>nig suggested changes to make it work better with PAUSE.
 
 Chris Nandor helped with figuring out the broken SourceForge stuff.
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge project which always has the
-latest sources in SVN, as well as all of the previous releases. This
-source now lives in the "Module/Release" section of the repository,
-and older sources live in the "release" section.
+This source is in Github:
 
-	http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this module appropriately.
+	git://github.com/briandfoy/module-release.git
 
 =head1 AUTHOR
 

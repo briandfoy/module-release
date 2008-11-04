@@ -2,8 +2,6 @@ load.t
 compile.t
 pod.t
 pod_coverage.t
-#prereq.t
-#sf_login.t
 abstract.t
 new.t
 defaults.t

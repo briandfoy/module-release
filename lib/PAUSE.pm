@@ -4,13 +4,14 @@ package Module::Release::PAUSE;
 use strict;
 use warnings;
 use base qw(Exporter);
+use vars qw($VERSION);
 
 our @EXPORT = qw(
 	pause_ftp_site should_upload_to_pause pause_claim set_pause_ftp_site
 	pause_claim_base_url pause_claim_content pause_claim_content_type
 	);
 
-our $VERSION = '0.10_02';
+$VERSION = '2.00_05';
 
 =head1 NAME
 
@@ -150,9 +151,9 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-So far this is in a private git repository. It's only private because I'm
-lazy. I can send it to you if you like, and I promise to set up something
-public Real Soon Now.
+This source is in Github:
+
+	git://github.com/briandfoy/module-release.git
 
 =head1 AUTHOR
 

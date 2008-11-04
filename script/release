@@ -14,7 +14,7 @@ release - give your Perl distros to the world
 
 =head1 SYNOPSIS
 
-	release [ LOCAL_FILE [ REMOTE_FILE ] ]
+	release [OPTIONS] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 	# try a dry run without uploading anything
 	release -t
@@ -31,11 +31,17 @@ release - give your Perl distros to the world
 	# print release number and exit
 	release -v
 
+	# set $ENV{AUTOMATED_TESTING} to a true value
+	release -a
+	
+
 =head1 DESCRIPTION
 
 This is the prototype program for using C<Module::Release>. You should
 modify it to fit your needs. If it doesn't do what you want, you can
-change it however you like.
+change it however you like. This is how I like to release my modules,
+and I'm happy to add features that do not get in my way. Beyond that,
+you should write your own script to match your process.
 
 This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
@@ -88,11 +94,51 @@ repository.  You should be able to checkout the code from any release.
 
 =back
 
+=head2 Command-line switches
+
+=over 4
+
+=item -a
+
+Set $ENV{AUTOMATED_TESTING} to true. You can also set automated_testing
+in the configuration file.
+
+=item -d
+
+Show debugging information
+
+=item -h
+
+Print a help message then exit
+
+=item -k
+
+Skip the kwalitee checks. You can also set the skip_kwalitee directive
+to a true value in the configuration file.
+
+Have you considered just fixing the kwalitee though? :)
+
+=item -p
+
+Skip the prereq checks. You can also set the skip_prereqs directive
+to a true value in the configuration file.
+
+Have you considered just fixing the prereqs though? :)
+
+=item -t
+
+Run all checks then stop. Do not change any files or upload the distribution.
+
+=item -v
+
+Print the program name and version then exit
+
+=back
+
 =head2 Configuration
 
 The release script uses a configuration file in the current working
 directory.  The file name is F<.releaserc>.
-
 
 release's own F<.releaserc> looks like this:
 
@@ -110,37 +156,45 @@ release does not test the perls in any particular order.
 
 =item cpan_user
 
+The PAUSE user
+
 =item passive_ftp
 
 Set C<passive_ftp> to "y" or "yes" for passive FTP transfers.  Usually
 this is to get around a firewall issue.
 
+=item skip_kwalitee
+
+Set to a false value to skip kwalitee checks (such as for a script
+distribution with no modules in it).
+
+=item skip_prereqs
+
+Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
+checks. By default this is 0 and C<release> will try to check
+prerequisites.
+
+=item automated_testing
+
+Set C<automated_testing> to the value you want for the 
+$ENV{AUTOMATED_TESTING} setting. By default this is 0, so
+testing is started in interactive mode.
+
 =item release_subclass
 
-Specify the name of a subclass to use instead of Module::Release.  The
-subclass can override any of the Module::Release methods.  This makes
-it possible to maintain your own local releasing procedures.  For
-instance, one such subclass might look like this:
-
-  package Module::Release::KWILLIAMS;
-  use base qw(Module::Release);
-
-  sub make_cvs_tag {
-    my $self = shift;
-    (my $version) = $self->{remote} =~ / - (\d[\w.]*) \.tar \.gz $/x;
-    $version =~ s/[^a-z0-9_]/_/gi;
-    return "release-$version";
-  }
-  1;
-
-To use this subclass, you'd put it in your C<@INC> somewhere, then set
-C<release_subclass> to C<Module::Release::KWILLIAMS>.
+DEPRECATED AND REMOVED. You should really just write your own
+release script. Fork this one even!
 
 =back
 
 =head2 Environment
 
 =over 4
+
+=item * AUTOMATED_TESTING
+
+Module::Release doesn't do anything with this other than set it for
+Test::Harness.
 
 =item * CPAN_PASS
 
@@ -173,13 +227,9 @@ make; otherwise, the perl used to run release will be used.
 
 =head1 SOURCE AVAILABILITY
 
-This source is part of a SourceForge.net project which always has the
-latest sources in CVS, as well as all of the previous releases.
+This source is in Github as part of the Module::Release project:
 
-        http://sourceforge.net/projects/brian-d-foy/
-
-If, for some reason, I disappear from the world, one of the other
-members of the project can shepherd this software appropriately.
+        git://github.com/briandfoy/module-release.git
 
 =head1 AUTHOR
 
@@ -197,23 +247,24 @@ Ken Williams turned the original release(1) script into a module.
 
 Andy Lester contributed to the module and script.
 
-H. Merijn Brand submitted patches to work with 5.005.
+H. Merijn Brand submitted patches to work with 5.005 and to create
+the automated_testing feature.
 
 =cut
 
 use Getopt::Std;
-use Module::Release 1.26;
+use Module::Release '2.00_04';
 
 my $class = "Module::Release";
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
-getopts('hdtvk', \%opts) or $opts{h} = 1;
+getopts('ahdptvk', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = 1.25;
+my( $script_version ) = '2.00_04';
 
 if( $opts{v} )
 	{
@@ -274,14 +325,15 @@ $release->_debug( "release $script_version, using $class "
 # load whatever will handle source control
 {
 my @vcs = (
-	[ '.git' => "Module::Release::Git" ],
-	[ '.svn' => "Module::Release::SVN" ],
-	[ 'CVS'  => "Module::Release::CVS" ],
+	[ '.git'       => "Module::Release::Git" ],
+	[ '.gitignore' => "Module::Release::Git" ],
+	[ '.svn'       => "Module::Release::SVN" ],
+	[ 'CVS'        => "Module::Release::CVS" ],
 	);
 
 foreach my $vcs ( @vcs )
 	{
-	next unless -d $vcs->[0];
+	next unless -e $vcs->[0];
 
 	my $module = $vcs->[1];
 
@@ -296,14 +348,31 @@ foreach my $vcs ( @vcs )
 
 }
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Will we upload to PAUSE?
-if( $release->config->cpan_user )
+if( $release->config->cpan_user ) # not a dry run
 	{
 	$release->load_mixin( 'Module::Release::PAUSE' );
 	}
 
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Will we upload to PAUSE?
+$release->load_mixin( 'Module::Release::Prereq' );
+
+my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Set automated testing from command line, config, environment, or default 
+$ENV{AUTOMATED_TESTING} = ( 
+	grep { defined } ( 
+		$opts{a}, $release->config->automated_testing, 
+		$ENV{AUTOMATED_TESTING}, 0 ) 
+	)[0];
+$release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
+	" automated_testing was " . $release->config->automated_testing . ";\n" );
+	
+	
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
 {
@@ -318,6 +387,16 @@ foreach my $perl ( $release->perls )
 	$release->build_makefile;
 	$release->make;
 	$release->test;
+
+	unless( $skip_prereqs )
+		{
+		$release->check_prereqs;
+		}
+	else
+		{
+		$release->_print( "Skipping prereq checks. Shame on you!\n" );
+		}
+		
 	$release->dist;
 	$release->disttest;
 	}
@@ -328,7 +407,7 @@ $release->set_perl( $old_perl );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check kwalitee
-unless( $opts{k} )
+unless( $opts{k} || $release->config->skip_kwalitee  )
 	{
 	$release->load_mixin( 'Module::Release::Kwalitee' );
 	$release->_print("============Testing for kwalitee\n");
@@ -338,7 +417,10 @@ unless( $opts{k} )
 	$release->dist;
 	$release->check_kwalitee;
 	}
-
+else
+	{
+	$release->_print( "Skipping kwalitee checks. Shame on you!\n" );
+	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check source repository (but do not commit)

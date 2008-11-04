@@ -16,3 +16,6 @@ sf_login\.t
 \.svnignore
 t/test_dir
 cover_db
+\.git
+\.bbproj
+sf_upload

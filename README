@@ -14,9 +14,9 @@ the file, you can read it with perldoc.
 
 Look at the example script in script/release.
 	
-This module is also in CVS on SourceForge
+This module is also in Github
 
-	http://sourceforge.net/projects/brian-d-foy/
+	git://github.com/briandfoy/module-release.git
 
 
 Enjoy, 

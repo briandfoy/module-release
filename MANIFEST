@@ -4,6 +4,7 @@ hack/git.pl
 lib/FTP.pm
 lib/Kwalitee.pm
 lib/PAUSE.pm
+lib/Prereq.pm
 lib/Release.pm
 lib/SourceForge.pm
 lib/SVN.pm
@@ -11,7 +12,6 @@ Makefile.PL
 MANIFEST
 README
 script/release
-script/sf_upload
 t/abstract.t
 t/compile.t
 t/defaults.t

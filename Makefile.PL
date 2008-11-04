@@ -30,6 +30,7 @@ WriteMakefile(
 		'lib/FTP.pm'     => '$(INST_LIBDIR)/Release/FTP.pm',
 		'lib/PAUSE.pm'   => '$(INST_LIBDIR)/Release/PAUSE.pm',
 		'lib/Kwalitee.pm'   => '$(INST_LIBDIR)/Release/Kwalitee.pm',
+		'lib/Prereq.pm'   => '$(INST_LIBDIR)/Release/Prereq.pm',
 		#map { "lib/$_.pm" => "\$(INST_LIBDIR)/Release/$_.pm" } qw( SVN PAUSE FTP ),
 		},
 
