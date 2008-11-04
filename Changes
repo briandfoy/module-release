@@ -1,5 +1,12 @@
 $Id$
 
+2.00_05 - Tue Nov  4 04:00:40 2008
+	* Added the -a switch to turn on $ENV{AUTOMATED_TESTING}
+	* Added the -p switch to turn off prereq tests
+	* Added automated_testing to possible config directives
+	* The kwalitee directive is now skip_kwalitee
+	* There's a skip_prereqs directive
+
 2.00_03 - Fri Aug 15 16:45:23 2008
 	* Distro cleanup, no big whoop
 
