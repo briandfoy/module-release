@@ -365,7 +365,7 @@ my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default 
 {
-no warning 'uninitialized';
+no warnings 'uninitialized';
 
 $ENV{AUTOMATED_TESTING} = ( 
 	grep { defined } ( 
