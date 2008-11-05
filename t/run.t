@@ -64,7 +64,7 @@ ok( ! -x $command, "$command is not executable (good)" );
 my $message = eval { $release->run( qq|$command| ) };
 my $at = $@;
 ok( defined $at, "Bad command dies" );
-like( $at, qr/No such file/, "Error message with bad command" );
+like( $at, qr/Could not open command/, "Error message with bad command" );
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

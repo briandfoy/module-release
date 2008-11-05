@@ -8,7 +8,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_prereqs );
 
-$VERSION = '2.00_05';
+$VERSION = '2.00_06';
 
 =head1 NAME
 

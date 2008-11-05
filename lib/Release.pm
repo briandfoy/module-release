@@ -23,7 +23,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.00_05';
+$VERSION = '2.00_06';
 
 use Carp;
 use File::Spec;
@@ -1227,7 +1227,7 @@ sub run
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 	
-	open my($fh), "$command |" or $self->_die( $! );
+	open my($fh), "$command |" or $self->_die( "Could not open command [$command]: $!" );
 	$fh->autoflush;
 
 	my $output = '';

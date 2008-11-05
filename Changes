@@ -1,4 +1,4 @@
-$Id$
+# Changes for Module::Release
 
 2.00_05 - Tue Nov  4 04:00:40 2008
 	* Added the -a switch to turn on $ENV{AUTOMATED_TESTING}
@@ -16,7 +16,6 @@ $Id$
 	lot more testing. 
 	* This is still a developer release, so don't get too
 	attached to anything just yet.
-
 
 1.22 - Sun Apr  6 13:13:30 2008
 	* BUG FIX: Move kwalitee testing after normal testing, and have
