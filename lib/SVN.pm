@@ -6,9 +6,11 @@ use warnings;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-our @EXPORT = qw(check_cvs cvs_tag make_cvs_tag);
+use Carp;
 
-$VERSION = '2.00_06';
+our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
+
+$VERSION = '2.00_07';
 
 =head1 NAME
 
@@ -22,7 +24,7 @@ F<.svn> directory. The module exports check_cvs, cvs_tag, and make_cvs_tag.
 =head1 DESCRIPTION
 
 C<Module::Release::SVN> is a plugin for C<Module::Release>, and provides
-its own implementations of the C<check_cvs()> and C<cvs_tag()> methods
+its own implementations of the C<check_vcs()> and C<vcs_tag()> methods
 that are suitable for use with a Subversion repository rather than a
 CVS repository.
 
@@ -38,11 +40,21 @@ This module depends on the external svn binary (so far).
 
 =item C<check_cvs()>
 
-Check the state of the Git repository.
+DEPRECATED. Use C<check_vcs> now.
+
+=item C<check_vcs()>
+
+Check the state of the SVN repository.
 
 =cut
 
 sub check_cvs
+	{
+	carp "check_cvs is deprecated in favor of check_vcs. Update your programs!";
+	&check_vcs;
+	}
+	
+sub check_vcs
 	{
 	my $self = shift;
 
@@ -108,13 +120,24 @@ sub check_cvs
 	$self->_print( "Subversion up-to-date\n" );
 	}
 
-=item C<cvs_tag(TAG)>
+=item C<cvs_tag()>
+
+DEPRECATED. Use C<vcs_tag> now.
+
+=item C<vcs_tag(TAG)>
 
 Tag the release in Subversion.
 
 =cut
 
+
 sub cvs_tag
+	{
+	carp "cvs_tag is deprecated in favor of vcs_tag. Update your programs!";
+	&check_vcs;
+	}
+	
+sub vcs_tag
 	{
 	require URI;
 
@@ -197,7 +220,11 @@ sub cvs_tag
 
 	}
 
-=item make_cvs_tag
+=item C<make_cvs_tag()>
+
+DEPRECATED. Use C<make_vcs_tag> now.
+
+=item make_vcs_tag
 
 By default, examines the name of the remote file
 (i.e. F<Foo-Bar-0.04.tar.gz>) and constructs a tag string like
@@ -206,7 +233,14 @@ different tagging scheme, or don't even call it.
 
 =cut
 
+
 sub make_cvs_tag
+	{
+	carp "make_cvs_tag is deprecated in favor of make_vcs_tag. Update your programs!";
+	&make_vcs_tag;
+	}
+	
+sub make_vcs_tag
 	{
 	my $self = shift;
 	my( $major, $minor ) = $self->remote_file

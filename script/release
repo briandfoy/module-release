@@ -429,7 +429,7 @@ else
 # check source repository (but do not commit)
 $release->_print("============Checking source repository\n");
 
-$release->check_cvs;
+$release->check_vcs;
 
 my $Version = $release->dist_version;
 
@@ -527,7 +527,7 @@ while( $release->should_upload_to_pause )
 	last;
 	}
 
-$release->cvs_tag unless $release->debug;
+$release->vcs_tag unless $release->debug;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

@@ -23,7 +23,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.00_06';
+$VERSION = '2.00_07';
 
 use Carp;
 use File::Spec;
@@ -507,7 +507,7 @@ sub _looks_like_perl
 	my( $self, $path ) = @_;
 
 
-	my $version = `$path -e 'print \$\]' 2>&1`;
+	my $version = `$path -e "print \$\]" 2>&1`;
 
 	$version =~ m/^\d+\.[\d_]+$/ ? $version : ();
 	}
@@ -1051,11 +1051,14 @@ sub files_in_manifest
 	sort keys %$hash;
 	}
 
-=item check_cvs
+=item check_vcs
 
-=item cvs_tag
+=item vcs_tag
 
-=item make_cvs_tag
+=item make_vcs_tag
+
+Note: these methods were formerly "cvs", but are now "vcs" for
+Version Control System.
 
 This is a placeholder method which should be implemented in a mixin
 module. Try installing Module::Release::CVS, Module::Release::SVN,
@@ -1069,18 +1072,18 @@ separate module.
 
 =cut
 
-sub check_cvs
+sub check_vcs
 	{
 	$_[0]->_die( "check_cvs must be implemented in a mixin class" );
 	}
 
 
-sub cvs_tag
+sub vcs_tag
 	{
 	$_[0]->_die( "cvs_tag must be implemented in a mixin class" );
 	}
 
-sub make_cvs_tag
+sub make_vcs_tag
 	{
 	$_[0]->_die( "make_cvs_tag must be implemented in a mixin class" );
 	}

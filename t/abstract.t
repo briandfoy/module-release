@@ -12,9 +12,9 @@ use_ok( $class );
 # Are the subroutines defined?
 {
 my @subs = qw(
-	check_cvs
-	cvs_tag
-	make_cvs_tag
+	check_vcs
+	vcs_tag
+	make_vcs_tag
 	);
 	
 can_ok( $class, @subs );
