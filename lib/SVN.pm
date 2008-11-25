@@ -10,7 +10,7 @@ use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.00_07';
+$VERSION = '2.01';
 
 =head1 NAME
 
