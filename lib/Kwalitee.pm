@@ -8,7 +8,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 =head1 NAME
 
