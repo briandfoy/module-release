@@ -1,5 +1,11 @@
 # Changes for Module::Release
 
+2.02 - Sat Feb  7 17:30:30 2009
+	* Fix the command runner for the SVN.pm. SVN.pm is otherwise
+	neglected since I've stopped using SVN but I will accept
+	patches.
+	* The run.t patch undefs PATH before it looks for commands
+
 2.01 - Tue Nov 25 10:37:03 2008
 	A bump to a release version
 
