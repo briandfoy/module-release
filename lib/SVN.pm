@@ -200,13 +200,13 @@ sub vcs_tag
 		return;
 		}
 
-	my $tag = $self->make_cvs_tag;
+	my $tag = $self->make_vcs_tag;
 
 	push @tag_url, $tag;
 	$tag_url->path_segments(@tag_url);
 	$self->_print( "Tagging release to $tag_url\n" );
 
-	$self->run( 'svn copy $trunk_url $tag_url' );
+	$self->run( "svn copy $trunk_url $tag_url" );
 
 	if ( $? )
 		{

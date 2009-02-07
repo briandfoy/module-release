@@ -58,6 +58,7 @@ like( $at, qr/Didn't get a command!/, "Error message with undef argument" );
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Pass it a bad command
 {
+local $ENV{PATH} = '';
 my $command = "foo";
 ok( ! -x $command, "$command is not executable (good)" );
 
