@@ -19,3 +19,4 @@ run.t
 kwalitee/check_kwalitee.t
 ftp/ftp.t
 pause/pause.t
+without.t

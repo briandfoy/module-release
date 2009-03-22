@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Module::Release;
-use Test::More tests => 10;
+use Test::More tests => 6;
 
 use Test::Without::Module qw( Test::Prereq Module::CPANTS::Analyse );
 

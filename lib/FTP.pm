@@ -1,4 +1,3 @@
-# $Id$
 package Module::Release::FTP;
 
 use strict;
@@ -201,7 +200,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2007-2008, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2009, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

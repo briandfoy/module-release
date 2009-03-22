@@ -1,4 +1,3 @@
-# $Id$
 package Module::Release::Prereq;
 
 use strict;
@@ -35,6 +34,9 @@ It looks in local_name to get the name of the distribution file.
 
 sub check_prereqs
 	{
+	eval "require Test::Prereq; 1 " or
+		$_[0]->_die( "You need Test::Prereq to check prereqs" );
+
 	$_[0]->_print( "Checking prereqs... " );
 	
 	my $perl = $_[0]->{perl};
@@ -66,7 +68,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2007-2008, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2009, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

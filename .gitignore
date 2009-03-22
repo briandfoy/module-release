@@ -7,3 +7,4 @@ Module-*
 *test_dir*
 Debian_CPANTS.txt
 *.bbproj
+.DS_Store

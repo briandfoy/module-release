@@ -1,4 +1,3 @@
-# $Id$
 package Module::Release::Kwalitee;
 
 use strict;
@@ -34,6 +33,9 @@ It looks in local_name to get the name of the distribution file.
 
 sub check_kwalitee
 	{
+	eval "require Module::CPANTS::Analyse; 1" or
+		$_[0]->_die( "You need Module::CPANTS::Analyse to check kwalitee" );
+
 	$_[0]->_print( "Checking kwalitee... " );
 
 	my $name    = $_[0]->local_file;
@@ -88,7 +90,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2007-2008, brian d foy, All Rights Reserved.
+Copyright (c) 2007-2009, brian d foy, All Rights Reserved.
 
 You may redistribute this under the same terms as Perl itself.
 
