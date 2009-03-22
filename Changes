@@ -1,5 +1,10 @@
 # Changes for Module::Release
 
+2.03 - Sun Mar 22 06:10:45 2009
+	* Treat Test::Prereq and Module::CPANTS::Analysse as
+	optional dependencies. They were before, but now you get
+	a nicer error message.
+
 2.02 - Sat Feb  7 17:30:30 2009
 	* Fix the command runner for the SVN.pm. SVN.pm is otherwise
 	neglected since I've stopped using SVN but I will accept
