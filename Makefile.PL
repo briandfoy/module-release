@@ -16,14 +16,15 @@ WriteMakefile(
 
 	'PREREQ_PM'    => 
 		{
-		'ConfigReader::Simple' => 0,
-		'Net::FTP'             => 0,
-		'HTTP::Message'        => 0,
-		'IO::Null'             => 0,
-		'Crypt::SSLeay'        => 0,
-		'Test::Output'         => 0,
-		'URI'                  => 0,
-		'HTTP::Request'        => 0,
+		'ConfigReader::Simple'  => 0,
+		'Crypt::SSLeay'         => 0,
+		'HTTP::Message'         => 0,
+		'HTTP::Request'         => 0,
+		'IO::Null'              => 0,
+		'Net::FTP'              => 0,
+		'Test::Output'          => 0,
+		'Test::Without::Module' => 0,
+		'URI'                   => 0,
 		},
 
 	'PM'           => {
