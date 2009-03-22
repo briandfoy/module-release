@@ -12,7 +12,7 @@ our @EXPORT = qw(
 	default_ftp_password default_ftp_upload_dir
 	);
 
-$VERSION = '2.02';
+$VERSION = '2.03';
 
 =head1 NAME
 
