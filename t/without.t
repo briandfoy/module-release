@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use Test::More tests => 6;
+
 BEGIN {
 	use File::Spec;
 	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
@@ -9,7 +11,6 @@ BEGIN {
 	}
 
 use Module::Release;
-use Test::More tests => 6;
 
 use Test::Without::Module qw( Test::Prereq Module::CPANTS::Analyse );
 
