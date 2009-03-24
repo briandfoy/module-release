@@ -22,7 +22,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.04';
+$VERSION = '2.04_01';
 
 use Carp;
 use File::Spec;
@@ -130,6 +130,10 @@ Your SourceForge account (i.e. login) name.
 
 Set this to a true value to enable passive FTP.
 
+=item ignore_prereqs
+
+A whitespace separated list of modules for C<Test::Prereq> to ignore.
+
 =back
 
 =head2 Methods
@@ -164,6 +168,7 @@ sub new
 
 	if( $config->release_subclass )
 		{
+		$self->_warn( "Use of release_subclass is deprecated" );
 		$self->_die( "release_subclass is the same class! Don't do that!" )
 			if $config->release_subclass eq $class;
 		my $subclass_self = $self->_handle_subclass(
@@ -208,18 +213,19 @@ sub _set_defaults
 	my( $self, %params ) = @_;
 
 	my $defaults = {
-			'Makefile.PL' => 'Makefile.PL',
-			'Makefile'    => 'Makefile',
-			make          => $Config::Config{make},
-			manifest      => 'MANIFEST',
-			debug         => $ENV{RELEASE_DEBUG} || 0,
-			local_file    => undef,
-			remote_file   => undef,
-			output_fh     => *STDOUT{IO},
-			debug_fh      => *STDERR{IO},
-			null_fh       => IO::Null->new(),
-			quiet         => 0,
-			devnull       => File::Spec->devnull,
+			'Makefile.PL'  => 'Makefile.PL',
+			'Makefile'     => 'Makefile',
+			make           => $Config::Config{make},
+			manifest       => 'MANIFEST',
+			debug          => $ENV{RELEASE_DEBUG} || 0,
+			local_file     => undef,
+			remote_file    => undef,
+			output_fh      => *STDOUT{IO},
+			debug_fh       => *STDERR{IO},
+			null_fh        => IO::Null->new(),
+			quiet          => 0,
+			devnull        => File::Spec->devnull,
+			ignore_prereqs => '',
 			
 			%params,
 		   };

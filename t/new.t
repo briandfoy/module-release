@@ -21,7 +21,7 @@ BEGIN {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create object with no parameters
 {
-my $release = $class->new;
+my $release = $class->new( quiet => 1 );
 isa_ok( $release, $class );
 }
 
@@ -49,7 +49,7 @@ close $fh;
 }
 
 {
-my $release = $class->new;
+my $release = $class->new( quiet => 1 );
 isa_ok( $release, $mock_class );
 isa_ok( $release, $class );
 }
@@ -79,7 +79,7 @@ close $fh;
 }
 
 {
-my $release = eval { $class->new; 1 };
+my $release = eval { $class->new( quiet => 1 ); 1 };
 my $at = $@;
 
 like( $@, qr/Could not create object/, "Subclass that doesn't return object croaks" );

@@ -5,9 +5,9 @@ use warnings;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-our @EXPORT = qw( check_prereqs );
+our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-$VERSION = '2.04';
+$VERSION = '2.04_01';
 
 =head1 NAME
 
@@ -41,7 +41,11 @@ sub check_prereqs
 	
 	my $perl = $_[0]->{perl};
 	
-	my $messages = $_[0]->run( "$perl -MTest::Prereq -eprereq_ok" );
+	my @ignore = $_[0]->_get_prereq_ignore_list;
+	
+	my $messages = $_[0]->run( 
+		qq|$perl -MTest::Prereq -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"| 
+		);
 	
 	$_[0]->_die( "Prereqs had a problem:\n$messages\n" )
 		unless $messages =~ m/^ok 1 - Prereq test/m;
@@ -49,6 +53,10 @@ sub check_prereqs
 	$_[0]->_print( "done\n" );
 	}
 
+sub _get_prereq_ignore_list
+	{	
+	my @ignore = split /\s+/, $_[0]->config->ignore_prereqs;
+	}
 
 =back
 
