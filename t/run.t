@@ -73,7 +73,7 @@ like( $at, qr/Could not open command/, "Error message with bad command" );
 # This use to die, but now it just warns
 {
 stderr_like
-	{ eval { $release->run( qq|$^X -e 'exit 255'| ) } }
+	{ eval { $release->run( qq|$^X -e "exit 255"| ) } }
 	qr/didn't close cleanly/, 
 	"Error message with bad close";
 }
@@ -81,6 +81,6 @@ stderr_like
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Pass it perl printing hello
 {
-my $message = $release->run( qq|$^X -e 'print "Hello"'| );
+my $message = $release->run( qq|$^X -e "print q(Hello)"| );
 is( $message, 'Hello', "Got right message from running perl" );
 }

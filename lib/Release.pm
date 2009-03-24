@@ -512,7 +512,6 @@ sub _looks_like_perl
 	{
 	my( $self, $path ) = @_;
 
-
 	my $version = `$path -e "print \$\]" 2>&1`;
 
 	$version =~ m/^\d+\.[\d_]+$/ ? $version : ();
