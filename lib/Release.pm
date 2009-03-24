@@ -22,7 +22,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.03';
+$VERSION = '2.04';
 
 use Carp;
 use File::Spec;
@@ -219,7 +219,8 @@ sub _set_defaults
 			debug_fh      => *STDERR{IO},
 			null_fh       => IO::Null->new(),
 			quiet         => 0,
-
+			devnull       => File::Spec->devnull,
+			
 			%params,
 		   };
 
@@ -825,7 +826,7 @@ sub dist
 		return;
 		}
 
-	my $messages = $self->run( "$self->{make} dist 2>&1 < /dev/null" );
+	my $messages = $self->run( "$self->{make} dist 2>&1 < $self->{devnull}" );
 	$self->_debug( "messages are [$messages]" );
 
 	# If the distro isn't already set, try to guess it
