@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.04 - Tue Mar 24 04:07:54 2009
+	* Use a platform-specific version of devnull
+
 2.03 - Sun Mar 22 06:10:45 2009
 	* Treat Test::Prereq and Module::CPANTS::Analysse as
 	optional dependencies. They were before, but now you get
