@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.04_01 - Tue Mar 24 04:55:40 2009
+	* Add experimental ignore_prereqs option to pass on to Test::Prereqs
+
 2.04 - Tue Mar 24 04:07:54 2009
 	* Use a platform-specific version of devnull
 
