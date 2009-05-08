@@ -2,7 +2,16 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+BEGIN {
+use Test::More;
+eval "use  Module::CPANTS::Analyse";
+my $at = $@;
+plan $at ? 
+	( 'skip_all', 'You need  Module::CPANTS::Analyse to check Kwalitee' ) 
+	: 
+	'no_plan';
+}
+
 use Test::Output;
 
 use Cwd;
