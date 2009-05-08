@@ -54,8 +54,8 @@ sub check_prereqs
 	}
 
 sub _get_prereq_ignore_list
-	{	
-	my @ignore = split /\s+/, $_[0]->config->ignore_prereqs;
+	{
+	my @ignore = split /\s+/, $_[0]->config->ignore_prereqs || '';
 	}
 
 =back
