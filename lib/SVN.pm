@@ -9,7 +9,7 @@ use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.04_02';
+$VERSION = '2.04_03';
 
 =head1 NAME
 
@@ -70,13 +70,13 @@ sub check_vcs
 	$svn_update =~ s/^(........)\s+\d+\s+\d+\s+\S+\s+(.*)$/$1 $2/mg;
 
 	my %message = (
-		qr/^C......./   => 'These files have conflicts',
-		qr/^M......./   => 'These files have not been checked in',
-		qr/^........\*/ => 'These files need to be updated',
-		qr/^P......./   => 'These files need to be patched',
-		qr/^A......./   => 'These files were added but not checked in',
-		qr/^D......./   => 'These files are scheduled for deletion',
-		qr/^\?......./  => 'I don\'t know about these files',
+		qr/^C......./m   => 'These files have conflicts',
+		qr/^M......./m   => 'These files have not been checked in',
+		qr/^........\*/m => 'These files need to be updated',
+		qr/^P......./m   => 'These files need to be patched',
+		qr/^A......./m   => 'These files were added but not checked in',
+		qr/^D......./m   => 'These files are scheduled for deletion',
+		qr/^\?......./m  => 'I don\'t know about these files',
 		);
 
 	my @svn_states = keys %message;
@@ -84,7 +84,7 @@ sub check_vcs
 	my %svn_state;
 	foreach my $state (@svn_states)
 		{
-		$svn_state{$state} = [ $svn_update =~ /$state\s+(.*)/gm ];
+		$svn_state{$state} = [ $svn_update =~ /$state\s+(.*)/g ];
 		}
 
 	my $count;

@@ -22,7 +22,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.04_02';
+$VERSION = '2.04_03';
 
 use Carp;
 use File::Spec;
@@ -271,6 +271,24 @@ sub _process_configuration
 	$self->{passive_ftp} =
 		($self->config->passive_ftp && $self->config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
 
+
+	{
+	my @pairs = (
+		[ qw(Makefile.PL makefile_PL) ],
+		[ qw(Makefile    makefile)    ],
+		[ qw(make        make)        ],
+		);
+		
+	foreach my $pair ( @pairs )
+		{
+		my( $key, $config ) = @$pair;
+		
+		$self->{$key} = $self->config->get($config)
+			if $self->config->exists($config);
+		}
+	}
+	
+	
 	my @required = qw(  );
 
 	my $ok = 1;
