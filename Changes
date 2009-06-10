@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.04_03 - Wed Jun 10 01:50:35 2009
+	* RT 46696: Fix parsing of SVN output, handle makefile config
+	directives as documented.
+
 2.04_01 - Tue Mar 24 04:55:40 2009
 	* Add experimental ignore_prereqs option to pass on to Test::Prereqs
 
