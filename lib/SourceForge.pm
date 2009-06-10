@@ -7,7 +7,7 @@ Module::Release::SourceForge - Work with SourceForge with Module::Release
 =head1 SYNOPSIS
 
 All of this is horribly broken because Sourceforge changed everything.
-This is the old code.
+This is the old code. If you want it, you have to fix it.
 
 =cut
 

@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 
-# $Id$
-
 =head1 NAME
 
 release - give your Perl distros to the world
