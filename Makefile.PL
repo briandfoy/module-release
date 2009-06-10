@@ -1,8 +1,18 @@
 use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 
 require 5.008;
 
 eval "use Test::Manifest 1.21";
+
+my @plugins = qw( SVN PAUSE FTP Kwalitee Prereq );
+
+# The $|++ is there just to let Perl know it's not a hash. I don't know
+# how it's deciding to parse that.
+my %modules = map { $|++; "lib/$_.pm" => "\$(INST_LIBDIR)/Release/$_.pm" } @plugins;
+my %man3    = map { $|++; "lib/$_.pm" => "\$(INST_MAN3DIR)/Module::Release::$_.\$(MAN3EXT)" } @plugins;
+
 
 WriteMakefile(
 	'NAME'	       => 'Module::Release',
@@ -28,10 +38,24 @@ WriteMakefile(
 
 	'PM'           => {
 		'lib/Release.pm' => '$(INST_LIBDIR)/Release.pm',
-
-		map { "lib/$_.pm" => "\$(INST_LIBDIR)/Release/$_.pm" } 
-			qw( SVN PAUSE FTP Kwalitee Prereq ),
+		%modules,
 		},
+
+	(
+	$ExtUtils::MakeMaker::VERSION ge '6.48' ? 
+		(
+		MIN_PERL_VERSION => 5.006,
+
+		META_MERGE       => {
+			resources => {
+		  		repository => 'git://github.com/briandfoy/module-release.git',
+				},
+			keywords => ['workflow', 'module', 'distribution', 'pause'],
+	  		},
+	 	) 
+	 	: 
+	 	()
+	 ),
 
 	'MAN1PODS'     => {
 		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
@@ -39,9 +63,7 @@ WriteMakefile(
 
 	'MAN3PODS'     => {
 		'lib/Release.pm' => '$(INST_MAN3DIR)/Module::Release.$(MAN3EXT)',
-
-		map { "lib/$_.pm" => "\$(INST_MAN3DIR)/Module::Release::$_.\$(MAN3EXT)" } 
-			qw( SVN PAUSE FTP Kwalitee Prereq ),
+		%man3,
 		},
 
 	clean => { FILES => '*.bak release-* Module-*' },
