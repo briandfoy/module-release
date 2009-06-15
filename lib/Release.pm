@@ -22,7 +22,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.04_03';
+$VERSION = '2.05';
 
 use Carp;
 use File::Spec;

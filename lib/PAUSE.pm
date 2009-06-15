@@ -10,7 +10,7 @@ our @EXPORT = qw(
 	pause_claim_base_url pause_claim_content pause_claim_content_type
 	);
 
-$VERSION = '2.04_03';
+$VERSION = '2.05';
 
 =head1 NAME
 
