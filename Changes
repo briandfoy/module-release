@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.05 - Mon Jun 15 04:05:31 2009
+	* Fixes to SVN status pattern matching
+	* Set build file names in config, if you like
+
 2.04_03 - Wed Jun 10 01:50:35 2009
 	* RT 46696: Fix parsing of SVN output, handle makefile config
 	directives as documented.
