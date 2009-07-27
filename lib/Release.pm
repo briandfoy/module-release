@@ -185,7 +185,14 @@ sub new
 
 =item init()
 
-Set up the C<Module::Release> object.
+Set up the C<Module::Release> object. By default, it expects something
+using MakeMaker, but if it sees a F<Build.PL> it configures itself for
+C<Module::Build>.
+
+The values in the configuration file override any settings here, so if you
+have both a F<Makefile.PL> and a F<Build.PL> then you can override the
+C<Module::Build> preference by setting the C<makefile_PL> and C<make>
+configuration values.
 
 =cut
 
@@ -238,6 +245,16 @@ sub _set_defaults
 	$self->set_perl( $^X );
 	$self->add_a_perl( $^X );
 
+	# setup for Module::Build. This is a kludge. There isn't a 
+	# programmatic interface to Makemaker, and I don't want to
+	# treat Makemaker and Module::Build differently. I'm stuck
+	# with a fancy shell script.
+	if( -e 'Build.PL' )
+		{
+		$self->{'make'}        = './Build';
+		$self->{'Makefile.PL'} = 'Build.PL';
+		$self->{'Makefile'}    = '_build';
+		}
 	1;
 	}
 

@@ -5,6 +5,7 @@ BEGIN {
 		Module::Release::FTP
 		Module::Release::PAUSE
 		Module::Release::SVN
+		Module::Release::MANIFEST
 		);
 	}
 

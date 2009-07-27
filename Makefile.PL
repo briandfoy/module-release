@@ -6,7 +6,7 @@ require 5.008;
 
 eval "use Test::Manifest 1.21";
 
-my @plugins = qw( SVN PAUSE FTP Kwalitee Prereq );
+my @plugins = qw( SVN PAUSE FTP Kwalitee Prereq MANIFEST);
 
 # The $|++ is there just to let Perl know it's not a hash. I don't know
 # how it's deciding to parse that.
@@ -50,7 +50,7 @@ WriteMakefile(
 			resources => {
 		  		repository => 'git://github.com/briandfoy/module-release.git',
 				},
-			keywords => ['workflow', 'module', 'distribution', 'pause'],
+			keywords => ['workflow', 'module', 'distribution', 'pause', 'automation', 'testing'],
 	  		},
 	 	) 
 	 	: 

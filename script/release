@@ -351,7 +351,7 @@ if( $release->config->cpan_user ) # not a dry run
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Will we upload to PAUSE?
+# Are we checking prereqs?
 $release->load_mixin( 'Module::Release::Prereq' );
 
 my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
@@ -420,7 +420,23 @@ else
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# check MANIFEST. When we run 'make manifest' nothing should be
+# added or removed from MANIFEST
+unless( $opts{'m'} || $release->config->skip_manifest )
+	{
+	$release->load_mixin('Module::Release::MANIFEST');
+	$release->clean;
+	$release->build_makefile;
+	$release->make;
+	$release->check_MANIFEST;
+	}
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check source repository (but do not commit)
+# This should happen after everything else because I like to use
+# release as my testing tool before I checkin. It will test but
+# not release if VCS is dirty.
 $release->_print("============Checking source repository\n");
 
 $release->check_vcs;
