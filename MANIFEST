@@ -3,6 +3,7 @@ examples/README
 hack/git.pl
 lib/FTP.pm
 lib/Kwalitee.pm
+lib/MANIFEST.pm
 lib/PAUSE.pm
 lib/Prereq.pm
 lib/Release.pm
