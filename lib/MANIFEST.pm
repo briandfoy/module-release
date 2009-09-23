@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_MANIFEST );
 
-$VERSION = '2.05';
+$VERSION = '2.05_01';
 
 =head1 NAME
 
@@ -31,7 +31,11 @@ verifying F<MANIFEST> (and F<MANIFEST.SKIP>).
 Runs C<{make|Build} manifest>. If it sees output
 starting with C<added> or C<removed>, it dies.
 
-It looks in local_name to get the name of the distribution file.
+It looks in C<local_name> to get the name of the distribution file.
+
+There's a slight problem with this command. It might re-order the
+list of files in F<MANIFEST>. Although this doesn't bother this
+command, it might make the file dirty for source control.
 
 =cut
 
