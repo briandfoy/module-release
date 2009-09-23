@@ -1,5 +1,11 @@
 # Changes for Module::Release
 
+2.05_01 - Tue Sep 22 22:23:11 2009
+	* Let's start checking MANIFEST to ensure we didn't forget
+	anything. This might be annoying the first time since 
+	make manifest might re-order your file and you have to
+	recommit it.
+
 2.05 - Mon Jun 15 04:05:31 2009
 	* Fixes to SVN status pattern matching
 	* Set build file names in config, if you like
