@@ -37,18 +37,20 @@ It looks in local_name to get the name of the distribution file.
 
 sub check_MANIFEST
 	{
-	$_[0]->_print( "Checking MANIFEST... " );
+	my $self = shift;
 	
-	my $perl = $_[0]->{perl};
+	$self->_print( "Checking MANIFEST... " );
 	
-	my @ignore = $_[0]->_get_prereq_ignore_list;
+	my $perl = $self->{perl};
 	
-	my $output = $_[0]->run( "$_[0]->{make} test 2>&1" );
+	my @ignore = $self->_get_prereq_ignore_list;
+	
+	my $output = $self->run( "$_[0]->{make} test 2>&1" );
 
-	$_[0]->_die( "\nERROR: MANIFEST is dirty! Update MANIFEST or MANIFEST.SKIP!\n$output\n\nAborting release\n" )
-		    if $output =~ /^(added|removed)/mi;
+	$self->_die( "\nERROR: MANIFEST is dirty! Update MANIFEST or MANIFEST.SKIP!\n$output\n\nAborting release\n" )
+		    if $output =~ /^(?:added|removed)/mi;
 	
-	$_[0]->_print( "done\n" );
+	$self->_print( "done\n" );
 	}
 
 =back
