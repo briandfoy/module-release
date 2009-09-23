@@ -45,11 +45,11 @@ sub check_MANIFEST
 	
 	my @ignore = $self->_get_prereq_ignore_list;
 	
-	my $output = $self->run( "$_[0]->{make} test 2>&1" );
+	my $output = $self->run( "$self->{make} manifest 2>&1" );
 
 	$self->_die( "\nERROR: MANIFEST is dirty! Update MANIFEST or MANIFEST.SKIP!\n$output\n\nAborting release\n" )
 		    if $output =~ /^(?:added|removed)/mi;
-	
+
 	$self->_print( "done\n" );
 	}
 
