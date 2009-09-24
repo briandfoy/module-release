@@ -873,7 +873,7 @@ sub dist
 	unless( $self->local_file )
 		{
 		$self->_debug( ", guessing local distribution name" );
-		my( $guess ) = $messages =~ /(?:\s|')(\S+\.tar)/m;
+		my( $guess ) = $messages =~ /(?:\s|')(\S+\.tar)/;
 		$self->_debug( "guessed [$guess]" );
 		$self->local_file( $guess );
 
