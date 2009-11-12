@@ -251,7 +251,7 @@ sub _set_defaults
 	# with a fancy shell script.
 	if( -e 'Build.PL' )
 		{
-		$self->{'make'}        = './Build';
+		$self->{'make'}        = File::Spec->catfile(qw{. Build});
 		$self->{'Makefile.PL'} = 'Build.PL';
 		$self->{'Makefile'}    = '_build';
 		}
