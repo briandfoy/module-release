@@ -22,7 +22,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.05_01';
+$VERSION = '2.05_02';
 
 use Carp;
 use File::Basename qw(dirname);
