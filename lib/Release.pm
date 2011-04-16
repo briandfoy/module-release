@@ -881,22 +881,17 @@ sub dist
 	my $self = shift;
 	$self->_print( "Making dist... " );
 
-	unless( -e $self->{'Makefile'} )
-		{
-		$self->_debug( "no Makefle, so skipping" );
-		$self->_print( " no $self->{'Makefile'}---skipping\n" );
-		return;
-		}
+	$self->build_makefile;
 
 	my $messages = $self->run( "$self->{make} dist 2>&1 < $self->{devnull}" );
-	$self->_debug( "messages are [$messages]" );
+	$self->_debug( "messages are [$messages]\n" );
 
 	# If the distro isn't already set, try to guess it
 	unless( $self->local_file )
 		{
-		$self->_debug( ", guessing local distribution name" );
+		$self->_debug( ", guessing local distribution name\n" );
 		my( $guess ) = $messages =~ /(?:\s|')(\S+\.tar)/;
-		$self->_debug( "guessed [$guess]" );
+		$self->_debug( "guessed [$guess]\n" );
 		$self->local_file( $guess );
 
 		$self->_die( "Couldn't guess distname from dist output\n" )
