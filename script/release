@@ -148,6 +148,12 @@ release does not test the perls in any particular order.
 
 =over 4
 
+=item automated_testing
+
+Set C<automated_testing> to the value you want for the 
+$ENV{AUTOMATED_TESTING} setting. By default this is 0, so
+testing is started in interactive mode.
+
 =item cpan_user
 
 The PAUSE user
@@ -181,12 +187,6 @@ distribution with no modules in it).
 Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
 checks. By default this is 0 and C<release> will try to check
 prerequisites.
-
-=item automated_testing
-
-Set C<automated_testing> to the value you want for the 
-$ENV{AUTOMATED_TESTING} setting. By default this is 0, so
-testing is started in interactive mode.
 
 =item release_subclass
 
