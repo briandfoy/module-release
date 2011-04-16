@@ -197,7 +197,7 @@ configuration values.
 =cut
 
 sub init
-	{	
+	{
 	my( $self, $config, %params ) = @_;
 
 	$self->_set_defaults( %params );
@@ -233,7 +233,7 @@ sub _set_defaults
 			quiet          => 0,
 			devnull        => File::Spec->devnull,
 			ignore_prereqs => '',
-			
+
 			%params,
 		   };
 
@@ -245,7 +245,7 @@ sub _set_defaults
 	$self->set_perl( $^X );
 	$self->add_a_perl( $^X );
 
-	# setup for Module::Build. This is a kludge. There isn't a 
+	# setup for Module::Build. This is a kludge. There isn't a
 	# programmatic interface to Makemaker, and I don't want to
 	# treat Makemaker and Module::Build differently. I'm stuck
 	# with a fancy shell script.
@@ -295,17 +295,17 @@ sub _process_configuration
 		[ qw(Makefile    makefile)    ],
 		[ qw(make        make)        ],
 		);
-		
+
 	foreach my $pair ( @pairs )
 		{
 		my( $key, $config ) = @$pair;
-		
+
 		$self->{$key} = $self->config->get($config)
 			if $self->config->exists($config);
 		}
 	}
-	
-	
+
+
 	my @required = qw(  );
 
 	my $ok = 1;
@@ -381,7 +381,7 @@ sub load_mixin
 	return 1 if $self->mixin_loaded( $module );
 
 	no warnings 'redefine';
-	
+
 	eval "use $module";
 
 	$self->_die( "Could not load [$module]! $@" ) if $@;
@@ -436,7 +436,7 @@ sub get_web_user_agent { $_[0]->{web_user_agent} || $_[0]->setup_web_user_agent 
 Create a web user agent and store it in the object. Get a reference to it
 by saving the result or calling C<get_web_user_agent>. If you call this
 method again, it replaces the internal web user agent (and anything you've
-done to it since you first set it up). It passes any arguments to the 
+done to it since you first set it up). It passes any arguments to the
 constructor of the user agent class.
 
 It calls C<web_user_agent_name> to set the initial agent name, and sets
@@ -444,17 +444,17 @@ up an empty, in-memory cookie jar.
 
 =cut
 
-sub setup_web_user_agent 
+sub setup_web_user_agent
 	{
 	my $self = shift;
-	
+
 	my $class = $self->web_user_agent_class;
 	my $rc = eval { eval "require $class" };
 	unless( $rc ) { $self->_die( "Could not load $class: $@" ) };
-	
-	my $ua = $self->web_user_agent_class->new( 
+
+	my $ua = $self->web_user_agent_class->new(
 		agent => $self->web_user_agent_name,
-		@_ 
+		@_
 		);
 
 	$ua->cookie_jar( {} );
@@ -472,7 +472,7 @@ sub web_user_agent_class { 'LWP::UserAgent' }
 
 =item web_user_agent_name
 
-The user agent name to use with web requests. Let's just call that 
+The user agent name to use with web requests. Let's just call that
 C<Mozilla> for now.
 
 =cut
@@ -1052,9 +1052,9 @@ deprecated.
 
 sub manifest_name { 'MANIFEST' }
 
-sub manifest { 
+sub manifest {
 	$_[0]->_warn( "manifest is deprecated. Use manifest_name" );
-	&manifest_name 
+	&manifest_name
 	}
 
 =item files_in_manifest
@@ -1073,7 +1073,7 @@ sub files_in_manifest
 	# follows the right MANIFEST rules, but I have to adapt
 	# it's output to my output. Annoying, for sure.
 	my $hash = do {
-		local $SIG{'__WARN__'} = sub { 
+		local $SIG{'__WARN__'} = sub {
 			my $message = shift;
 			if( $message =~ m/Debug: (.*)/ )
 				{
@@ -1142,7 +1142,7 @@ Returns the number of files which it successfully touched.
 sub touch
 	{
 	my( $self, @files ) = @_;
-	
+
 	my $time = time;
 
 	my $count = 0;
@@ -1197,9 +1197,9 @@ sub check_for_passwords
 	{
 	if( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  )
 		{
-		$_[0]->config->set( 'cpan_pass', $pass ); 
+		$_[0]->config->set( 'cpan_pass', $pass );
 		}
-		
+
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass );
 	}
 
@@ -1269,7 +1269,7 @@ sub run
 
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
-	
+
 	open my($fh), "$command |" or $self->_die( "Could not open command [$command]: $!" );
 	$fh->autoflush;
 

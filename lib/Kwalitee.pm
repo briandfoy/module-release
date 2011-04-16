@@ -40,17 +40,17 @@ sub check_kwalitee
 
 	my $name    = $_[0]->local_file;
 	my $program = $_[0]->cpants_lint;
-	
+
 	{
 	no warnings 'uninitialized';
 	$_[0]->_die( " no $name---aborting release\n" ) unless -e $name;
 	}
-	
+
 	# XXX: what if it's not .tar.gz?
 	my $messages = $_[0]->run( "$program $name" );
 
 	my $regex = $_[0]->cpants_pass_regex;
-	
+
 	$_[0]->_die( "Kwalitee is less than perfect:\n$messages\n" )
 		unless $messages =~ m/$regex/;
 

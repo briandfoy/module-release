@@ -38,15 +38,15 @@ sub check_prereqs
 		$_[0]->_die( "You need Test::Prereq to check prereqs" );
 
 	$_[0]->_print( "Checking prereqs... " );
-	
+
 	my $perl = $_[0]->{perl};
-	
+
 	my @ignore = $_[0]->_get_prereq_ignore_list;
-	
-	my $messages = $_[0]->run( 
-		qq|$perl -MTest::Prereq -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"| 
+
+	my $messages = $_[0]->run(
+		qq|$perl -MTest::Prereq -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"|
 		);
-	
+
 	$_[0]->_die( "Prereqs had a problem:\n$messages\n" )
 		unless $messages =~ m/^ok 1 - Prereq test/m;
 

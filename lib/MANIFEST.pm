@@ -16,10 +16,10 @@ Module::Release::MANIFEST - Check Perl's MANIFEST to ensure you've updated it
 =head1 SYNOPSIS
 
 The release script automatically loads this module and checks your
-MANIFEST file. It runs C<{make|Build} manifest> and dies if the 
+MANIFEST file. It runs C<{make|Build} manifest> and dies if the
 output contains any lines that start with C<added> or C<removed>.
 
-If it dies, you have to start the release process again after 
+If it dies, you have to start the release process again after
 verifying F<MANIFEST> (and F<MANIFEST.SKIP>).
 
 =head1 DESCRIPTION
@@ -42,13 +42,13 @@ command, it might make the file dirty for source control.
 sub check_MANIFEST
 	{
 	my $self = shift;
-	
+
 	$self->_print( "Checking MANIFEST... " );
-	
+
 	my $perl = $self->{perl};
-	
+
 	my @ignore = $self->_get_prereq_ignore_list;
-	
+
 	my $output = $self->run( "$self->{make} manifest 2>&1" );
 
 	$self->_die( "\nERROR: MANIFEST is dirty! Update MANIFEST or MANIFEST.SKIP!\n$output\n\nAborting release\n" )

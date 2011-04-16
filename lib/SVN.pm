@@ -52,7 +52,7 @@ sub check_cvs
 	carp "check_cvs is deprecated in favor of check_vcs. Update your programs!";
 	&check_vcs;
 	}
-	
+
 sub check_vcs
 	{
 	my $self = shift;
@@ -135,7 +135,7 @@ sub cvs_tag
 	carp "cvs_tag is deprecated in favor of vcs_tag. Update your programs!";
 	&check_vcs;
 	}
-	
+
 sub vcs_tag
 	{
 	require URI;
@@ -238,7 +238,7 @@ sub make_cvs_tag
 	carp "make_cvs_tag is deprecated in favor of make_vcs_tag. Update your programs!";
 	&make_vcs_tag;
 	}
-	
+
 sub make_vcs_tag
 	{
 	my $self = shift;
