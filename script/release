@@ -157,6 +157,20 @@ The PAUSE user
 Set C<passive_ftp> to "y" or "yes" for passive FTP transfers.  Usually
 this is to get around a firewall issue.
 
+=item perls
+
+A colon-separated list of perls to test with. If C<allow_glob_in_perls> is
+a true value, globs in paths will expand to their paths so you can specify
+many perls.
+
+Default: the perl that's running C<release>.
+
+=item allow_glob_in_perls
+
+If true, expand globs in the C<perls> configuration.
+
+Default: 0
+
 =item skip_kwalitee
 
 Set to a false value to skip kwalitee checks (such as for a script
