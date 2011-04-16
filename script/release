@@ -450,10 +450,9 @@ $release->_debug( "dist version is  $Version\n" );
 # exit if this is a dry run. Everything following this changes
 # things or uploads. Don't leave anything behind.
 
-if( $opts{t} )
-	{
+if( $opts{t} ) {
 	$release->distclean;
-	unlink glob( "*.tar*" );
+	unlink glob( "*.tar *.tgz *.tar.gz *.zip" );
 	exit;
 	}
 
