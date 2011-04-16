@@ -1,5 +1,11 @@
 # Changes for Module::Release
 
+2.05_02 - Sat Apr 16 12:05:58 2011
+	* Two features from H.Merijn Brand: if a test fails under
+	debugging, try harder with prove
+	* Add the allow_glob_in_perls to specify a pattern for paths
+	for the perls option.
+
 2.05_01 - Tue Sep 22 22:23:11 2009
 	* Let's start checking MANIFEST to ensure we didn't forget
 	anything. This might be annoying the first time since 
