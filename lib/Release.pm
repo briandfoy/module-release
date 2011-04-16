@@ -1088,9 +1088,9 @@ Return the filenames in the manifest file as a list.
 sub files_in_manifest
 	{
 	my $self = shift;
-	
+
 	require ExtUtils::Manifest;
-	
+
 	# I want to use ExtUtils::Manifest so it automatically
 	# follows the right MANIFEST rules, but I have to adapt
 	# it's output to my output. Annoying, for sure.
@@ -1106,10 +1106,10 @@ sub files_in_manifest
 				$self->_die( "files_in_manifest: could not open file\n" );
 				}
 			};
-			
+
 		ExtUtils::Manifest::maniread( $self->manifest_name );
 		};
-	
+
 	sort keys %$hash;
 	}
 
