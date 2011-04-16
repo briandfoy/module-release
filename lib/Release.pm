@@ -841,8 +841,30 @@ sub test
 
 	my $tests = $self->run( "$self->{make} test 2>&1" );
 
-	$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
-		    unless $tests =~ /All tests successful/;
+	$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" );
+
+	unless ($tests =~ m/All tests successful/) {
+		if( $self->debug ) { # from H.Merijn Brand
+			my $prove = File::Spec->catfile(
+				dirname( $self->get_perl ),
+				'prove'
+				);
+
+			if( -x $prove ) {
+				my $prove_out =
+					join "\n\n",
+					map { scalar qx"$prove -wvb $_" }
+                    ($tests =~ m{^(t/\w+\.t)\s+[0-9]+}gm);
+				$prove_out =~ s/^.*\r//gm;
+				$self->_warn( $prove_out );
+				}
+			elsif( $self->debug ) {
+				$self->_print( "prove [$prove] was not executable!" );
+				}
+			}
+
+          $self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" )
+          }
 
 	$self->_print( "all tests pass\n" );
 	}
