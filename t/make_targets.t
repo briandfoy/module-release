@@ -97,6 +97,7 @@ close $fh;
 
 foreach my $target ( @makefile_targets )
 	{
+	next if $target eq 'dist'; # this one recreates it
 	ok( ! -e 'Makefile',  'Makefile is not there (good)'    );
 
 	stdout_like
