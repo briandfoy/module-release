@@ -850,8 +850,6 @@ sub test
 
 	my $tests = $self->run( "$self->{make} test 2>&1" );
 
-	$self->_die( "\nERROR: Tests failed!\n$tests\n\nAborting release\n" );
-
 	unless ($tests =~ m/All tests successful/) {
 		if( $self->debug ) { # from H.Merijn Brand
 			my $prove = File::Spec->catfile(
