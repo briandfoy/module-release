@@ -1399,9 +1399,11 @@ module form.
 Andy Lester handled the maintenance while I was on my Big Camping
 Trip. He applied patches from many authors.
 
-Andreas KE<ouml>nig suggested changes to make it work better with PAUSE.
+Andreas König suggested changes to make it work better with PAUSE.
 
 Chris Nandor helped with figuring out the broken SourceForge stuff.
+
+H.Merijn Brand has contributed many patches and features.
 
 =head1 SOURCE AVAILABILITY
 
@@ -1423,5 +1425,3 @@ it under the same terms as Perl itself.
 =cut
 
 1;
-
-__END__
