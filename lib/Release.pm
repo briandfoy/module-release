@@ -25,6 +25,7 @@ use vars qw($VERSION);
 $VERSION = '2.05_01';
 
 use Carp;
+use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
 
@@ -601,6 +602,14 @@ sub add_a_perl
 	unless( -x $path )
 		{
 		$self->_warn( "$path is not executable" );
+		if( $path =~ m/[*?[]/ && $self->config->allow_glob_in_perls )
+			{
+			$self->add_a_perl( $_ ) for glob $path;
+			}
+		else
+			{
+			$self->_warn( "$path is not executable" );
+			}
 		return;
 		}
 
