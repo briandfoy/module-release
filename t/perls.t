@@ -144,5 +144,3 @@ is( $perls[0], $^X, "The reset perl is the one in \$^X" );
 }
 
 }
-
-

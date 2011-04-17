@@ -565,7 +565,7 @@ Added in 1.21.
 
 sub get_perl { $_[0]->{perl} }
 
-=item perls
+=item perls()
 
 Return the list of perl binaries Module::Release will use to test the
 distribution.
@@ -574,12 +574,7 @@ Added in 1.21.
 
 =cut
 
-sub perls
-	{
-	my $self = shift;
-
-	return keys %{ $self->{perls} };
-	}
+sub perls { keys %{ $_[0]->{perls} } }
 
 =item add_a_perl( PATH )
 
