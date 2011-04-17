@@ -601,7 +601,6 @@ sub add_a_perl
 
 	unless( -x $path )
 		{
-		$self->_warn( "$path is not executable" );
 		if( $path =~ m/[*?[]/ && $self->config->allow_glob_in_perls )
 			{
 			$self->add_a_perl( $_ ) for glob $path;
