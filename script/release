@@ -466,7 +466,7 @@ $release->_debug( "dist version is  $Version\n" );
 
 if( $opts{t} ) {
 	$release->distclean;
-	unlink glob( "*.tar *.tgz *.tar.gz *.zip" );
+	unlink glob( '*.tar *.tgz *.tar.gz *.tar.bz *.tar.bz2 *.tbz *.zip' );
 	exit;
 	}
 
