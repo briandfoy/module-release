@@ -32,7 +32,7 @@ WriteMakefile(
 	(
 	$ExtUtils::MakeMaker::VERSION ge '6.48' ? 
 		(
-		MIN_PERL_VERSION => 5.006,
+		MIN_PERL_VERSION => 5.008,
 
 		META_MERGE       => {
 			resources => {
