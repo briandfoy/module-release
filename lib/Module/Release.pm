@@ -24,7 +24,7 @@ use vars qw($VERSION);
 
 $VERSION = '2.05_02';
 
-use Carp;
+use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
