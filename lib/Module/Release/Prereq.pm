@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-$VERSION = '2.05_02';
+$VERSION = '2.05_03';
 
 =head1 NAME
 
