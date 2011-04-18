@@ -22,6 +22,7 @@ WriteMakefile(
 		'HTTP::Message'         => 0,
 		'HTTP::Request'         => 0,
 		'IO::Null'              => 0,
+		'LWP::UserAgent'        => 0,
 		'Net::FTP'              => 0,
 		'Test::Output'          => 0,
 		'Test::Without::Module' => 0,
