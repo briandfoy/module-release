@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.05_04 - Mon Apr 18 12:03:31 2011
+	* Add LWP::UserAgent prereq: now not in the same distro
+	as HTTP::*!
+
 2.05_02 - Sat Apr 16 12:05:58 2011
 	* Two features from H.Merijn Brand: if a test fails under
 	debugging, try harder with prove
