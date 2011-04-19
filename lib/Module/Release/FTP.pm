@@ -129,7 +129,7 @@ sub get_ftp_object
 	my( $self, $site ) = @_;
 
 	my $class = $self->ftp_class_name;
-	my $rc = eval { eval "require $class" };
+	my $rc = eval "require $class; 1";
 
 	$self->_die( "Couldn't load $class: $@" ) unless defined $rc;
 
