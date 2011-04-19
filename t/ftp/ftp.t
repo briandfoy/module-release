@@ -78,13 +78,13 @@ is( $release->ftp_class_name, $mock_class, 'Mock FTP class is right' );
 my $test_site = 'ftp.example.com';
 my $ftp = eval { $release->get_ftp_object( $test_site ) };
 my $at = $@;
-like( $at, qr/Couldn't load/, "With missing FTP class, get_ftp_object dies" );
+like( $at, qr/Couldn't/, "With missing FTP class, get_ftp_object dies" );
 }
 
 {
 my $rc = eval { $release->ftp_upload };
 my $at = $@;
-like( $at, qr/Couldn't load/, "With undef FTP class, ftp_upload dies" );
+like( $at, qr/Couldn't/, "With undef FTP class, ftp_upload dies" );
 }
 
 }
