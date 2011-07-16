@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.05_05 - Sat Jul 16 01:10:37 2011
+	* Handle Module::Build
+	* Some Windows stuff is still broken
+
 2.05_04 - Mon Apr 18 12:03:31 2011
 	* Add LWP::UserAgent prereq: now not in the same distro
 	as HTTP::*!
