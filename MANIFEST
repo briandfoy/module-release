@@ -11,6 +11,7 @@ lib/Module/Release/SourceForge.pm
 lib/Module/Release/SVN.pm
 Makefile.PL
 MANIFEST
+MYMETA.yml
 README
 script/release
 t/abstract.t

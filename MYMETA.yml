@@ -1,0 +1,42 @@
+---
+abstract: 'Automate software releases'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+keywords:
+  - workflow
+  - module
+  - distribution
+  - pause
+  - automation
+  - testing
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Module-Release
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ConfigReader::Simple: 0
+  Crypt::SSLeay: 0
+  HTTP::Message: 0
+  HTTP::Request: 0
+  IO::Null: 0
+  LWP::UserAgent: 0
+  Net::FTP: 0
+  Test::Output: 0
+  Test::Without::Module: 0
+  URI: 0
+  perl: 5.008
+resources:
+  repository: git://github.com/briandfoy/module-release.git
+version: 2.05_05
