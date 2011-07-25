@@ -1,5 +1,11 @@
 # Changes for Module::Release
 
+2.05_06 - Sun Jul 24 23:30:37 2011
+	* Handle the latest in LWP, using LWP::Protocol::https and
+	the new CACertOrg::CA to supply the cert for PAUSE.
+	* Add a -C command-line option to skip updating the Changes
+	file, it the case of a failed upload.
+
 2.05_05 - Sat Jul 16 01:10:37 2011
 	* Handle Module::Build
 	* Some Windows stuff is still broken
