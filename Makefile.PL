@@ -17,16 +17,17 @@ WriteMakefile(
 
 	'PREREQ_PM'    => 
 		{
-		'ConfigReader::Simple'  => 0,
-		'Crypt::SSLeay'         => 0,
-		'HTTP::Message'         => 0,
-		'HTTP::Request'         => 0,
-		'IO::Null'              => 0,
-		'LWP::UserAgent'        => 0,
-		'Net::FTP'              => 0,
-		'Test::Output'          => 0,
-		'Test::Without::Module' => 0,
-		'URI'                   => 0,
+		'CACertOrg::CA'         => '0',
+		'ConfigReader::Simple'  => '0',
+		'HTTP::Message'         => '0',
+		'HTTP::Request'         => '0',
+		'IO::Null'              => '0',
+		'LWP::Protocol::https'  => '6.02',
+		'LWP::UserAgent'        => '6.02',
+		'Net::FTP'              => '0',
+		'Test::Output'          => '0',
+		'Test::Without::Module' => '0',
+		'URI'                   => '0',
 		},
 
 
