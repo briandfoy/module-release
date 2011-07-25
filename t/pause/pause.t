@@ -206,6 +206,7 @@ sub web_user_agent_class { 'Module::Release::MockUA' }
 package Module::Release::MockUA;
 sub new { bless {}, $_[0] }
 sub request { Module::Release::NullClass->new }
+sub ssl_opts   { 1 }
 sub cookie_jar { 1 }
 $INC{'Module/Release/MockUA.pm'} = $0;
 
