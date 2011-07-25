@@ -17,7 +17,7 @@ use vars qw( $VERSION );
 use warnings;
 no warnings;
 
-$VERSION = '2.05_05';
+$VERSION = '2.05_06';
 
 =head1 DESCRIPTION
 
