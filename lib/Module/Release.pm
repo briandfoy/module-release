@@ -1219,7 +1219,7 @@ sub check_for_passwords
 		$_[0]->config->set( 'cpan_pass', $pass );
 		}
 
-	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass );
+	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
 
