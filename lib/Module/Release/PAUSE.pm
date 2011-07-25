@@ -79,11 +79,14 @@ Claim the file in PAUSE
 sub pause_claim
 	{
 	require HTTP::Request;
+	require CACertOrg::CA;
 
 	my $self = shift;
 	return unless $self->should_upload_to_pause;
 
 	my $ua  = $self->get_web_user_agent;
+	$ua->ssl_opts( verify_hostnames => 1 );
+	$ua->ssl_opts( SSL_ca_file => CACertOrg::CA::SSL_ca_file() );
 
 	my $request = HTTP::Request->new( POST => $self->pause_claim_base_url );
 
