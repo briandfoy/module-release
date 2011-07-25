@@ -9,7 +9,7 @@ eval "use Test::Manifest 1.21";
 WriteMakefile(
 	'NAME'	       => 'Module::Release',
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
-	'ABSTRACT'     => 'Automate software releases',
+	'ABSTRACT'     => 'Automate Perl distribution releases',
 	'VERSION_FROM' => "lib/Module/Release.pm",
 	'LICENSE'      => 'perl',
 
