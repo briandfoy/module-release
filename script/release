@@ -268,7 +268,7 @@ my $class = "Module::Release";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
-getopts('ahdptvk', \%opts) or $opts{h} = 1;
+getopts('aChdptvk', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -286,12 +286,14 @@ if( $opts{h} )
 	{
 	print <<"USE";
 
-Use: release -hdktv [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -aCdhktv [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
 both) if not supplied.
 
+	-a   Set AUTOMATED_TESTING to true
+	-C   Skip Changes file (useful for re-running botched releases)
 	-h   This help
 	-d   Print extra debugging information
 	-k   Skip kwalitee check
@@ -472,7 +474,7 @@ if( $opts{t} ) {
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-unless( $release->debug )
+unless( $release->debug or $opts{C} )
 	{
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
@@ -523,12 +525,13 @@ unless( $release->debug )
 	}
 else
 	{
-	$release->_print( "Skipping Changes file since you're debugging" );
+	$release->_print( "Skipping Changes file" );
 	}
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Build the release in preparation for uploading
+$release->_print("============Preparing to release\n");
 $release->clean;
 $release->touch_all_in_manifest;
 $release->build_makefile;
