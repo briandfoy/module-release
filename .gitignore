@@ -8,3 +8,4 @@ Module-*
 Debian_CPANTS.txt
 *.bbproj
 .DS_Store
+*.yml
