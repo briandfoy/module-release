@@ -965,10 +965,50 @@ sub dist_version
 		unless defined $self->remote_file;
 
 	no warnings 'uninitialized';
-	my( $major, $minor, $dev ) = $self->remote_file
-		=~ /(\d+) \. (\d+)(_\d+)? (?:\. tar \. gz)? $/xg;
+	my ($version_str, $vee, $version) = $self->remote_file
+		=~ / ( (v?) ([\d_.]+) ) (?:\. tar \. gz)? $/xi
+			or return '';
 
-	$self->dist_version_format( $major, $minor, $dev );
+	my @components = split /[.]/, $version;
+	if ($vee || @components > 2) # This is a multi-part version
+		{
+		# We assume that version.pm is available if multi-part
+		# versions are in use.
+		eval
+			{
+			require version;
+			}
+		or do
+		    	{ # Fall back to using $version_str verbatim
+			warn $@;
+			return $version_str;
+			};
+
+		# There are pre- and post-0.77 versions of version.pm.
+		# The former are deprecated, but I assume we must
+		# gracefully use what we have available.
+		eval
+			{
+			$version = version->VERSION >= 0.77?
+				version->parse (lc($vee) . $version)->normal : # latest and best
+				''.version->new(lc($vee) . $version)         ; # legacy
+			1;
+			}
+		or
+			$self->_die( "Couldn't parse version '$version_str' from '".
+				$self->remote_file. "': $@");
+
+		return $version;
+		}
+
+
+	# Else, use the older implementation for backward-compatibility
+	# Note the lack of an initial ^ matcher is deliberate.
+
+	my( $major, $minor, $dev ) =
+		$version_str =~ /(\d+) \. (\d+)(_\d+)? $/xg;
+
+	return $self->dist_version_format( $major, $minor, $dev );
 	}
 
 =item dist_version_format
