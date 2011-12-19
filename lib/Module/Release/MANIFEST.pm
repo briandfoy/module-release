@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_MANIFEST );
 
-$VERSION = '2.05_07';
+$VERSION = '2.06';
 
 =head1 NAME
 
