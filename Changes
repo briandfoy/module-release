@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.06_01 - Mon Dec 19 17:01:05 2011
+	* Quash some warnings while loading mixins
+
 2.06 - Mon Dec 19 14:47:15 2011
 	* Bumping to a stable release
 
