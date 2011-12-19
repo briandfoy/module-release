@@ -1171,20 +1171,17 @@ separate module.
 
 =cut
 
-sub check_vcs
-	{
-	$_[0]->_die( "check_cvs must be implemented in a mixin class" );
+sub check_vcs {
+	$_[0]->_die( "check_vcs must be implemented in a mixin class" );
 	}
 
 
-sub vcs_tag
-	{
-	$_[0]->_die( "cvs_tag must be implemented in a mixin class" );
+sub vcs_tag {
+	$_[0]->_die( "vcs_tag must be implemented in a mixin class" );
 	}
 
-sub make_vcs_tag
-	{
-	$_[0]->_die( "make_cvs_tag must be implemented in a mixin class" );
+sub make_vcs_tag {
+	$_[0]->_die( "make_vcs_tag must be implemented in a mixin class" );
 	}
 
 =item touch( FILES )
