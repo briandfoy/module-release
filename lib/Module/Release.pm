@@ -381,9 +381,7 @@ sub load_mixin
 
 	return 1 if $self->mixin_loaded( $module );
 
-	no warnings 'redefine';
-
-	eval "use $module";
+	{ local $^W = 0; eval "use $module" };
 
 	$self->_die( "Could not load [$module]! $@" ) if $@;
 
