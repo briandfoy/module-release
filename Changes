@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.06 - Mon Dec 19 14:47:15 2011
+	* Bumping to a stable release
+
 2.05_07 - Wed Nov 30 12:29:33 2011
 	* Handle point versions RT  #72845 (WULEE)
 
