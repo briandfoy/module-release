@@ -9,3 +9,4 @@ Debian_CPANTS.txt
 *.bbproj
 .DS_Store
 *.yml
+MYMETA.json
