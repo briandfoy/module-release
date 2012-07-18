@@ -1,8 +1,8 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.48;
 use strict;
 use warnings;
 
-require 5.008;
+require 5.010;
 
 eval "use Test::Manifest 1.21";
 
@@ -15,8 +15,7 @@ WriteMakefile(
 
 	'EXE_FILES'    =>  [ 'script/release' ],
 
-	'PREREQ_PM'    => 
-		{
+	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
 		'HTTP::Message'         => '0',
@@ -30,22 +29,15 @@ WriteMakefile(
 		'URI'                   => '0',
 		},
 
+	MIN_PERL_VERSION => 5.010,
 
-	(
-	$ExtUtils::MakeMaker::VERSION ge '6.48' ? 
-		(
-		MIN_PERL_VERSION => 5.008,
-
-		META_MERGE       => {
+	META_MERGE => {
 			resources => {
 		  		repository => 'git://github.com/briandfoy/module-release.git',
 				},
-			keywords => ['workflow', 'module', 'distribution', 'pause', 'automation', 'testing'],
+			keywords => ['workflow', 'module', 'distribution', 
+				'pause', 'automation', 'testing'],
 	  		},
-	 	) 
-	 	: 
-	 	()
-	 ),
 
 	'MAN1PODS'     => {
 		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
