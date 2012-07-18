@@ -1,5 +1,7 @@
 package Module::Release;
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release - Automate software releases

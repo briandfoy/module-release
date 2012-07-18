@@ -9,6 +9,8 @@ our @EXPORT = qw( check_MANIFEST );
 
 $VERSION = '2.06_01';
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::MANIFEST - Check Perl's MANIFEST to ensure you've updated it

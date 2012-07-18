@@ -9,6 +9,8 @@ our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
 $VERSION = '2.06_01';
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::Kwalitee - Play the CPANTS game

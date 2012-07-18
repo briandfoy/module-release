@@ -9,6 +9,8 @@ our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
 $VERSION = '2.06_01';
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::Prereq - Check  pre-requisites list in build file

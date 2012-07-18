@@ -14,6 +14,8 @@ our @EXPORT = qw(
 
 $VERSION = '2.06_01';
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::FTP - Interact with an FTP server

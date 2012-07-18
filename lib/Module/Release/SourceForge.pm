@@ -1,5 +1,7 @@
 package Module::Release::SourceForge;
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::SourceForge - Work with SourceForge with Module::Release

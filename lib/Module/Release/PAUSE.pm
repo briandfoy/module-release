@@ -12,6 +12,8 @@ our @EXPORT = qw(
 
 $VERSION = '2.06_01';
 
+=encoding utf8
+
 =head1 NAME
 
 Module::Release::PAUSE - Interact with the Perl Authors Upload Server (PAUSE)
