@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-$VERSION = '2.06_01';
+$VERSION = '2.06_02';
 
 =encoding utf8
 
