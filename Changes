@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.06_02 - Wed Jul 18 12:28:49 2012
+	* Add =encoding to Pod sections to avoid new Pod::Simple warnings
+
 2.06_01 - Mon Dec 19 17:01:05 2011
 	* Quash some warnings while loading mixins
 
