@@ -5,6 +5,8 @@ use warnings;
 use base qw(Exporter);
 use vars qw($VERSION);
 
+use Carp qw(croak);
+
 our @EXPORT = qw(
 	pause_ftp_site should_upload_to_pause pause_claim set_pause_ftp_site
 	pause_claim_base_url pause_claim_content pause_claim_content_type
@@ -29,6 +31,8 @@ directive.
 =over 4
 
 =item set_pause_ftp_site( HOSTNAME )
+
+NOTE: PAUSE has turned off FTP uploads
 
 Set the name of the PAUSE FTP site. If you pass it something that
 doesn't look like a host name, it warns and doesn't set anything.

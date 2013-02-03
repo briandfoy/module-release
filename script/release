@@ -74,12 +74,8 @@ source control complains, fail.
 
 =item Upload to PAUSE
 
-Simply drop the distribution in the incoming/ directory of PAUSE
-
-=item Claim the file on PAUSE
-
-Connect to the PAUSE web thingy and claim the uploaded file for your
-CPAN account.
+This program used to use FTP uploads, but PAUSE has turned that feature.
+Now it uploads through the web form.
 
 =item Tag the repository
 
@@ -161,7 +157,8 @@ The PAUSE user
 =item passive_ftp
 
 Set C<passive_ftp> to "y" or "yes" for passive FTP transfers.  Usually
-this is to get around a firewall issue.
+this is to get around a firewall issue. Note that PAUSE has turned off
+FTP uploads, so this setting is useless now.
 
 =item perls
 

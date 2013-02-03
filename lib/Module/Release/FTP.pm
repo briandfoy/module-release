@@ -5,6 +5,8 @@ use warnings;
 use base qw(Exporter);
 use vars qw($VERSION);
 
+use Carp qw(croak);
+
 our @EXPORT = qw(
 	ftp_upload ftp_passive_on ftp_passive_off ftp_passive
 	ftp_class_name get_ftp_object
@@ -21,6 +23,9 @@ $VERSION = '2.06_02';
 Module::Release::FTP - Interact with an FTP server
 
 =head1 SYNOPSIS
+
+NOTE: PAUSE has turned off FTP uploads. Methods in this class
+will croak.
 
 The release script automatically loads this module when it's time
 to upload a file
