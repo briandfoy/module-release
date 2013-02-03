@@ -288,7 +288,7 @@ Chris Nandor helped with figuring out the broken SourceForge stuff.
 
 This source is in Github:
 
-	git://github.com/briandfoy/module-release.git
+	https://github.com/briandfoy/module-release
 
 =head1 AUTHOR
 

@@ -70,7 +70,7 @@ L<Module::Release>
 
 This source is in Github:
 
-	git://github.com/briandfoy/module-release.git
+	https://github.com/briandfoy/module-release
 
 =head1 AUTHOR
 
