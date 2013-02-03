@@ -45,8 +45,8 @@ module):
 
 =cut
 
-sub ftp_upload
-	{
+sub ftp_upload {
+	croak "PAUSE moved hosts and has turned off FTP uploads\n";
 	my $self = shift;
 
 	my %defaults = map { my $m = "default_ftp_$_"; $_, $self->$m() } qw(
@@ -126,8 +126,7 @@ C<ftp_class_name>. IT connects to HOSTNAME, but does not login.
 
 =cut
 
-sub get_ftp_object
-	{
+sub get_ftp_object {
 	my( $self, $site ) = @_;
 
 	my $class = $self->ftp_class_name;

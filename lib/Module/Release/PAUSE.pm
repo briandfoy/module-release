@@ -35,8 +35,8 @@ doesn't look like a host name, it warns and doesn't set anything.
 
 =cut
 
-sub set_pause_ftp_site
-	{
+sub set_pause_ftp_site {
+	croak "PAUSE moved hosts and has turned off FTP uploads\n";
 	no warnings 'uninitialized';
 	unless( $_[1] =~ /^[a-z0-9-]+(\.[a-z0-9-]+)+\z/ )
 		{
@@ -53,8 +53,7 @@ Return the hostname for PAUSE uploads.
 
 =cut
 
-sub pause_ftp_site
-	{
+sub pause_ftp_site {
 	$_[0]->{pause_ftp_site} || 'pause.perl.org';
 	}
 
@@ -64,8 +63,7 @@ Returns true is the object thinks it should upload a distro to PAUSE.
 
 =cut
 
-sub should_upload_to_pause
-	{
+sub should_upload_to_pause {
 	no warnings 'uninitialized';
 	$_[0]->_debug(    "CPAN user: " . $_[0]->config->cpan_user .
 		           " | CPAN pass: " . $_[0]->config->cpan_pass . "\n" );
@@ -78,8 +76,8 @@ Claim the file in PAUSE
 
 =cut
 
-sub pause_claim
-	{
+sub pause_claim {
+	croak "PAUSE moved hosts and has turned off FTP uploads\n";
 	require HTTP::Request;
 	require CACertOrg::CA;
 
@@ -123,8 +121,8 @@ Construct the data for the POST request to claim a file in PAUSE.
 
 =cut
 
-sub pause_claim_content
-	{
+sub pause_claim_content {
+	croak "PAUSE moved hosts and has turned off FTP uploads\n";
 	require CGI; CGI->import( qw(-oldstyle_urls) );
 
 	my $cgi = CGI->new();

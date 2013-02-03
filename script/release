@@ -274,16 +274,14 @@ getopts('aChdptvk', \%opts) or $opts{h} = 1;
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my( $script_version ) = '2.00_04';
 
-if( $opts{v} )
-	{
+if( $opts{v} ) {
 	print "$0 version $script_version\n";
 	exit;
 	}
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-if( $opts{h} )
-	{
+if( $opts{h} ) {
 	print <<"USE";
 
 Use: release -aCdhktv [ LOCAL_FILE [ REMOTE_FILE ] ]
@@ -314,12 +312,10 @@ USE
 my %params;
 $params{local}  = shift @ARGV if @ARGV;
 
-if( @ARGV )
-	{
+if( @ARGV ) {
     $params{remote} = shift @ARGV;
 	}
-elsif( $params{local} )
-	{
+elsif( $params{local} ) {
     $params{remote} = $params{local};
 	}
 
@@ -341,8 +337,7 @@ my @vcs = (
 	[ 'CVS'        => "Module::Release::CVS" ],
 	);
 
-foreach my $vcs ( @vcs )
-	{
+foreach my $vcs ( @vcs ) {
 	next unless -e $vcs->[0];
 
 	my $module = $vcs->[1];
@@ -360,8 +355,7 @@ foreach my $vcs ( @vcs )
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Will we upload to PAUSE?
-if( $release->config->cpan_user ) # not a dry run
-	{
+if( $release->config->cpan_user ) { # not a dry run
 	$release->load_mixin( 'Module::Release::PAUSE' );
 	}
 
@@ -391,8 +385,7 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 {
 my $old_perl = $release->get_perl;
 
-foreach my $perl ( $release->perls )
-	{
+foreach my $perl ( $release->perls ) {
 	$release->_print("============Testing with $perl\n");
 	$release->set_perl( $perl ) or next;
 
@@ -401,12 +394,10 @@ foreach my $perl ( $release->perls )
 	$release->make;
 	$release->test;
 
-	unless( $skip_prereqs )
-		{
+	unless( $skip_prereqs ) {
 		$release->check_prereqs;
 		}
-	else
-		{
+	else {
 		$release->_print( "Skipping prereq checks. Shame on you!\n" );
 		}
 		
@@ -420,8 +411,7 @@ $release->set_perl( $old_perl );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check kwalitee
-unless( $opts{k} || $release->config->skip_kwalitee  )
-	{
+unless( $opts{k} || $release->config->skip_kwalitee  ) {
 	$release->load_mixin( 'Module::Release::Kwalitee' );
 	$release->_print("============Testing for kwalitee\n");
 	$release->clean;
@@ -430,16 +420,14 @@ unless( $opts{k} || $release->config->skip_kwalitee  )
 	$release->dist;
 	$release->check_kwalitee;
 	}
-else
-	{
+else {
 	$release->_print( "Skipping kwalitee checks. Shame on you!\n" );
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check MANIFEST. When we run 'make manifest' nothing should be
 # added or removed from MANIFEST
-unless( $opts{'m'} || $release->config->skip_manifest )
-	{
+unless( $opts{'m'} || $release->config->skip_manifest ) {
 	$release->load_mixin('Module::Release::MANIFEST');
 	$release->clean;
 	$release->build_makefile;
@@ -474,8 +462,7 @@ if( $opts{t} ) {
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-unless( $release->debug or $opts{C} )
-	{
+unless( $release->debug or $opts{C} ) {
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
 
@@ -485,8 +472,7 @@ unless( $release->debug or $opts{C} )
 
 	my $str = $Version . " - " . localtime() . "\n";
 
-	while( <STDIN> )
-		{
+	while( <STDIN> ) {
 		$_ =~ s/^(\S)/\t$1/; # always indent
 
 		$str .= $_;
@@ -500,8 +486,7 @@ unless( $release->debug or $opts{C} )
 	open my $in, $bak or die "Could not read old $changes file! $!\n";
 	open my $out, ">", $changes;
 
-	while( <$in> )
-		{
+	while( <$in> ) {
 		print $out $_;
 		last unless m/\S/;
 		}
@@ -523,8 +508,7 @@ unless( $release->debug or $opts{C} )
 
 	$release->_print( $cvs_commit );
 	}
-else
-	{
+else {
 	$release->_print( "Skipping Changes file" );
 	}
 
@@ -543,9 +527,8 @@ $release->check_for_passwords;
 $release->_debug( "This is where I should release stuff\n" );
 
 $release->load_mixin( 'Module::Release::PAUSE' );
-while( $release->should_upload_to_pause )
-	{
 	$release->load_mixin( 'Module::Release::FTP' );
+while( $release->should_upload_to_pause ) {
 	$release->_print("Now uploading to PAUSE\n" );
 	$release->_print("============Uploading to PAUSE\n");
 	last if $release->debug;
