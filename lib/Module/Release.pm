@@ -13,7 +13,7 @@ Module::Release - Automate software releases
 	my $release = Module::Release->new( %params );
 
 	# call methods to automate your release process
-	$release->check_cvs;
+	$release->check_vcs;
 	...
 
 =cut
@@ -24,7 +24,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.06_02';
+$VERSION = '2.06_04';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
@@ -79,13 +79,6 @@ Use this value as the perl interpreter, otherwise use the value in C<$^X>.
 
 Do you want debugging output? Set this to a true value
 
-=item SF_PASS
-
-Your SourceForge password. If you don't set this and you want to
-upload to SourceForge, you should be prompted for it. Failing that,
-the module tries to upload anonymously but cannot claim the file for
-you.
-
 =item CPAN_PASS
 
 Your CPAN password. If you don't set this and you want to upload to
@@ -101,13 +94,6 @@ the current working directory. It reads that with
 C<ConfigReader::Simple> to get these values:
 
 =over 4
-
-=item release_subclass (DEPRECATED)
-
-The subclass of C<Module::Release> that you want to use. This allows
-you to specify the subclass via a F<.releaserc> file; otherwise you
-wouldn't be able to use the C<release> script because the
-C<Module::Release> class name is hard-coded there.
 
 =item makefile_PL
 
@@ -125,13 +111,11 @@ C<Module::Build>-based systems.
 
 Your PAUSE user id.
 
-=item sf_user
+=item cpan_pass
 
-Your SourceForge account (i.e. login) name.
+=item http_proxy
 
-=item passive_ftp
-
-Set this to a true value to enable passive FTP.
+=item https_proxy
 
 =item ignore_prereqs
 
@@ -147,38 +131,17 @@ If you don't like what any of these methods do, override them in a subclass.
 
 =item new()
 
-Create the bare bones C<Module::Release> object so you can read the
-configuration file. If you can read the configuration file, check for
-the C<release_subclass> directive. If the C<release_subclass> is there,
-C<new> calls the subclass's C<new> and returns the result. Otehrwise,
-this C<new> calls C<init> to set up the object.
-
-If you make a subclass, you're responsible for everything, including
-reading the configuration and adding it to your object.
+Create the C<Module::Release> object. It reads the configuration
+and initializes everything.
 
 =cut
 
-sub new
-	{
+sub new {
 	my( $class, %params ) = @_;
 
 	my $self = bless {}, $class;
 
-	# NOTE: I have to read the configuration to see if I should
-	# call the subclass, but I haven't called init yet.
-	# Don't set up anything in _read_configuration!
 	my $config = $self->_read_configuration;
-
-	if( $config->release_subclass )
-		{
-		$self->_warn( "Use of release_subclass is deprecated" );
-		$self->_die( "release_subclass is the same class! Don't do that!" )
-			if $config->release_subclass eq $class;
-		my $subclass_self = $self->_handle_subclass(
-			$config->release_subclass, %params );
-
-		return $subclass_self;
-		}
 
 	$self->init( $config, %params );
 
@@ -199,8 +162,7 @@ configuration values.
 
 =cut
 
-sub init
-	{
+sub init {
 	my( $self, $config, %params ) = @_;
 
 	$self->_set_defaults( %params );
@@ -215,8 +177,7 @@ sub init
 
 sub _select_config_file_name { -e ".releaserc" ? ".releaserc" : "releaserc" }
 
-sub _set_defaults
-	{
+sub _set_defaults {
 	require Config;
 	require IO::Null;
 
@@ -240,8 +201,7 @@ sub _set_defaults
 			%params,
 		   };
 
-	foreach my $key ( keys %$defaults )
-		{
+	foreach my $key ( keys %$defaults ) {
 		$self->{$key} = $defaults->{$key};
 		}
 
@@ -252,8 +212,7 @@ sub _set_defaults
 	# programmatic interface to Makemaker, and I don't want to
 	# treat Makemaker and Module::Build differently. I'm stuck
 	# with a fancy shell script.
-	if( -e 'Build.PL' )
-		{
+	if( -e 'Build.PL' ) {
 		$self->{'make'}        = File::Spec->catfile(qw{. Build});
 		$self->{'Makefile.PL'} = 'Build.PL';
 		$self->{'Makefile'}    = '_build';
@@ -261,8 +220,7 @@ sub _set_defaults
 	1;
 	}
 
-sub _read_configuration
-	{
+sub _read_configuration {
 	require ConfigReader::Simple;
 
 	# NOTE: I have to read the configuration to see if I should
@@ -281,8 +239,7 @@ sub _read_configuration
 	$config;
 	}
 
-sub _process_configuration
-	{
+sub _process_configuration {
 	my $self = shift;
 
 	# Figure out options
@@ -299,8 +256,7 @@ sub _process_configuration
 		[ qw(make        make)        ],
 		);
 
-	foreach my $pair ( @pairs )
-		{
+	foreach my $pair ( @pairs ) {
 		my( $key, $config ) = @$pair;
 
 		$self->{$key} = $self->config->get($config)
@@ -312,10 +268,8 @@ sub _process_configuration
 	my @required = qw(  );
 
 	my $ok = 1;
-	for( @required )
-		{
-		unless( length $self->config->$_() )
-			{
+	for( @required ) {
+		unless( length $self->config->$_() ) {
 			$ok = 0;
 			$self->_warn( "Missing configuration data: $_; Aborting!\n" );
 			}
@@ -323,19 +277,16 @@ sub _process_configuration
 	$self->_die( "Missing configuration data" ) unless $ok;
 
 
-	if( $self->config->perls )
-		{
+	if( $self->config->perls ) {
 		my @paths = split /:/, $self->config->perls;
 
-		foreach my $path ( @paths )
-			{
+		foreach my $path ( @paths ) {
 			$self->add_a_perl( $path );
 			}
 		}
 	}
 
-sub _handle_subclass
-	{
+sub _handle_subclass {
 	my( $self, $subclass, %params ) = @_;
 
 
@@ -344,8 +295,7 @@ sub _handle_subclass
 	# we haven't loaded, it might be in another file the user already
 	# loaded, or the user might have defined it inline inside
 	# the script. We'll try loading it if it fails can()
-	unless( eval { $subclass->can( 'new' ) } )
-		{
+	unless( eval { $subclass->can( 'new' ) } ) {
 		# I don't care if this fails because loading the file
 		# might not be the problem
 		eval { require File::Spec->catfile( split '::', $subclass ) . '.pm' };
@@ -377,8 +327,7 @@ Added in 1.21
 
 =cut
 
-sub load_mixin
-	{
+sub load_mixin {
 	my( $self, $module ) = @_;
 
 	return 1 if $self->mixin_loaded( $module );
@@ -423,63 +372,6 @@ object;
 
 sub config { $_[0]->{config} }
 
-=item get_web_user_agent
-
-Get a web user agent that follows the LWP::UserAgent API. The first time
-you call this it also sets up the web client by calling C<setup_web_client>.
-
-=cut
-
-sub get_web_user_agent { $_[0]->{web_user_agent} || $_[0]->setup_web_user_agent }
-
-=item setup_web_user_agent( ARGS )
-
-Create a web user agent and store it in the object. Get a reference to it
-by saving the result or calling C<get_web_user_agent>. If you call this
-method again, it replaces the internal web user agent (and anything you've
-done to it since you first set it up). It passes any arguments to the
-constructor of the user agent class.
-
-It calls C<web_user_agent_name> to set the initial agent name, and sets
-up an empty, in-memory cookie jar.
-
-=cut
-
-sub setup_web_user_agent
-	{
-	my $self = shift;
-
-	my $class = $self->web_user_agent_class;
-	my $rc = eval { eval "require $class" };
-	unless( $rc ) { $self->_die( "Could not load $class: $@" ) };
-
-	my $ua = $self->web_user_agent_class->new(
-		agent => $self->web_user_agent_name,
-		@_
-		);
-
-	$ua->cookie_jar( {} );
-
-	$self->{web_user_agent} = $ua;
-	}
-
-=item web_user_agent_class
-
-The package name to use to build a web user agent object.
-
-=cut
-
-sub web_user_agent_class { 'LWP::UserAgent' }
-
-=item web_user_agent_name
-
-The user agent name to use with web requests. Let's just call that
-C<Mozilla> for now.
-
-=cut
-
-sub web_user_agent_name { 'Mozilla' }
-
 =item local_file( FILENAME )
 
 Returns or sets the name of the local distribution file. You can use
@@ -487,8 +379,7 @@ the literal argument C<undef> to clear the value.
 
 =cut
 
-sub local_file
-	{
+sub local_file {
 	$_[0]->{local_file} = $_[1] if @_ > 1;
 
 	$_[0]->{local_file};
@@ -501,8 +392,7 @@ literal argument C<undef> to clear the value.
 
 =cut
 
-sub remote_file
-	{
+sub remote_file {
 	$_[0]->{remote_file} = $_[1] if @_ > 1;
 
 	$_[0]->{remote_file};
@@ -589,20 +479,16 @@ Added in 1.21.
 
 =cut
 
-sub add_a_perl
-	{
+sub add_a_perl {
 	my( $self, $path ) = @_;
 
 	return 1 if exists $self->{perls}{$path};
 
-	unless( -x $path )
-		{
-		if( $path =~ m/[*?[]/ && $self->config->allow_glob_in_perls )
-			{
+	unless( -x $path ) {
+		if( $path =~ m/[*?[]/ && $self->config->allow_glob_in_perls ) {
 			$self->add_a_perl( $_ ) for glob $path;
 			}
-		else
-			{
+		else {
 			$self->_warn( "$path is not executable" );
 			}
 		return;
@@ -610,8 +496,7 @@ sub add_a_perl
 
 	my $version = $self->_looks_like_perl( $path );
 
-	unless( $version )
-		{
+	unless( $version ) {
 		$self->_warn( "$path does not appear to be perl!" );
 		return;
 		}
@@ -627,8 +512,7 @@ Added in 1.21.
 
 =cut
 
-sub remove_a_perl
-	{
+sub remove_a_perl {
 	my( $self, $path ) = @_;
 
 	return delete $self->{perls}{$path}
@@ -642,8 +526,7 @@ Added in 1.21.
 
 =cut
 
-sub reset_perls
-	{
+sub reset_perls {
 	my $self = shift;
 
 	$self->{perls} = {};
@@ -740,13 +623,11 @@ Run `make realclean`
 
 =cut
 
-sub clean
-	{
+sub clean {
 	my $self = shift;
 	$self->_print( "Cleaning directory... " );
 
-	unless( -e $self->{Makefile} )
-		{
+	unless( -e $self->{Makefile} ) {
 		$self->_print( " no $self->{Makefile}---skipping\n" );
 		return;
 		}
@@ -762,13 +643,11 @@ Run `make distclean`
 
 =cut
 
-sub distclean
-	{
+sub distclean {
 	my $self = shift;
 	$self->_print( "Cleaning directory... " );
 
-	unless( -e $self->{Makefile} )
-		{
+	unless( -e $self->{Makefile} ) {
 		$self->_print( " no $self->{Makefile}---skipping\n" );
 		return;
 		}
@@ -788,13 +667,11 @@ C<Makefile.PL>.
 
 =cut
 
-sub build_makefile
-	{
+sub build_makefile {
 	my $self = shift;
 	$self->_print( "Recreating make file... " );
 
-	unless( -e $self->{'Makefile.PL'} )
-		{
+	unless( -e $self->{'Makefile.PL'} ) {
 		$self->_print( " no $self->{'Makefile.PL'}---skipping\n" );
 		return;
 		}
@@ -810,8 +687,7 @@ Run a plain old `make`.
 
 =cut
 
-sub make
-	{
+sub make {
 	my $self = shift;
 	$self->_print( "Running make... " );
 
@@ -832,13 +708,11 @@ Run `make test`. If any tests fail, it dies.
 
 =cut
 
-sub test
-	{
+sub test {
 	my $self = shift;
 	$self->_print( "Checking make test... " );
 
-	unless( -e $self->{'Makefile'} )
-		{
+	unless( -e $self->{'Makefile'} ) {
 		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
@@ -878,8 +752,7 @@ name if not set on the command line.
 
 =cut
 
-sub dist
-	{
+sub dist {
 	my $self = shift;
 	$self->_print( "Making dist... " );
 
@@ -889,8 +762,7 @@ sub dist
 	$self->_debug( "messages are [$messages]\n" );
 
 	# If the distro isn't already set, try to guess it
-	unless( $self->local_file )
-		{
+	unless( $self->local_file ) {
 		$self->_debug( ", guessing local distribution name\n" );
 		my( $guess ) = $messages =~ /(?:\s|')(\S+\.tar)/;
 		$self->_debug( "guessed [$guess]\n" );
@@ -916,14 +788,12 @@ Run `make disttest`. If the tests fail, it dies.
 
 =cut
 
-sub disttest
-	{
+sub disttest {
 	my $self = shift;
 
 	$self->_print( "Checking make disttest... " );
 
-	unless( -e $self->{'Makefile'} )
-		{
+	unless( -e $self->{'Makefile'} ) {
 		$self->_print( " no $self->{'Makefile'}---skipping\n" );
 		return;
 		}
@@ -944,8 +814,7 @@ give a warning.
 
 =cut
 
-sub dist_test
-	{
+sub dist_test {
 	$_[0]->_warn( "dist_test is deprecated. Use disttest instead." );
 
 	goto &disttest;
@@ -957,8 +826,7 @@ Return the distribution version ( set in dist() )
 
 =cut
 
-sub dist_version
-	{
+sub dist_version {
 	my $self = shift;
 
 	$self->_die( "Can't get dist_version! It's not set (did you run dist first?)" )
@@ -970,16 +838,13 @@ sub dist_version
 			or return '';
 
 	my @components = split /[.]/, $version;
-	if ($vee || @components > 2) # This is a multi-part version
-		{
+	if ($vee || @components > 2) { # This is a multi-part version
 		# We assume that version.pm is available if multi-part
 		# versions are in use.
-		eval
-			{
+		eval {
 			require version;
 			}
-		or do
-		    	{ # Fall back to using $version_str verbatim
+		or do { # Fall back to using $version_str verbatim
 			warn $@;
 			return $version_str;
 			};
@@ -987,8 +852,7 @@ sub dist_version
 		# There are pre- and post-0.77 versions of version.pm.
 		# The former are deprecated, but I assume we must
 		# gracefully use what we have available.
-		eval
-			{
+		eval {
 			$version = version->VERSION >= 0.77?
 				version->parse (lc($vee) . $version)->normal : # latest and best
 				''.version->new(lc($vee) . $version)         ; # legacy
@@ -1019,8 +883,7 @@ Return the distribution version ( set in dist() )
 
 =cut
 
-sub dist_version_format
-	{
+sub dist_version_format {
 	no warnings 'uninitialized';
 	my $self = shift;
 	my( $major, $minor, $dev ) = @_;
@@ -1048,22 +911,19 @@ to re-run your release script.
 # for that output type.
 #
 # returns the number of interesting things it found, but that's it.
-sub _check_output_lines
-	{
+sub _check_output_lines {
 	my $self = shift;
 	my( $message_hash, $message ) = @_;
 
 	my %state;
-	foreach my $state ( keys %$message_hash )
-		{
+	foreach my $state ( keys %$message_hash ) {
 		$state{$state} = [ $message =~ /^\Q$state\E\s+(.+)/gm ];
 		}
 
 	my $rule = "-" x 50;
 	my $count = 0;
 
-	foreach my $key ( sort keys %state )
-		{
+	foreach my $key ( sort keys %state ) {
 		my $list = $state{$key};
 		next unless @$list;
 
@@ -1077,8 +937,7 @@ sub _check_output_lines
 	return $count;
 	}
 
-sub check_manifest
-	{
+sub check_manifest {
 	my $self = shift;
 
 	$self->_print( "Checking state of MANIFEST... " );
@@ -1122,8 +981,7 @@ Return the filenames in the manifest file as a list.
 
 =cut
 
-sub files_in_manifest
-	{
+sub files_in_manifest {
 	my $self = shift;
 
 	require ExtUtils::Manifest;
@@ -1134,12 +992,10 @@ sub files_in_manifest
 	my $hash = do {
 		local $SIG{'__WARN__'} = sub {
 			my $message = shift;
-			if( $message =~ m/Debug: (.*)/ )
-				{
+			if( $message =~ m/Debug: (.*)/ ) {
 				$self->_debug( $1 );
 				}
-			else
-				{
+			else {
 				$self->_die( "files_in_manifest: could not open file\n" );
 				}
 			};
@@ -1195,17 +1051,14 @@ Returns the number of files which it successfully touched.
 
 =cut
 
-sub touch
-	{
+sub touch {
 	my( $self, @files ) = @_;
 
 	my $time = time;
 
 	my $count = 0;
-	foreach my $file ( @files )
-		{
-		unless( -f $file )
-			{
+	foreach my $file ( @files ) {
+		unless( -f $file ) {
 			$self->_warn( "$file is not a plain file" );
 			next;
 			}
@@ -1217,8 +1070,7 @@ sub touch
 		utime( $time, $time, $file );
 
 		# check that it actually worked
-		unless( 2 == grep { $_ == $time } (stat $file)[8,9] )
-			{
+		unless( 2 == grep { $_ == $time } (stat $file)[8,9] ) {
 			$self->_warn( "$file did not set utimes." );
 			next;
 			}
@@ -1249,10 +1101,8 @@ Get passwords for CPAN.
 
 =cut
 
-sub check_for_passwords
-	{
-	if( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  )
-		{
+sub check_for_passwords {
+	if( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  ) {
 		$_[0]->config->set( 'cpan_pass', $pass );
 		}
 
@@ -1268,8 +1118,7 @@ you may well want to overload it.
 
 =cut
 
-sub get_readme
-	{
+sub get_readme {
 	open my $fh, '<README' or return '';
 	my $data = do {
 		local $/;
@@ -1286,14 +1135,12 @@ you may well want to overload it.
 
 =cut
 
-sub get_changes
-	{
+sub get_changes {
 	open my $fh, '<', 'Changes' or return '';
 
 	my $data = <$fh>;  # get first line
 
-	while( <$fh> )
-		{
+	while( <$fh> ) {
 		last if /^\S/;
 		$data .= $_;
 		}
@@ -1317,8 +1164,7 @@ sub _run_error_reset { $_[0]->{_run_error} = 0 }
 sub _run_error_set   { $_[0]->{_run_error} = 1 }
 sub run_error        { $_[0]->{_run_error}     }
 
-sub run
-	{
+sub run {
 	my( $self, $command ) = @_;
 
 	$self->_run_error_reset;
@@ -1335,8 +1181,7 @@ sub run
 
 	my $readlen = $self->debug ? 1 : 256;
 
-	while( read $fh, $buffer, $readlen )
-		{
+	while( read $fh, $buffer, $readlen ) {
 		$output .= $_;
 		$self->_debug( $_, $buffer );
 		$output .= $buffer;
@@ -1344,8 +1189,7 @@ sub run
 
 	$self->_debug( $self->_dashes, "\n" );
 
-	unless( close $fh )
-		{
+	unless( close $fh ) {
 		$self->_run_error_set;
 		$self->_warn(  "Command [$command] didn't close cleanly: $?" );
 		}
@@ -1359,8 +1203,7 @@ Get an environment variable or prompt for it
 
 =cut
 
-sub get_env_var
-	{
+sub get_env_var {
 	my ($self, $field) = @_;
 
 	# Check for an explicit argument passed

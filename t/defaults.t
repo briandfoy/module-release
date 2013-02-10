@@ -63,20 +63,3 @@ can_ok( $release, $method );
 is( $release->$method(), $ENV{$var}, 
 	"$method matches $var ($ENV{RELEASE_DEBUG})" );
 }
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Create object with no parameters
-{
-local %ENV; # don't react to overall setup
-
-my $method = 'pause_ftp_site';
-
-my $release = $class->new;
-isa_ok( $release, $class );
-$release->load_mixin( 'Module::Release::PAUSE' );
-
-can_ok( $release, $method );
-
-is( $release->$method(), 'pause.perl.org', 
-	"$method returns the right default host" );
-}

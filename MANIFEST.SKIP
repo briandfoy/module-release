@@ -19,3 +19,6 @@ cover_db
 \.git
 \.bbproj
 sf_upload
+t/ftp/
+t/pause/
+hack/

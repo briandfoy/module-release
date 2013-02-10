@@ -11,12 +11,9 @@ make_targets.t
 dist_version.t
 perls.t
 mixins.t
-user_agent.t
 touch.t
 touch-utime-fails.t
 manifest.t
 run.t
 kwalitee/check_kwalitee.t
-ftp/ftp.t
-pause/pause.t
 without.t

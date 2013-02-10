@@ -2,7 +2,7 @@ BEGIN {
 	@classes = qw(
 		Module::Release 
 		Module::Release::Kwalitee
-		Module::Release::FTP
+		Module::Release::WebUpload::Mojo
 		Module::Release::PAUSE
 		Module::Release::SVN
 		Module::Release::MANIFEST
