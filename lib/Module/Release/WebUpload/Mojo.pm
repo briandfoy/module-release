@@ -64,14 +64,6 @@ sub web_upload {
 		 );
 	my $code = $tx->res->code;
 	$self->_print( "File uploaded [$code]\n" );
-	
-	open my $fh, '>:utf8', 'mojo.req.txt';
-	print {$fh} $tx->req->to_string;
-	close $fh;
-
-	open my $fh, '>:utf8', 'mojo.res.txt';
-	print {$fh} $tx->res->to_string;
-	close $fh;
 	}
 
 sub make_agent {
