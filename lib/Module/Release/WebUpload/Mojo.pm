@@ -49,8 +49,8 @@ sub web_upload {
 	my $params = {
 		HIDDENNAME                    => $self->config->cpan_user,
 		CAN_MULTIPART                 => 1,
-		pause99_add_uri_uri           => '',
-		SUBMIT_pause99_add_uri_upload => ' Upload this file from my disk ',
+		pause99_add_uri_subdirtext    => '',
+		SUBMIT_pause99_add_uri_httpupload => ' Upload this file from my disk ',
 		pause99_add_uri_httpupload    => { file => $self->local_file },
 		};
 
