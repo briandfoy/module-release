@@ -35,6 +35,5 @@ t/run.t
 t/test_manifest
 t/touch-utime-fails.t
 t/touch.t
-t/user_agent.t
 t/without.t
 ToDo
