@@ -1102,8 +1102,8 @@ go for it.
 
 =cut
 
-sub should_upload_to_pause
-	{
+sub should_upload_to_pause {
+	$_[0]->_debug( "Checking if I should upload\n" );
 	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
 	}
 
