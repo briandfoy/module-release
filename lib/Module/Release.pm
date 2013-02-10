@@ -1104,8 +1104,7 @@ go for it.
 
 sub should_upload_to_pause {
 	$_[0]->_debug( "Checking if I should upload\n" );
-	my $answer = $_[0]->{cpan_user} && $_[0]->{cpan_pass};
-	$_[0]->_debug( "$_[0]->{cpan_user} && $_[0]->{cpan_pass}\n" );
+	my $answer = $_[0]->config->cpan_user && $_[0]->config->cpan_pass;
 	$_[0]->_debug( "The answer is [$answer]\n" );
 	$answer;
 	}
