@@ -1095,6 +1095,18 @@ sub touch_all_in_manifest { $_[0]->touch( $_[0]->files_in_manifest ) }
 
 =over 4
 
+=item should_upload_to_pause
+
+Should I upload to PAUSE? If C<cpan_user> and C<cpan_pass> are set,
+go for it.
+
+=cut
+
+sub should_upload_to_pause
+	{
+	$_[0]->{cpan_user} && $_[0]->{cpan_pass}
+	}
+
 =item check_for_passwords
 
 Get passwords for CPAN.
@@ -1108,8 +1120,6 @@ sub check_for_passwords {
 
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
-
-
 
 =item get_readme()
 

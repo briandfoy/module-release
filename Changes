@@ -1,8 +1,5 @@
 # Changes for Module::Release
 
-2.06_04 - Sun Feb 10 06:10:18 2013
-	* PAUSE turned off FTP, so I switch to using a Mojo web uploader
-
 2.06_02 - Wed Jul 18 12:28:49 2012
 	* Add =encoding to Pod sections to avoid new Pod::Simple warnings
 
