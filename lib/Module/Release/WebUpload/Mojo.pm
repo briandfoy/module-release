@@ -44,10 +44,8 @@ sub web_upload {
 
 	my $ua = $self->make_agent;
 
-	my $asset  = Mojo::Asset::File->new(
-		path => $self->local_file,
-		);
-	
+	$self->_debug( sprintf "Uploading file %s", $self->local_file );
+
 	my $params = {
 		HIDDENNAME                    => $self->config->cpan_user,
 		CAN_MULTIPART                 => 1,
@@ -66,6 +64,14 @@ sub web_upload {
 		 );
 	my $code = $tx->res->code;
 	$self->_print( "File uploaded [$code]\n" );
+	
+	open my $fh, '>:utf8', 'mojo.req.txt';
+	print {$fh} $tx->req->to_string;
+	close $fh;
+
+	open my $fh, '>:utf8', 'mojo.res.txt';
+	print {$fh} $tx->res->to_string;
+	close $fh;
 	}
 
 sub make_agent {
