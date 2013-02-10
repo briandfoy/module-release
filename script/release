@@ -446,6 +446,8 @@ $release->_print("============Checking source repository\n");
 
 $release->check_vcs;
 
+$release->dist unless( $release->local_file and -e $release->local_file );
+
 my $Version = $release->dist_version;
 
 $release->_debug( "dist version is  $Version\n" );
