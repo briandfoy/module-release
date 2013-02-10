@@ -119,6 +119,10 @@ Have you considered just fixing the prereqs though? :)
 
 Run all checks then stop. Do not change any files or upload the distribution.
 
+=item -T
+
+Skip the tests. This is useful when you just want to upload.
+
 =item -v
 
 Print the program name and version then exit
@@ -265,7 +269,7 @@ my $class = "Module::Release";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 my %opts;
-getopts('aChdptvk', \%opts) or $opts{h} = 1;
+getopts('aChdptvkT', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -379,31 +383,31 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 	
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
-{
-my $old_perl = $release->get_perl;
+unless( $opts{T} ) {
+	my $old_perl = $release->get_perl;
 
-foreach my $perl ( $release->perls ) {
-	$release->_print("============Testing with $perl\n");
-	$release->set_perl( $perl ) or next;
+	foreach my $perl ( $release->perls ) {
+		$release->_print("============Testing with $perl\n");
+		$release->set_perl( $perl ) or next;
 
-	$release->clean;
-	$release->build_makefile;
-	$release->make;
-	$release->test;
+		$release->clean;
+		$release->build_makefile;
+		$release->make;
+		$release->test;
 
-	unless( $skip_prereqs ) {
-		$release->check_prereqs;
-		}
-	else {
-		$release->_print( "Skipping prereq checks. Shame on you!\n" );
-		}
+		unless( $skip_prereqs ) {
+			$release->check_prereqs;
+			}
+		else {
+			$release->_print( "Skipping prereq checks. Shame on you!\n" );
+			}
 		
-	$release->dist;
-	$release->disttest;
-	}
+		$release->dist;
+		$release->disttest;
+		}
 
-$release->set_perl( $old_perl );
-}
+	$release->set_perl( $old_perl );
+	}
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
