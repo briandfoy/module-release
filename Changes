@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.06_05 - Thu Dec 12 23:10:55 2013
+	* Don't try so hard to check perl on Windows
+
 2.06_04 - Sun Feb 10 06:14:47 2013
 	* PAUSE turned off FTP, so I switch to using a Mojo web uploader
 
