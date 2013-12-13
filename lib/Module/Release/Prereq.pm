@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-$VERSION = '2.06_04';
+$VERSION = '2.06_05';
 
 =encoding utf8
 

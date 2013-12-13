@@ -24,7 +24,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.06_04';
+$VERSION = '2.06_05';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
@@ -439,6 +439,8 @@ sub _looks_like_perl {
 
 	# resolve a path, especially on Windows, like
 	# C:\STRAWB~1\perl\bin\perl.exe
+	return 1 if $path =~ /\bperl.exe\z/;
+
 	my $version = `$path -e "print \$\]" 2>&1`;
 
 	$version =~ m/^\d+\.[\d_]+$/ ? $version : ();

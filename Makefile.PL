@@ -18,8 +18,6 @@ WriteMakefile(
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
-		'HTTP::Message'         => '0',
-		'HTTP::Request'         => '0',
 		'IO::Null'              => '0',
 		'Mojo::UserAgent'       => '0',
 		'Test::Output'          => '0',

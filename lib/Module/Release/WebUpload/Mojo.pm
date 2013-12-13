@@ -16,7 +16,7 @@ our @EXPORT = qw(
 	pause_add_uri
 	);
 
-$VERSION = '2.06_04';
+$VERSION = '2.06_05';
 
 =encoding utf8
 
@@ -71,7 +71,7 @@ sub make_agent {
 	my $agent = Mojo::UserAgent->new( name => 'release' );
 	$agent->http_proxy( $self->config->http_proxy ) if $self->config->http_proxy;
 	$agent->https_proxy( $self->config->https_proxy ) if $self->config->https_proxy;
-    require CACertOrg::CA;
+	require CACertOrg::CA;
 	$agent->cert( CACertOrg::CA::SSL_ca_file() );
 
 	return $agent;
