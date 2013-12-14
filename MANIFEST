@@ -6,13 +6,11 @@ lib/Module/Release/Kwalitee.pm
 lib/Module/Release/MANIFEST.pm
 lib/Module/Release/PAUSE.pm
 lib/Module/Release/Prereq.pm
-lib/Module/Release/SourceForge.pm
 lib/Module/Release/SVN.pm
 lib/Module/Release/WebUpload/Mojo.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-PL
 README
 script/release
 t/abstract.t
@@ -32,7 +30,6 @@ t/perls.t
 t/pod.t
 t/pod_coverage.t
 t/run.t
-t/sf_login.t
 t/test_manifest
 t/touch-utime-fails.t
 t/touch.t
