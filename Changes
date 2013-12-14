@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.06_06 - Sat Dec 14 10:52:35 2013
+	* Update for Mojo 4 (not that big of a change :)
+
 2.06_05 - Thu Dec 12 23:10:55 2013
 	* Don't try so hard to check perl on Windows
 
