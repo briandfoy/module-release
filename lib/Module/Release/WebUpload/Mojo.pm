@@ -55,12 +55,12 @@ sub web_upload {
 		};
 
 	$self->_print( "File uploading\n" );
-	my $tx = $ua->post_form(
+	my $tx = $ua->post(
 		$self->pause_add_uri( 
 		 	$self->config->cpan_user, 
 		 	$self->config->cpan_pass,
 		 	),
-		 => $params,
+		 form => $params,
 		 );
 	my $code = $tx->res->code;
 	$self->_print( "File uploaded [$code]\n" );
