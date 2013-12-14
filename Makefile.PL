@@ -27,9 +27,25 @@ WriteMakefile(
 
 	MIN_PERL_VERSION => 5.010,
 
+	'META_MERGE' => {
+        'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'git@github.com:briandfoy/tie-cycle.git',
+				web  => 'https://github.com/briandfoy/tie-cycle',
+				},
+			},
+		},
+
 	META_MERGE => {
+			'meta-spec' => { version => 2 },
 			resources => {
-		  		repository => 'git://github.com/briandfoy/module-release.git',
+				repository => {
+					type => 'git',
+					url  => 'git@github.com:briandfoy/tie-cycle.git',
+					web  => 'https://github.com/briandfoy/tie-cycle',
+					},
 				},
 			keywords => ['workflow', 'module', 'distribution', 
 				'pause', 'automation', 'testing'],
