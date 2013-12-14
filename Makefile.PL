@@ -19,7 +19,7 @@ WriteMakefile(
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
 		'IO::Null'              => '0',
-		'Mojo::UserAgent'       => '0',
+		'Mojolicious'           => '4',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
 		'URI'                   => '0',
