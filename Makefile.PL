@@ -7,7 +7,7 @@ require 5.010;
 eval "use Test::Manifest 1.21";
 
 WriteMakefile(
-	'NAME'	       => 'Module::Release',
+	'NAME'         => 'Module::Release',
 	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
 	'ABSTRACT'     => 'Automate Perl distribution releases',
 	'VERSION_FROM' => "lib/Module/Release.pm",
@@ -25,35 +25,24 @@ WriteMakefile(
 		'URI'                   => '0',
 		},
 
-	MIN_PERL_VERSION => 5.010,
+	'MIN_PERL_VERSION' => 5.010,
 
 	'META_MERGE' => {
-        'meta-spec' => { version => 2 },
+		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
 				type => 'git',
-				url  => 'git@github.com:briandfoy/tie-cycle.git',
-				web  => 'https://github.com/briandfoy/tie-cycle',
+				url  => 'git@github.com:briandfoy/module-release.git',
+				web  => 'https://github.com/briandfoy/module-release',
 				},
 			},
+		keywords => ['workflow', 'module', 'distribution', 
+			'pause', 'automation', 'testing'],
 		},
-
-	META_MERGE => {
-			'meta-spec' => { version => 2 },
-			resources => {
-				repository => {
-					type => 'git',
-					url  => 'git@github.com:briandfoy/tie-cycle.git',
-					web  => 'https://github.com/briandfoy/tie-cycle',
-					},
-				},
-			keywords => ['workflow', 'module', 'distribution', 
-				'pause', 'automation', 'testing'],
-	  		},
 
 	'MAN1PODS'     => {
 		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
 		},
 
-	clean => { FILES => '*.bak release-* Module-*' },
+	'clean' => { FILES => '*.bak release-* Module-*' },
 	);
