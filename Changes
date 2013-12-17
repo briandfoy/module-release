@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.07 - Tue Dec 17 10:07:20 2013
+	* Bump to a release version
+
 2.06_06 - Sat Dec 14 10:52:35 2013
 	* Update for Mojo 4 (not that big of a change :)
 
