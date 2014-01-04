@@ -29,7 +29,7 @@ WriteMakefile(
 		},
 	
 	'BUILD_REQUIRES' => {
-		'ExtUtils::MakeMaker'   => '6.64';
+		'ExtUtils::MakeMaker'   => '6.64',
 		},
 
 	'MIN_PERL_VERSION' => 5.010,
