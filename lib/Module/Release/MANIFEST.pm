@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_MANIFEST );
 
-$VERSION = '2.07';
+$VERSION = '2.07_01';
 
 =encoding utf8
 

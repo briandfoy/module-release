@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker 6.64;
 use strict;
 use warnings;
 
@@ -19,10 +19,17 @@ WriteMakefile(
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
 		'IO::Null'              => '0',
-		'Mojolicious'           => '4',
+		'Mojolicious'           => '4.50',
+		'URI'                   => '0',
+		},
+
+	'TEST_REQUIRES' => {
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
-		'URI'                   => '0',
+		},
+	
+	'BUILD_REQUIRES' => {
+		'ExtUtils::MakeMaker'   => '6.64';
 		},
 
 	'MIN_PERL_VERSION' => 5.010,
