@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.07_01 - Sat Jan  4 06:47:03 2014
+	* Update Mojo::UserAgent for transactor changes in 4.50
+
 2.07 - Tue Dec 17 10:07:20 2013
 	* Bump to a release version
 
