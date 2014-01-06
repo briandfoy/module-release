@@ -49,14 +49,12 @@ Check the state of the SVN repository.
 
 =cut
 
-sub check_cvs
-	{
+sub check_cvs {
 	carp "check_cvs is deprecated in favor of check_vcs. Update your programs!";
 	&check_vcs;
 	}
 
-sub check_vcs
-	{
+sub check_vcs {
 	my $self = shift;
 
 	$self->_print( "Checking state of Subversion..." );
@@ -84,16 +82,14 @@ sub check_vcs
 	my @svn_states = keys %message;
 
 	my %svn_state;
-	foreach my $state (@svn_states)
-		{
+	foreach my $state (@svn_states) {
 		$svn_state{$state} = [ $svn_update =~ /$state\s+(.*)/g ];
 		}
 
 	my $count;
 	my $question_count;
 
-	foreach my $key ( sort keys %svn_state )
-		{
+	foreach my $key ( sort keys %svn_state ) {
 		my $list = $svn_state{$key};
 		next unless @$list;
 
@@ -132,14 +128,12 @@ Tag the release in Subversion.
 =cut
 
 
-sub cvs_tag
-	{
+sub cvs_tag {
 	carp "cvs_tag is deprecated in favor of vcs_tag. Update your programs!";
 	&check_vcs;
 	}
 
-sub vcs_tag
-	{
+sub vcs_tag {
 	require URI;
 
 	my $self = shift;
@@ -161,8 +155,7 @@ sub vcs_tag
 	my $trunk_url = URI->new( $1 );
 
 	my @tag_url = $trunk_url->path_segments;
-	if(! grep /^trunk$/, @tag_url )
-		{
+	if(! grep /^trunk$/, @tag_url ) {
 		$self->_warn(
 			"\nWARNING: Current SVN URL:\n  $trunk_url\ndoes not contain a 'trunk' component\n",
 			"Aborting tagging.\n"
@@ -171,10 +164,8 @@ sub vcs_tag
 		return;
 		}
 
-	foreach( @tag_url )
-		{
-		if($_ eq 'trunk')
-			{
+	foreach( @tag_url ) {
+		if($_ eq 'trunk') {
 			$_ = 'tags';
 			last;
 			}
@@ -190,8 +181,7 @@ sub vcs_tag
 	# stops $? from being properly propogated.  Reported to brian d foy as
 	# part of RT#6489
 	$self->run( "svn list $tag_url 2>&1" );
-	if( $? )
-		{
+	if( $? ) {
 		$self->_warn(
 			sprintf("\nWARNING:\n  svn list $tag_url\nfailed with non-zero exit status: %d\n", $? >> 8),
 			"Assuming tagging directory does not exist in repo.  Please create it.\n",
@@ -209,8 +199,7 @@ sub vcs_tag
 
 	$self->run( "svn copy $trunk_url $tag_url" );
 
-	if ( $? )
-		{
+	if ( $? ) {
 		# already uploaded, and tagging is not (?) essential, so warn, don't die
 		$self->_warn(
 			sprintf(
@@ -235,14 +224,12 @@ different tagging scheme, or don't even call it.
 =cut
 
 
-sub make_cvs_tag
-	{
+sub make_cvs_tag {
 	carp "make_cvs_tag is deprecated in favor of make_vcs_tag. Update your programs!";
 	&make_vcs_tag;
 	}
 
-sub make_vcs_tag
-	{
+sub make_vcs_tag {
 	my $self = shift;
 	my( $major, $minor ) = $self->remote_file
 		=~ /(\d+) \. (\d+(?:_\d+)?) (?:\. tar \. gz)? $/xg;
