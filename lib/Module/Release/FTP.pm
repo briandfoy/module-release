@@ -25,10 +25,8 @@ Module::Release::FTP - Interact with an FTP server
 =head1 SYNOPSIS
 
 NOTE: PAUSE has turned off FTP uploads. Methods in this class
-will croak.
-
-The release script automatically loads this module when it's time
-to upload a file
+will croak. If you want to make a private PAUSE with FTP, you
+can adapt this manual.
 
 =head1 DESCRIPTION
 
