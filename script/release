@@ -546,6 +546,8 @@ $release->vcs_tag unless $release->debug;
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 $release->clean;
 
+$release->vcs_exit;
+
 $release->_print( "Done.\n" );
 
 __END__
