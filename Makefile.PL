@@ -28,7 +28,7 @@ WriteMakefile(
 		'Test::Without::Module' => '0',
 		},
 	
-	'BUILD_REQUIRES' => {
+	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
 		},
 
