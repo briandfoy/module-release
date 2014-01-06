@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.08 - Mon Jan  6 03:11:03 2014
+	* Add a vcs_exit() at the end so a repository can do
+	post-release tasks (such as a `git push`)
+
 2.07_01 - Sat Jan  4 06:47:03 2014
 	* Update Mojo::UserAgent for transactor changes in 4.50
 
