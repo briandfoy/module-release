@@ -250,6 +250,8 @@ sub make_vcs_tag
 	return "RELEASE_${major}_${minor}";
 	}
 
+sub vcs_exit { 1 }
+
 =back
 
 =head1 SEE ALSO
