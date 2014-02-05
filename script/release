@@ -12,6 +12,8 @@ release - give your Perl distros to the world
 
 	# try a dry run without uploading anything
 	release -t
+	# skip dist while checking
+	release -D
 
 	# print a help message and exit
 	release -h
@@ -366,6 +368,7 @@ if( $release->config->cpan_user ) { # not a dry run
 $release->load_mixin( 'Module::Release::Prereq' );
 
 my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
+my $skip_dist    = $opts{D} || $release->config->skip_dist;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default 
@@ -399,11 +402,13 @@ unless( $opts{T} ) {
 			$release->check_prereqs;
 			}
 		else {
-			$release->_print( "Skipping prereq checks. Shame on you!\n" );
+			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
 			}
 		
-		$release->dist;
-		$release->disttest;
+		unless( $skip_dist ) {
+			$release->dist;
+			$release->disttest;
+			}
 		}
 
 	$release->set_perl( $old_perl );
@@ -422,7 +427,7 @@ unless( $opts{k} || $release->config->skip_kwalitee  ) {
 	$release->check_kwalitee;
 	}
 else {
-	$release->_print( "Skipping kwalitee checks. Shame on you!\n" );
+	$opts{t} or $release->_print( "Skipping kwalitee checks. Shame on you!\n" );
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -446,7 +451,17 @@ $release->_print("============Checking source repository\n");
 
 $release->check_vcs;
 
-$release->dist unless( $release->local_file and -e $release->local_file );
+my $Version;
+if ($skip_dist) {
+	$Version = "?"; # Get from ?
+	}
+else {
+	$release->dist unless( $release->local_file and -e $release->local_file );
+
+	$Version = $release->dist_version;
+
+	$release->_debug( "dist version is  $Version\n" );
+	}
 
 my $Version = $release->dist_version;
 

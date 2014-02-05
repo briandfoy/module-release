@@ -69,6 +69,7 @@ is( $mock->get_perl, $^X, "main perl is still \$^X" );
 
 }
 
+(my $pX = $^X) =~ s,.*/,,;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test the perls
@@ -90,20 +91,23 @@ is( scalar @perls, 0, "There are no perls" );
 $mock->add_a_perl( $^X );
 my @perls = $mock->perls;
 is( scalar @perls, 1, "There are no perls" );
-is( $perls[0], $^X, "The reset perl is the one in \$^X" );
+(my $p0 = $perls[0]) =~ s,.*/,,;
+is( $p0, $pX, "The reset perl is the one in \$^X" );
 
 # Adding the same thing shouldn't do anything
 $mock->add_a_perl( $^X );
 @perls = $mock->perls;
 is( scalar @perls, 1, "There are no perls" );
-is( $perls[0], $^X, "The reset perl is the one in \$^X" );
+($p0 = $perls[0]) =~ s,.*/,,;
+is( $p0, $pX, "The reset perl is the one in \$^X" );
 
 # Adding something not executable shouldn't do anything
 $mock->turn_quiet_on;
 $mock->add_a_perl( 'README' );
 @perls = $mock->perls;
 is( scalar @perls, 1, "There are no perls" );
-is( $perls[0], $^X, "The reset perl is the one in \$^X" );
+($p0 = $perls[0]) =~ s,.*/,,;
+is( $p0, $pX, "The reset perl is the one in \$^X" );
 
 # Adding something is executable but not perl shouldn't do anything
 {
@@ -120,7 +124,8 @@ SKIP: {
 	$mock->add_a_perl( $trial_file );
 	@perls = $mock->perls;
 	is( scalar @perls, 1, "There are no perls" );
-	is( $perls[0], $^X, "The reset perl is the one in \$^X" );
+	($p0 = $perls[0]) =~ s,.*/,,;
+	is( $p0, $pX, "The reset perl is the one in \$^X" );
 	}
 
 unlink $trial_file;
@@ -140,7 +145,8 @@ is( scalar @perls, 0, "There are no perls" );
 $mock->reset_perls;
 @perls = $mock->perls;
 is( scalar @perls, 1, "There is one perls" );
-is( $perls[0], $^X, "The reset perl is the one in \$^X" );
+(my $p0 = $perls[0]) =~ s,.*/,,;
+is( $p0, $pX, "The reset perl is the one in \$^X" );
 }
 
 }
