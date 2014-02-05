@@ -402,7 +402,7 @@ unless( $opts{T} ) {
 			$release->check_prereqs;
 			}
 		else {
-			$release->_print( "Skipping prereq checks. Shame on you!\n" );
+			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
 			}
 		
 		unless( $skip_dist ) {
@@ -427,7 +427,7 @@ unless( $opts{k} || $release->config->skip_kwalitee  ) {
 	$release->check_kwalitee;
 	}
 else {
-	$release->_print( "Skipping kwalitee checks. Shame on you!\n" );
+	$opts{t} or $release->_print( "Skipping kwalitee checks. Shame on you!\n" );
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
