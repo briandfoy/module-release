@@ -4,6 +4,7 @@ use warnings;
 
 use Test::More 'no_plan';
 
+use Config;
 use File::Spec;
 
 my $class = 'Module::Release';
@@ -17,10 +18,20 @@ BEGIN {
 	require $file;
 	}
 	
+
+my %required_env;
+
+if ( $^O eq 'android' ) {
+    my $ldlibpth             = $Config{ldlibpthname};
+    $required_env{$ldlibpth} = $ENV{$ldlibpth};
+    $required_env{PATH}      = $ENV{PATH};
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create object with no parameters, clean environment
 {
-local %ENV; # don't react to overall setup
+
+local %ENV = %required_env; # don't react to overall setup
 my $method = 'debug';
 
 my $release = $class->new;
@@ -33,7 +44,7 @@ ok( ! $release->$method(), "debug starts off" );
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create object with no parameters, RELEASE_DEBUG = 1
 {
-local %ENV; # don't react to overall setup
+local %ENV = %required_env; # don't react to overall setup
 my $var = "RELEASE_DEBUG";
 
 $ENV{RELEASE_DEBUG} = 1;
@@ -50,7 +61,7 @@ is( $release->$method(), $ENV{$var},
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create object with no parameters, RELEASE_DEBUG = 0
 {
-local %ENV; # don't react to overall setup
+local %ENV = %required_env; # don't react to overall setup
 my $var = "RELEASE_DEBUG";
 
 $ENV{RELEASE_DEBUG} = 0;
