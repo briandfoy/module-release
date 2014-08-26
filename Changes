@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.09 - Tue Aug 26 14:23:04 2014
+	* Release the Andriod fix
+
 2.08 - Mon Jan  6 03:11:03 2014
 	* Add a vcs_exit() at the end so a repository can do
 	post-release tasks (such as a `git push`)
