@@ -871,7 +871,7 @@ sub dist_version {
 		# The former are deprecated, but I assume we must
 		# gracefully use what we have available.
 		eval {
-			$version = version->VERSION >= 0.77?
+			$version = version->VERSION >= 0.77 ?
 				version->parse (lc($vee) . $version)->normal : # latest and best
 				''.version->new(lc($vee) . $version)         ; # legacy
 			1;
@@ -950,7 +950,6 @@ sub _check_output_lines {
 		local $" = "\n\t";
 		$self->_print( "\n\t$message_hash->{$key}\n\t$rule\n\t@$list\n" );
 		}
-
 
 	return $count;
 	}
