@@ -224,6 +224,10 @@ debugging output.
 The C<PERL> environment variable sets the path to perl for use in the
 make; otherwise, the perl used to run release will be used.
 
+=item * RELEASE_OPTS
+
+A string representing options to add to the command line.
+
 =back
 
 =head1 TO DO
@@ -270,6 +274,12 @@ my $class = "Module::Release";
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+$ENV{RELEASE_OPTS} = defined $ENV{RELEASE_OPTS} ? $ENV{RELEASE_OPTS} : '';
+$ENV{RELEASE_OPTS} =~ s/\A\s+|\s+\z//g;
+
+my @extra_opts = split /\s+/, $ENV{RELEASE_OPTS};
+push @ARGV, @extra_opts;
+
 my %opts;
 getopts('aChdptvkT', \%opts) or $opts{h} = 1;
 
