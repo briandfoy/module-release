@@ -471,15 +471,17 @@ sub perls {
     my $self = shift;
 
     my @perls = keys %{$self->{perls}};
+	warn "perls are [@perls]\n";
 
     # Sort them
     @perls =
 	map  { $_->[0] }
 	sort { $a->[2] <=> $b->[2] || $a->[3] <=> $b->[3] || $a->[0] cmp $b->[0] }
-	map  { [ $_, (m/(perl5\.(?|([0-9]{3})_?([0-9]{2})|([0-9]{1,2})\.([0-9]+)))/) ] }
-	map  { (m{.*/(.*)}) }
+	map  { [ $_->[0], ( $_->[1] =~ m/(perl5\.(?|([0-9]{3})_?([0-9]{2})|([0-9]{1,2})\.([0-9]+)))/) ] }
+	map  { [ $_, (m{.*/(.*)}) ] }
 	grep { -x $_ }
 	@perls;
+	warn "perls are [@perls]\n";
 
     warn "Testing with ", scalar @perls, " versions of perl\n";
     return @perls;
