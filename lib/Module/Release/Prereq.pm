@@ -13,7 +13,7 @@ $VERSION = '2.09';
 
 =head1 NAME
 
-Module::Release::Prereq - Check  pre-requisites list in build file
+Module::Release::Prereq - Check pre-requisites list in build file
 
 =head1 SYNOPSIS
 
