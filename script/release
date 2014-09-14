@@ -473,7 +473,7 @@ else {
 	$release->_debug( "dist version is  $Version\n" );
 	}
 
-my $Version = $release->dist_version;
+$Version = $release->dist_version;
 
 $release->_debug( "dist version is  $Version\n" );
 
