@@ -1,5 +1,9 @@
 # Changes for Module::Release
 
+2.11 - Sun Sep 14 15:44:06 2014
+	* Add RELEASE_OPTS
+	* various small fixups
+
 2.09 - Tue Aug 26 14:23:04 2014
 	* Release the Andriod fix
 
