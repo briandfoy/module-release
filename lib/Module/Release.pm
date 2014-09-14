@@ -906,7 +906,7 @@ sub dist_version_format {
 	my $self = shift;
 	my( $major, $minor, $dev ) = @_;
 
-	sprintf "%d.%02d%s", $major, $minor, $dev;
+	sprintf "%s.%s%s", $major, $minor, $dev;
 	}
 
 =item check_manifest
