@@ -24,6 +24,7 @@ WriteMakefile(
 		},
 
 	'TEST_REQUIRES' => {
+		'Test::More'            => '0.95',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
 		},
