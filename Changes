@@ -1,5 +1,8 @@
 # Changes for Module::Release
 
+2.11 - Thu Sep 18 06:43:58 2014
+	* Update the data to 20140910.
+
 2.11 - Sun Sep 14 15:44:06 2014
 	* Add RELEASE_OPTS
 	* various small fixups
