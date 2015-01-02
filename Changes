@@ -63,7 +63,7 @@
 
 2.05_01 - Tue Sep 22 22:23:11 2009
 	* Let's start checking MANIFEST to ensure we didn't forget
-	anything. This might be annoying the first time since 
+	anything. This might be annoying the first time since
 	make manifest might re-order your file and you have to
 	recommit it.
 
@@ -102,7 +102,7 @@
 
 2.00_06 - Wed Nov  5 00:42:53 2008
 	* Fix up a test to work even if the system error message isn't
-	english. 
+	english.
 
 2.00_05 - Tue Nov  4 04:00:40 2008
 	* Added the -a switch to turn on $ENV{AUTOMATED_TESTING}
@@ -115,9 +115,9 @@
 	* Distro cleanup, no big whoop
 
 2.00_02 - Sat Aug  9 03:41:07 2008
-	* The beginning of the new Module::Release. Lots of stuff 
+	* The beginning of the new Module::Release. Lots of stuff
 	moved into separate modules to act as mixins. There is a
-	lot more testing. 
+	lot more testing.
 	* This is still a developer release, so don't get too
 	attached to anything just yet.
 
@@ -138,7 +138,7 @@
 	* Sagar Shah noticed I tried to call _die() before I used bless().
 	Oops. Fixed.
 	* If you have older versions before I started using _die(), you don't
-	need to rush to get this version. If you got the latest to use 
+	need to rush to get this version. If you got the latest to use
 	Module::Release::Git, you need to upgrade.
 
 1.18 - Sat Oct 27 22:19:57 2007
@@ -151,13 +151,13 @@
 	just to manage my time well. :)
 
 1.17_01 - Wed Oct  3 21:52:02 2007
-	* The output and debugging filehandles come from methods now. 
+	* The output and debugging filehandles come from methods now.
 	This makes it easier to move the output around, or even turn
 	it off. I wanted this for Module::Release::Git. The interface
 	has some new features, but should be compatible with the older
 	stuff.
-	* Added some git support to release(1). This should refactor 
-	itself out in various ways, but I just need the support right 
+	* Added some git support to release(1). This should refactor
+	itself out in various ways, but I just need the support right
 	now without going through all the work to make it nice nice.
 
 1.17 - Mon Aug 13 13:43:17 2007
@@ -172,7 +172,7 @@
 
 1.13 - Thu Feb 22 10:16:18 2007
 	* Updated the distro for PAUSE indexing problems (my fault)
-	* release(1) now detects SVN and loads Module::Release::Subversion 
+	* release(1) now detects SVN and loads Module::Release::Subversion
 	to handle it (that's a separate distro, though).
 	* release(1) now uses Module::CPANTS::Analyze's cpants_lint.pl
 	to check kwalitee. That's also a separate distro.
@@ -180,35 +180,35 @@
 1.12 - Mon Sep 25 22:38:35 CDT 2006
 
 	* Changes from Ken Williams
-	
+
 	* New 'makefile_PL' and 'makefile' parameters to the new()
 	method allow Module::Build-based distributions to work more
 	smoothly - set them to 'Build.PL' and 'Build', respectively.
-	
+
 	* The 'release_subclass' parameter to new() is un-deprecated
 	again.
-	
+
 	* Subclasses previously could not override the new() method
 	when invoked via the 'release_subclass' mechanism, now they can.
-	
+
 	* When running under a passive FTP mode, we were telling the
 	server to go into passive mode twice, which causes some
 	servers to bomb out.  This is fixed.
-	
+
 	* The error message when an FTP PUT operation failed has been
 	improved.
-	
+
 	* System calls made during the release process will now read
 	their underlying STDOUT and STDERR using read(), which helps
 	you see what's going on when there are interactive steps.
-	
+
 	* The getpass() method will now check for CPAN_PASS and
 	SF_PASS values previously set as member variables.  This
 	helps users who might want to, for example, look their
 	values up in the OS X keychain using a custom subclass.
-	
+
 	* Fixed a couple of minor POD formatting errors.
-	
+
 1.10 - Thu Jun  8 06:51:25 2006
 	* Distro cleanup (removed sf_login.t test), fixed doc bug about
 	PAUSE, cleansed POD. No need to upgrade.
@@ -217,8 +217,8 @@
 	* Added MANIFEST checking feature. If `make manifest` has to change
 	MANIFEST, check_manifest() dies. You'll have to check in MANIFEST
 	before you can go on anyway, so you might as well stop and take a
-	look at it (and maybe update MANIFEST.SKIP too). I needed this 
-	because although I had a lot of pod_coverage tests lying about, 
+	look at it (and maybe update MANIFEST.SKIP too). I needed this
+	because although I had a lot of pod_coverage tests lying about,
 	they never made it into the dists because I never added them to
 	MANIFEST. Stoopid me.
 	* This updates the release(1) script too. Make sure you want this
@@ -254,7 +254,7 @@
 	* release will not run if there are any switch errors
 
 	* Added many error checks in ftp_upload.
-    
+
 	* Added some docs on how to find sf_group_id and sf_release_id.
 
 	* Removed a "last CVS" in cvs() method.  It would have
@@ -286,7 +286,7 @@
 	  tag string.  This lets me override make_cvs_tag() in a subclass.
 
 0.20 - Wed Mar 26 11:05:00 2003 (Andy Lester)
-	* Moved all the real work into Module::Release.  Thanks to 
+	* Moved all the real work into Module::Release.  Thanks to
 	Ken Williams for doing all the dirty work on this.
 
 	* Fixed the Test::Pod dependency
@@ -328,7 +328,7 @@
 	Most of the changes in this revision are from Chris Nandor:
 
 	* Add basic help page
-	
+
 	* Add more debugging information (dump `` output)
 
 	* Add command-line switches for help, debug, and test (exits after
@@ -351,7 +351,7 @@
 	* Patches to make this less brian-specific.  Thanks to Chris
 	  Nandor for taking it upon himself to do so.
 
-	* Removed a lot of dependencies on external modules. 
+	* Removed a lot of dependencies on external modules.
 
 0.10 - Wed Dec 11 16:40:53 2002 (brian d foy)
 	* prompt for comments to put in Changes, commit Changes, and
