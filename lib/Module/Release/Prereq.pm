@@ -78,7 +78,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2007-2014, brian d foy, All Rights Reserved.
+Copyright © 2007-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 
