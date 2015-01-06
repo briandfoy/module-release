@@ -1,147 +1,147 @@
 Revision history for Perl module Module::Release
 
-2.11 - Thu Sep 18 06:43:58 2014
+2.11 - 2014-09-18
 	* Update the data to 20140910.
 
-2.11 - Sun Sep 14 15:44:06 2014
+2.11 - 2014-09-14
 	* Add RELEASE_OPTS
 	* various small fixups
 
-2.09 - Tue Aug 26 14:23:04 2014
+2.09 - 2014-08-26
 	* Release the Andriod fix
 
-2.08 - Mon Jan  6 03:11:03 2014
+2.08 - 2014-01-06
 	* Add a vcs_exit() at the end so a repository can do
 	post-release tasks (such as a `git push`)
 
-2.07_01 - Sat Jan  4 06:47:03 2014
+2.07_01 - 2014-01-04
 	* Update Mojo::UserAgent for transactor changes in 4.50
 
-2.07 - Tue Dec 17 10:07:20 2013
+2.07 - 2013-12-17
 	* Bump to a release version
 
-2.06_06 - Sat Dec 14 10:52:35 2013
+2.06_06 - 2013-12-14
 	* Update for Mojo 4 (not that big of a change :)
 
-2.06_05 - Thu Dec 12 23:10:55 2013
+2.06_05 - 2013-12-12
 	* Don't try so hard to check perl on Windows
 
-2.06_04 - Sun Feb 10 06:14:47 2013
+2.06_04 - 2013-02-10
 	* PAUSE turned off FTP, so I switch to using a Mojo web uploader
 
-2.06_02 - Wed Jul 18 12:28:49 2012
+2.06_02 - 2012-07-18
 	* Add =encoding to Pod sections to avoid new Pod::Simple warnings
 
-2.06_01 - Mon Dec 19 17:01:05 2011
+2.06_01 - 2011-12-19
 	* Quash some warnings while loading mixins
 
-2.06 - Mon Dec 19 14:47:15 2011
+2.06 - 2011-12-19
 	* Bumping to a stable release
 
-2.05_07 - Wed Nov 30 12:29:33 2011
+2.05_07 - 2011-11-30
 	* Handle point versions RT  #72845 (WULEE)
 
-2.05_06 - Sun Jul 24 23:30:37 2011
+2.05_06 - 2011-07-24
 	* Handle the latest in LWP, using LWP::Protocol::https and
 	the new CACertOrg::CA to supply the cert for PAUSE.
 	* Add a -C command-line option to skip updating the Changes
 	file, it the case of a failed upload.
 
-2.05_05 - Sat Jul 16 01:10:37 2011
+2.05_05 - 2011-07-16
 	* Handle Module::Build
 	* Some Windows stuff is still broken
 
-2.05_04 - Mon Apr 18 12:03:31 2011
+2.05_04 - 2011-04-18
 	* Add LWP::UserAgent prereq: now not in the same distro
 	as HTTP::*!
 
-2.05_02 - Sat Apr 16 12:05:58 2011
+2.05_02 - 2011-04-16
 	* Two features from H.Merijn Brand: if a test fails under
 	debugging, try harder with prove
 	* Add the allow_glob_in_perls to specify a pattern for paths
 	for the perls option.
 
-2.05_01 - Tue Sep 22 22:23:11 2009
+2.05_01 - 2009-09-22
 	* Let's start checking MANIFEST to ensure we didn't forget
 	anything. This might be annoying the first time since
 	make manifest might re-order your file and you have to
 	recommit it.
 
-2.05 - Mon Jun 15 04:05:31 2009
+2.05 - 2009-06-15
 	* Fixes to SVN status pattern matching
 	* Set build file names in config, if you like
 
-2.04_03 - Wed Jun 10 01:50:35 2009
+2.04_03 - 2009-06-10
 	* RT 46696: Fix parsing of SVN output, handle makefile config
 	directives as documented.
 
-2.04_01 - Tue Mar 24 04:55:40 2009
+2.04_01 - 2009-03-24
 	* Add experimental ignore_prereqs option to pass on to Test::Prereqs
 
-2.04 - Tue Mar 24 04:07:54 2009
+2.04 - 2009-03-24
 	* Use a platform-specific version of devnull
 
-2.03 - Sun Mar 22 06:10:45 2009
+2.03 - 2009-03-22
 	* Treat Test::Prereq and Module::CPANTS::Analysse as
 	optional dependencies. They were before, but now you get
 	a nicer error message.
 
-2.02 - Sat Feb  7 17:30:30 2009
+2.02 - 2009-02-07
 	* Fix the command runner for the SVN.pm. SVN.pm is otherwise
 	neglected since I've stopped using SVN but I will accept
 	patches.
 	* The run.t patch undefs PATH before it looks for commands
 
-2.01 - Tue Nov 25 10:37:03 2008
+2.01 - 2008-11-25
 	A bump to a release version
 
-2.00_07 - Thu Nov  6 23:11:04 2008
+2.00_07 - 2008-11-06
 	* Changes the methods with "cvs" in the name to be "vcs" instead.
 	The old names came from the time I used CVS, but no one does
 	that anymore. "vcs" is for Version Control System.
 
-2.00_06 - Wed Nov  5 00:42:53 2008
+2.00_06 - 2008-11-05
 	* Fix up a test to work even if the system error message isn't
 	english.
 
-2.00_05 - Tue Nov  4 04:00:40 2008
+2.00_05 - 2008-11-04
 	* Added the -a switch to turn on $ENV{AUTOMATED_TESTING}
 	* Added the -p switch to turn off prereq tests
 	* Added automated_testing to possible config directives
 	* The kwalitee directive is now skip_kwalitee
 	* There's a skip_prereqs directive
 
-2.00_03 - Fri Aug 15 16:45:23 2008
+2.00_03 - 2008-08-15
 	* Distro cleanup, no big whoop
 
-2.00_02 - Sat Aug  9 03:41:07 2008
+2.00_02 - 2008-08-09
 	* The beginning of the new Module::Release. Lots of stuff
 	moved into separate modules to act as mixins. There is a
 	lot more testing.
 	* This is still a developer release, so don't get too
 	attached to anything just yet.
 
-1.22 - Sun Apr  6 13:13:30 2008
+1.22 - 2008-04-06
 	* BUG FIX: Move kwalitee testing after normal testing, and have
 	the kwalitee tests make their own dist to ensure that they
 	have it.
 
-1.21 - Sat Apr  5 14:54:20 2008
+1.21 - 2008-04-05
 	* NEW FEATURE: Now test with multiple perls!
 
-1.20 - Tue Nov 20 07:45:51 2007
+1.20 - 2007-11-20
 	* fix dist_version to handle dev versions. Previously it was
 	ignoring the _\d+, so the version that showed up in changes
 	didn't have the _\d+.
 
-1.19 - Sun Nov 11 04:10:22 2007
+1.19 - 2007-11-11
 	* Sagar Shah noticed I tried to call _die() before I used bless().
 	Oops. Fixed.
 	* If you have older versions before I started using _die(), you don't
 	need to rush to get this version. If you got the latest to use
 	Module::Release::Git, you need to upgrade.
 
-1.18 - Sat Oct 27 22:19:57 2007
+1.18 - 2007-10-27
 	* distro cleanups after moving from CVS to SVN
 	* Changes from Torsten Schoenfeld to make get_readme and get_changes
 	subclassable (that is, call them as methods like everything else)
@@ -150,7 +150,7 @@ Revision history for Perl module Module::Release
 	going back farther in time now, I have to draw the line somewhere
 	just to manage my time well. :)
 
-1.17_01 - Wed Oct  3 21:52:02 2007
+1.17_01 - 2007-10-03
 	* The output and debugging filehandles come from methods now.
 	This makes it easier to move the output around, or even turn
 	it off. I wanted this for Module::Release::Git. The interface
@@ -160,24 +160,24 @@ Revision history for Perl module Module::Release
 	itself out in various ways, but I just need the support right
 	now without going through all the work to make it nice nice.
 
-1.17 - Mon Aug 13 13:43:17 2007
+1.17 - 2007-08-13
 	* distro cleanups - no need to upgrade
 
-1.16 - Thu May  3 10:08:14 2007
+1.16 - 2007-05-03
 	* Fix for test suite problem
 
-1.14 - Fri Mar 16 18:51:26 2007
+1.14 - 2007-03-16
 	* use a temp file for cookies
 	* don't test script if M::R::Subversion isn't installed
 
-1.13 - Thu Feb 22 10:16:18 2007
+1.13 - 2007-02-22
 	* Updated the distro for PAUSE indexing problems (my fault)
 	* release(1) now detects SVN and loads Module::Release::Subversion
 	to handle it (that's a separate distro, though).
 	* release(1) now uses Module::CPANTS::Analyze's cpants_lint.pl
 	to check kwalitee. That's also a separate distro.
 
-1.12 - Mon Sep 25 22:38:35 CDT 2006
+1.12 - 2006-09-25
 
 	* Changes from Ken Williams
 
@@ -209,11 +209,11 @@ Revision history for Perl module Module::Release
 
 	* Fixed a couple of minor POD formatting errors.
 
-1.10 - Thu Jun  8 06:51:25 2006
+1.10 - 2006-06-08
 	* Distro cleanup (removed sf_login.t test), fixed doc bug about
 	PAUSE, cleansed POD. No need to upgrade.
 
-1.08 - Sat May 20 03:04:01 2006
+1.08 - 2006-05-20
 	* Added MANIFEST checking feature. If `make manifest` has to change
 	MANIFEST, check_manifest() dies. You'll have to check in MANIFEST
 	before you can go on anyway, so you might as well stop and take a
@@ -224,10 +224,10 @@ Revision history for Perl module Module::Release
 	* This updates the release(1) script too. Make sure you want this
 	feature before you overwrite your old release(1).
 
-1.07 - Wed May 17 21:06:39 2006
+1.07 - 2006-05-17
 	* Minor updates to the distro - no code changes. No need to upgrade
 
-0.25 - Fri Dec 17 15:53:15 CST 2004
+0.25 - 2004-12-17
 	* No changes to functionality.
 	* Released only because I (Andy) deleted the latest version,
 	  because I thought brian had newer ones, when he didn't.
@@ -237,20 +237,20 @@ Revision history for Perl module Module::Release
 	* Made tests in t/load.t more inclusive
 	* Updated the Makefile.PL
 
-0.24 - Sat Nov 29 09:29:36 2003
+0.24 - 2003-11-29
 	* fixed a problem in Module::Release's check_cvs routine where
 	it was not checking each line of output
 
-0.23 - Sun Jun 22 23:40:00 2003 (Andy Lester)
+0.23 - 2003-06-22
 	* All output now goes to the screen if --debug is on.  Thanks to
 	Ken Williams.  "High school students."
 
-0.23
+0.23 - 1899-12-31
 	* release will show the user all STDOUT of the subprocesses
 	  whenever debug is on.  This will prevent the machine from waiting
 	  for a response from you because you don't know it's there.
 
-0.22 - Wed Apr  9 16:05:08 2003 (Andy Lester)
+0.22 - 2003-04-09
 	* release will not run if there are any switch errors
 
 	* Added many error checks in ftp_upload.
@@ -266,7 +266,7 @@ Revision history for Perl module Module::Release
 
 	* Added basic POD docs for the functions
 
-0.21 - Sat Mar 29 16:19:00 2003 (Andy Lester)
+0.21 - 2003-03-29
 	Many more patches, thanks to Ken Williams.  I fear it won't be
 	long until Module::Release is sending & receiving mail.
 
@@ -285,25 +285,25 @@ Revision history for Perl module Module::Release
 	* The cvs_tag() method now calls make_cvs_tag() to make the
 	  tag string.  This lets me override make_cvs_tag() in a subclass.
 
-0.20 - Wed Mar 26 11:05:00 2003 (Andy Lester)
+0.20 - 2003-03-26
 	* Moved all the real work into Module::Release.  Thanks to
 	Ken Williams for doing all the dirty work on this.
 
 	* Fixed the Test::Pod dependency
 
-0.16 - Wed Mar 19 15:38:00 2003 (Andy Lester)
+0.16 - 2003-03-19
 	* No new features
 	* Removed the dependency on Test::Pod
 
-0.15 - Fri Mar 14 17:23:30 2003 (Andy Lester)
+0.15 - 2003-03-14
 	* Support for the PERL environment variable.
 	* Cleaned up tabs 'n' spaces in the source.  Shouldn't
 	  affect anything in how you use the program.
 
-0.14 - Wed Mar 12 10:09:00 2003 (Andy Lester)
+0.14 - 2003-03-12
 	* 0.13 is an incorrect distro.  This is what you want.
 
-0.13 - Wed Mar 12 09:58:00 2003 (Andy Lester)
+0.13 - 2003-03-12
 	Most of these changes are from Max Maischein.  Cross-platform
 	compatibility should be a lot better.  Thanks, Max!
 
@@ -324,7 +324,7 @@ Revision history for Perl module Module::Release
 
 	* Added support for passive FTP.
 
-0.12 - Thu Mar  6 13:55:47 2003 (Andy Lester)
+0.12 - 2003-03-06
 	Most of the changes in this revision are from Chris Nandor:
 
 	* Add basic help page
@@ -347,13 +347,13 @@ Revision history for Perl module Module::Release
 
 	* General cleanup
 
-0.11 - Mon Mar  3 11:58:42 2003 (Andy Lester)
+0.11 - 2003-03-03
 	* Patches to make this less brian-specific.  Thanks to Chris
 	  Nandor for taking it upon himself to do so.
 
 	* Removed a lot of dependencies on external modules.
 
-0.10 - Wed Dec 11 16:40:53 2002 (brian d foy)
+0.10 - 2002-12-11
 	* prompt for comments to put in Changes, commit Changes, and
 	use comments in SourceForge change log notes
 
