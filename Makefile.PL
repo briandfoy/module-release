@@ -2,19 +2,29 @@ require 5.010;
 use strict;
 use warnings;
 
-my $github    = 'https://github.com/briandfoy/';
-my $main_file = 'lib/';
+use File::Spec::Functions qw(catfile);
+
+my $module    = 'Module::Release';
+my $github    = 'https://github.com/briandfoy/module-release';
+my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
 	'MIN_PERL_VERSION' => 5.010,
 
-	'NAME'         => 'Module::Release',
-	'AUTHOR'       => 'brian d foy <bdfoy@cpan.org>',
+	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
-	'VERSION_FROM' => "lib/Module/Release.pm",
-	'LICENSE'      => 'perl',
+	'VERSION_FROM'  => $main_file,
+	'LICENSE'       => 'perl',
+	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'EXE_FILES'    =>  [ 'script/release' ],
+
+	'CONFIGURE_REQUIRES' => {
+		'ExtUtils::MakeMaker'   => '6.64',
+		},
+
+	'BUILD_REQUIRES' => {
+		},
 
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
@@ -28,10 +38,6 @@ my %WriteMakefile = (
 		'Test::More'            => '0.95',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
-		},
-	
-	'CONFIGURE_REQUIRES' => {
-		'ExtUtils::MakeMaker'   => '6.64',
 		},
 
 	'META_MERGE' => {
