@@ -60,7 +60,7 @@ my %WriteMakefile = (
 		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
 		},
 
-	'clean' => { FILES => '*.bak release-* Module-*' },
+	'clean' => { FILES => "$dist-*" },
 	);
 
 sub arguments { \%WriteMakefile }
