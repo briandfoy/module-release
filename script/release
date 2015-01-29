@@ -490,6 +490,7 @@ if( $opts{t} ) {
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# CPAN::Spec::Changes
 unless( $release->debug or $opts{C} ) {
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
@@ -498,10 +499,18 @@ unless( $release->debug or $opts{C} ) {
 
 	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
 
-	my $str = $Version . " - " . localtime() . "\n";
+	my( $year, $month, $day, $hour, $minute, $second )
+		= (gmtime)[5,4,3,2,1,0];
+	$year += 1900;
+	$month += 1;
+	my $datetime = sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ",
+		$year, $month, $day, $hour, $minute, $second;
+
+	my $str = $Version . ' ' . $datetime . "\n";
 
 	while( <STDIN> ) {
-		$_ =~ s/^(\S)/\t$1/; # always indent
+		$_ =~ s/\A \s* (\*|-)? \s*/- /; # Make bullets (-)
+		$_ =~ s/\A(\S)/\t$1/;  # always indent
 
 		$str .= $_;
 		$release->_print( "> " );
@@ -511,8 +520,8 @@ unless( $release->debug or $opts{C} ) {
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
-	open my $in, $bak or die "Could not read old $changes file! $!\n";
-	open my $out, ">", $changes;
+	open my $in, '<:utf8', $bak or die "Could not read old $changes file! $!\n";
+	open my $out, ">:utf8", $changes;
 
 	while( <$in> ) {
 		print $out $_;
