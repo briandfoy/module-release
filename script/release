@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+=encoding utf8
+
 =head1 NAME
 
 release - give your Perl distros to the world
