@@ -76,11 +76,11 @@ the source repository:
 =back
 
 If you find a problem, file a ticket in the L<issue 
-tracker|>:
+tracker|https://github.com/briandfoy/module-release/issues>:
 
 =over 4
 
-=item *	L<>
+=item *	L<https://github.com/briandfoy/module-release/issues>
 
 =back
 
