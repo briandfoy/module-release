@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.11_01 2015-04-06T14:06:35Z
+	* Add the CA cert with the right Mojo::UserAgent method
+
 2.11 - 2014-09-18
 	* Update the data to 20140910.
 
