@@ -62,8 +62,17 @@ sub web_upload {
 		 	),
 		 form => $params,
 		 );
-	my $code = $tx->res->code;
-	$self->_print( "File uploaded [$code]\n" );
+
+	if( my $res = $tx->success ) {
+		$self->_print( "File uploaded\n" );
+		return 1;
+		}
+	else {
+		my $err = $tx->error;
+		$self->_print( "$err->{code} response: $err->{message}" ) if $err->{code};
+		$self->_print( "Connection error: $err->{message}" );
+		return 0;
+		}
 	}
 
 sub make_agent {
