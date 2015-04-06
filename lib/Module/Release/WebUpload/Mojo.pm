@@ -73,7 +73,7 @@ sub make_agent {
 	$agent->http_proxy( $self->config->http_proxy ) if $self->config->http_proxy;
 	$agent->https_proxy( $self->config->https_proxy ) if $self->config->https_proxy;
 	require CACertOrg::CA;
-	$agent->cert( CACertOrg::CA::SSL_ca_file() );
+	$agent->ca( CACertOrg::CA::SSL_ca_file() );
 
 	return $agent;
 	}
