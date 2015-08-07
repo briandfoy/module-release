@@ -81,11 +81,49 @@ sub make_agent {
 	$agent->transactor->name( 'release' );
 	$agent->http_proxy( $self->config->http_proxy ) if $self->config->http_proxy;
 	$agent->https_proxy( $self->config->https_proxy ) if $self->config->https_proxy;
-	require CACertOrg::CA;
-	$agent->ca( CACertOrg::CA::SSL_ca_file() );
 
 	return $agent;
 	}
+
+# XXX: Until I can upgrade OpenSSL
+BEGIN {
+use Mojo::IOLoop::Client;
+
+use constant TLS => $ENV{MOJO_NO_TLS}
+  ? 0
+  : eval 'use IO::Socket::SSL 1.94 (); 1';
+
+no warnings 'redefine';
+sub Mojo::IOLoop::Client::_try_tls {
+  my ($self, $args) = @_;
+
+  my $handle = $self->{handle};
+  return $self->_cleanup->emit(connect => $handle) unless $args->{tls};
+  return $self->emit(error => 'IO::Socket::SSL 1.94+ required for TLS support')
+    unless TLS;
+
+  # Upgrade
+  weaken $self;
+  my %options = (
+    SSL_ca_file => $args->{tls_ca}
+      && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+    SSL_cert_file  => $args->{tls_cert},
+    SSL_error_trap => sub { $self->emit(error => $_[1]) },
+    SSL_hostname   => IO::Socket::SSL->can_client_sni ? $args->{address} : '',
+    SSL_key_file   => $args->{tls_key},
+    SSL_startHandshake  => 0,
+    SSL_verify_mode     => 0x00,  # XXX turn off hostname verification
+    SSL_verifycn_name   => $args->{address},
+    SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
+  );
+
+  my $reactor = $self->reactor;
+  $reactor->remove($handle);
+  return $self->emit(error => 'TLS upgrade failed')
+    unless IO::Socket::SSL->start_SSL($handle, %options);
+  $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
+}
+}
 
 =back
 
