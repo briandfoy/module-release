@@ -1,5 +1,6 @@
 Changes
 examples/README
+INSTALL.SKIP
 lib/Module/Release.pm
 lib/Module/Release/FTP.pm
 lib/Module/Release/Kwalitee.pm
