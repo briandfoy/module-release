@@ -16,14 +16,14 @@ my @subs = qw(
 	loaded_mixins
 	mixin_loaded
 	);
-	
+
 can_ok( $class, @subs );
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Does it work with an existing module?
 {
-my $module = 'CGI'; # everyone should have this
+my $module = 'File::Basename'; # everyone should have this
 
 ok( ! $class->mixin_loaded( $module ), "$module mixin has not loaded" );
 ok( $class->load_mixin( $module ), "$module mixin loaded" );
