@@ -101,6 +101,10 @@ The name of the file to run as F<Makefile.PL>.  The default is
 C<"Makefile.PL">, but you can set it to C<"Build.PL"> to use a
 C<Module::Build>-based system.
 
+If this is set to C<"Build.PL">, this his will also cause
+C<Module::Build::Prereqs> to use C<Test::Prereqs::Build> instead of
+C<Test::Prereqs>.
+
 =item makefile
 
 The name of the file created by C<makefile_PL> above.  The default is
