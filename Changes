@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.12 2016-01-26T19:00:52Z
+	* Freshen distro and fix a few things under the hood.
+
 2.11_01 2015-04-06T14:06:35Z
 	* Add the CA cert with the right Mojo::UserAgent method
 
