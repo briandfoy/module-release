@@ -26,19 +26,19 @@ subtest 'remote not set' => sub {
 subtest 'formatting dev version' => sub {
 	my $mock = bless { remote_file => 'Foo-1.12_03.tar.gz' }, $class;
 
-	is( 
-		$mock->dist_version_format( 1, 12, "_03" ), '1.12_03', 
-		'Development version stays in there' 
+	is(
+		$mock->dist_version_format( 1, 12, "_03" ), '1.12_03',
+		'Development version stays in there'
 		);
 
-	is( 
-		$mock->dist_version_format( 1, 12 ), '1.12', 
-		"Without development version it's fine" 
+	is(
+		$mock->dist_version_format( 1, 12 ), '1.12',
+		"Without development version it's fine"
 		);
 
-	is( 
-		$mock->dist_version, '1.12_03', 
-		'Development version stays in there' 
+	is(
+		$mock->dist_version, '1.12_03',
+		'Development version stays in there'
 		);
 
 	};
@@ -46,16 +46,16 @@ subtest 'formatting dev version' => sub {
 subtest 'formatting release version' => sub {
 	my $mock = bless { remote_file => 'Foo-3.45.tar.gz' }, $class;
 	my $got = $mock->dist_version;
-	is( $mock->dist_version, '3.45', 
-		"Without development version it's fine" 
+	is( $mock->dist_version, '3.45',
+		"Without development version it's fine"
 		);
 	};
 
 subtest 'formatting three digit minor version' => sub {
 	my $mock = bless { remote_file => 'Foo-3.045.tar.gz' }, $class;
 	my $got = $mock->dist_version;
-	is( $mock->dist_version, '3.045', 
-		"Without development version it's fine" 
+	is( $mock->dist_version, '3.045',
+		"Without development version it's fine"
 		);
 	};
 
