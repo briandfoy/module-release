@@ -2,7 +2,7 @@ package Module::Release::FTP;
 
 use strict;
 use warnings;
-use base qw(Exporter);
+use Exporter qw(import);
 use vars qw($VERSION);
 
 use Carp qw(croak);

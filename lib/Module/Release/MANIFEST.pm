@@ -2,7 +2,7 @@ package Module::Release::MANIFEST;
 
 use strict;
 use warnings;
-use base qw(Exporter);
+use Exporter qw(import);
 use vars qw($VERSION);
 
 our @EXPORT = qw( check_MANIFEST );
