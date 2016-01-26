@@ -884,6 +884,11 @@ sub dist_version {
 
 		return $version;
 		}
+	elsif( @components == 1 ) {
+		# some versions might be a single number, such as those
+		# that use dates as integers with no dot.
+		return $components[0];
+		}
 
 
 	# Else, use the older implementation for backward-compatibility
