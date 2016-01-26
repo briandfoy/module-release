@@ -56,8 +56,8 @@ sub web_upload {
 
 	$self->_print( "File uploading\n" );
 	my $tx = $ua->post(
-		$self->pause_add_uri( 
-		 	$self->config->cpan_user, 
+		$self->pause_add_uri(
+		 	$self->config->cpan_user,
 		 	$self->config->cpan_pass,
 		 	),
 		 form => $params,
