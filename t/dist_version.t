@@ -51,6 +51,14 @@ subtest 'formatting release version' => sub {
 		);
 	};
 
+subtest 'formatting integer version' => sub {
+	my $mock = bless { remote_file => 'Foo-20160101.tar.gz' }, $class;
+	my $got = $mock->dist_version;
+	is( $mock->dist_version, '20160101',
+		"Single integer version extracts correct number"
+		);
+	};
+
 subtest 'formatting three digit minor version' => sub {
 	my $mock = bless { remote_file => 'Foo-3.045.tar.gz' }, $class;
 	my $got = $mock->dist_version;
