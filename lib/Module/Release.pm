@@ -24,7 +24,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.12_01';
+$VERSION = '2.121_01';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
@@ -854,7 +854,7 @@ sub dist_version {
 
 	no warnings 'uninitialized';
 	my ($version_str, $vee, $version) = $self->remote_file
-		=~ / ( (v?) ([\d_.]+) ) (?:\. tar \. gz)? $/xi
+		=~ / ( (v?) ([\d_.]+) ) (?:\. (?: tar \. gz | zip ) )? $/xi
 			or return '';
 
 	my @components = split /[.]/, $version;
