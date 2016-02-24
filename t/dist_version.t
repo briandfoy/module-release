@@ -79,7 +79,6 @@ subtest 'three part versions' => sub {
     my @cases = (
         ['Foo-v3.45.tar.gz'    => 'v3.45.0', "Two-part version string with leading 'v'"],
         ['Foo-v3.45.1.tar.gz'  => 'v3.45.1', "Three-part version string with leading 'v'"],
-        ['Foo-v3.45_1.tar.gz'  => 'v3.45_1', "Three-part development version string with leading 'v'"],
 
         # Capitalisation, various suffixes
         ['Foo-V3.45.1.tar.gz'  => 'v3.45.1', "Three-part version string with capitalised leading 'V'"],
@@ -97,7 +96,6 @@ subtest 'three part versions' => sub {
         # (Note, four, since the three case must be backward compatible and return
         # the same as the earlier test above.)
         ['Foo-3.45.1.1.tar.gz' => 'v3.45.1.1', "Four-part version string with no leading 'v'"],
-        ['Foo-3.45.1_1.tar.gz' => 'v3.45.1_1', "Four-part development version string with no leading 'v'"],
 
         # Test distros with no version
         ['Foo.tar.gz' => '', "No version"],
