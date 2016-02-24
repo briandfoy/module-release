@@ -1322,7 +1322,7 @@ debugging, debug_fh should return a null filehandle.
 
 =cut
 
-sub _debug { print { $_[0]->debug_fh } @_[1..$#_] }
+sub _debug { print { shift->debug_fh } @_ }
 
 =item _die( LIST )
 
