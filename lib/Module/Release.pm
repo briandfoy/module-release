@@ -846,19 +846,46 @@ Return the distribution version ( set in dist() )
 
 =cut
 
-sub dist_version {
-	my $self = shift;
+sub _parse_version {
+	my( $self ) = @_;
+	no warnings 'uninitialized';
 
 	$self->_die( "Can't get dist_version! It's not set (did you run dist first?)" )
 		unless defined $self->remote_file;
 
-	no warnings 'uninitialized';
-	my ($version_str, $vee, $version) = $self->remote_file
-		=~ / ( (v?) ([\d_.]+) ) (?:\. (?: tar \. gz | zip ) )? $/xi
+	my( $version_str, $vee, $version, $dev ) = $self->remote_file
+		=~ / ( (v?) ([\d.]+) (?: _ (\d+) )? ) (?:\. (?: tar \. gz | zip ) )? $/xi
 			or return '';
 
 	my @components = split /[.]/, $version;
-	if ($vee || @components > 2) { # This is a multi-part version
+	my $count      = @components;
+
+	my $multipart  = length($vee) || ($count > 2);
+
+	my $hash = {
+		components => \@components,
+		count      => $count,
+		string     => $version_str,
+		vee        => lc $vee,
+		version    => $version,
+		v_version  => lc($vee) . $version,
+		dev        => $dev,
+		multipart  => $multipart,
+		};
+
+	$self->_debug( Dumper( $self->remote_file, $hash ) ); use Data::Dumper;
+
+	return $hash;
+	}
+
+sub dist_version {
+	my( $self ) = @_;
+
+	my $v = $self->_parse_version;
+
+	if( $v->{multipart} ) {
+		$self->_debug( "Choosing multipart version" );
+		# This is a multi-part version
 		# We assume that version.pm is available if multi-part
 		# versions are in use.
 		eval {
@@ -866,38 +893,44 @@ sub dist_version {
 			}
 		or do { # Fall back to using $version_str verbatim
 			warn $@;
-			return $version_str;
+			return $v->{version_str};
 			};
 
 		# There are pre- and post-0.77 versions of version.pm.
 		# The former are deprecated, but I assume we must
 		# gracefully use what we have available.
 		eval {
-			$version = version->VERSION >= 0.77 ?
-				version->parse (lc($vee) . $version)->normal : # latest and best
-				''.version->new(lc($vee) . $version)         ; # legacy
+			my $string = $v->{v_version};
+			$v->{version} = version->VERSION >= 0.77 ?
+				version->parse ($string)->normal : # latest and best
+				''.version->new($string)         ; # legacy
 			1;
 			}
 		or
-			$self->_die( "Couldn't parse version '$version_str' from '".
+			$self->_die( "Couldn't parse version '$v->{string}' from '".
 				$self->remote_file. "': $@");
 
-		return $version;
+		return $v->{version};
 		}
-	elsif( @components == 1 ) {
+	elsif( $v->{count} == 1 ) {
+		$self->_debug( "Choosing single component version" );
 		# some versions might be a single number, such as those
 		# that use dates as integers with no dot.
-		return $components[0];
+		return $v->{components}[0];
+		}
+	elsif( $v->{version_str} =~ /(\d+) \. (\d+)(_\d+)? $/x ) {
+		$self->_debug( "Choosing major.minor_dev? version" );
+		# Else, use the older implementation for backward-compatibility
+		# Note the lack of an initial ^ matcher is deliberate.
+		my( $major, $minor, $dev ) = ( $1, $2, $3 );
+		return $self->dist_version_format( $major, $minor, $dev );
+		}
+	else {
+		$self->_debug( "Unhandled version" );
+		return '';
 		}
 
 
-	# Else, use the older implementation for backward-compatibility
-	# Note the lack of an initial ^ matcher is deliberate.
-
-	my( $major, $minor, $dev ) =
-		$version_str =~ /(\d+) \. (\d+)(_\d+)? $/xg;
-
-	return $self->dist_version_format( $major, $minor, $dev );
 	}
 
 =item dist_version_format
