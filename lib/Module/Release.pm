@@ -922,7 +922,7 @@ sub dist_version {
 		# that use dates as integers with no dot.
 		return $v->{components}[0];
 		}
-	elsif( $v->{version_str} =~ /(\d+) \. (\d+)(_\d+)? $/x ) {
+	elsif( $v->{string} =~ /(\d+) \. (\d+)(_\d+)? $/x ) {
 		$self->_debug( "Choosing major.minor_dev? version" );
 		# Else, use the older implementation for backward-compatibility
 		# Note the lack of an initial ^ matcher is deliberate.
@@ -1332,7 +1332,6 @@ sub _debug {
 	my $debug_fh = $self->debug_fh;
 
 	print { $debug_fh } @_;
-
 	}
 
 
