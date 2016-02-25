@@ -578,7 +578,10 @@ return whatever they like.
 
 =cut
 
-sub null_fh  { $_[0]->{null_fh} }
+sub null_fh  {
+	require IO::Null;
+	$_[0]->{null_fh} //= IO::Null->new;
+	}
 
 =item quiet
 
@@ -624,11 +627,12 @@ sub turn_debug_off { $_[0]->{debug} = 0 }
 sub debug          { $_[0]->{debug} }
 
 sub debug_fh  {
-	$_[0]->debug
-		?
-	( $_[0]->{debug_fh} || *STDERR{IO} )
-		:
-	$_[0]->null_fh
+		if( $_[0]->debug ) {
+			$_[0]->{debug_fh} || *STDERR{IO}
+			}
+		else {
+			$_[0]->null_fh
+			}
 	}
 
 =back
@@ -918,7 +922,7 @@ sub dist_version {
 		# that use dates as integers with no dot.
 		return $v->{components}[0];
 		}
-	elsif( $v->{version_str} =~ /(\d+) \. (\d+)(_\d+)? $/x ) {
+	elsif( $v->{string} =~ /(\d+) \. (\d+)(_\d+)? $/x ) {
 		$self->_debug( "Choosing major.minor_dev? version" );
 		# Else, use the older implementation for backward-compatibility
 		# Note the lack of an initial ^ matcher is deliberate.
@@ -1321,8 +1325,17 @@ Send the LIST to whatever is in debug_fh, or to STDERR. If you aren't
 debugging, debug_fh should return a null filehandle.
 
 =cut
+use Carp qw(carp);
+sub _debug {
+	my $self = shift;
 
-sub _debug { print { $_[0]->debug_fh } @_[1..$#_] }
+	my $debug_fh = $self->debug_fh;
+
+	print { $debug_fh } @_;
+	}
+
+
+#eval { print { shift->debug_fh } @_; 1 } or carp "Failure in _debug: [@_] [$@]" }
 
 =item _die( LIST )
 

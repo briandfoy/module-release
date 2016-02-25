@@ -20,13 +20,13 @@ BEGIN {
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my @fh_subs = qw( 
+my @fh_subs = qw(
 	output_fh
 	null_fh
 	debug_fh
 	);
 
-my @toggle_subs = map { $_, "turn_${_}_on", "turn_${_}_off" } 
+my @toggle_subs = map { $_, "turn_${_}_on", "turn_${_}_off" }
 	qw(quiet debug);
 
 my @internal = qw(
@@ -50,7 +50,7 @@ can_ok( $release, @fh_subs, @toggle_subs, @internal );
 $release->turn_quiet_on;
 $release->turn_debug_on;
 
-my @test_pairs = 
+my @test_pairs =
 	map { [ "turn_quiet_$_->[0]", "turn_debug_$_->[1]" ] }
 		(
 		[ qw(off off) ],
@@ -58,30 +58,30 @@ my @test_pairs =
 		[ qw(off  on) ],
 		[ qw( on  on) ]
 		);
-	
+
 foreach my $pair ( @test_pairs )
 	{
 	#diag( "Trying @$pair" );
 	$release->$_() for @$pair;
-	
+
 	foreach my $sub ( @fh_subs )
 		{
 		#diag( "Trying $sub" );
 		ok( defined $release->$sub(), "$sub returns something that is defined" );
 		can_ok( $release->$sub(), 'print' );
-	
+
 		my $fh = $release->$sub();
 		my $class = ref $fh;
-		
+
 		{
 		no warnings; # IO::Null emits warning because it's not an open filehandle
-		
-		ok( 
-			eval { print { $release->$sub() } ''; 1}, 
-			"print for $sub seems to work fine" 
+
+		ok(
+			eval { print { $release->$sub() } ''; 1},
+			"print for $sub seems to work fine"
 			);
 		}
-	
+
 		}
 	}
 
@@ -104,14 +104,14 @@ isa_ok( $release->debug_fh,  'IO::Null' );
 {
 $release->turn_quiet_off;
 my $old_output = $release->{output_fh};
-$release->{output_fh} = '';
+$release->{output_fh} = undef;
 can_ok( $release->output_fh, 'print' );
 $release->{output_fh} = $old_output;
 }
 
 {
 $release->turn_debug_on;
-$release->{debug_fh} = '';
+$release->{debug_fh} = undef;
 can_ok( $release->debug_fh, 'print' );
 }
 
