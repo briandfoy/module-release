@@ -104,14 +104,14 @@ isa_ok( $release->debug_fh,  'IO::Null' );
 {
 $release->turn_quiet_off;
 my $old_output = $release->{output_fh};
-$release->{output_fh} = '';
+$release->{output_fh} = undef;
 can_ok( $release->output_fh, 'print' );
 $release->{output_fh} = $old_output;
 }
 
 {
 $release->turn_debug_on;
-$release->{debug_fh} = '';
+$release->{debug_fh} = undef;
 can_ok( $release->debug_fh, 'print' );
 }
 
