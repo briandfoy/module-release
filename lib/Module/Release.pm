@@ -578,7 +578,10 @@ return whatever they like.
 
 =cut
 
-sub null_fh  { $_[0]->{null_fh} }
+sub null_fh  {
+	require IO::Null;
+	$_[0]->{null_fh} //= IO::Null->new;
+	}
 
 =item quiet
 
