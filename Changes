@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Release
 
+2.121_02 2016-02-26T13:33:24Z
+	* Don't support underscores in v-strings. version  0.991201
+	changed this behavior according to the Lyon Compromise:
+	https://gist.github.com/dagolden/9559280
+	RT # 112252
+
 2.12 2016-01-26T19:00:52Z
 	* Freshen distro and fix a few things under the hood.
 
