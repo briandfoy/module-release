@@ -859,7 +859,7 @@ sub _parse_version {
 
 	my( $version_str, $vee, $version, $dev ) = $self->remote_file
 		=~ / ( (v?) ([\d.]+) (?: _ (\d+) )? ) (?:\. (?: tar \. gz | zip ) )? $/xi
-			or return '';
+			or return { components => [], string => '', multipart => 0 };
 
 	my @components = split /[.]/, $version;
 	my $count      = @components;
