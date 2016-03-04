@@ -1,5 +1,12 @@
 Revision history for Perl module Module::Release
 
+2.122 2016-03-04T23:38:14Z
+	* RT #112252 - fix for changes in version.pm
+	* RT #44492  - add ignore_prereqs config option
+	* RT #44529  - fix some tests on Windows
+	* RT #78442  - add explicit pod encoding
+	* RT #72845  - parse three part version
+
 2.121_02 2016-02-26T13:33:24Z
 	* Don't support underscores in v-strings. version  0.991201
 	changed this behavior according to the Lyon Compromise:
