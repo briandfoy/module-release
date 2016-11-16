@@ -30,7 +30,7 @@ isa_ok( $release, $class );
 can_ok( $release, @subs );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# 
+#
 {
 my $filename = $release->manifest_name;
 ok( defined $filename, "manifest_name returns something that is defined" );
@@ -70,7 +70,7 @@ ok( -e $release->manifest_name, "MANIFEST file is there" );
 my @files = eval { $release->files_in_manifest };
 my $at = $@;
 ok( ! length $at, "eval did not fail when MANIFEST exists" );
-is( scalar @files, scalar keys %files, 
+is( scalar @files, scalar keys %files,
 	"files_in_manifest returns the right number of files" );
 }
 
