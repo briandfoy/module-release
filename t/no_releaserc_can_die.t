@@ -9,7 +9,7 @@ Reported by Sagar Shah.
 
 =cut
 
-use Test::More 'no_plan';
+use Test::More;
 
 BEGIN {
 	use Cwd;

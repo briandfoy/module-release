@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 
 BEGIN {
 	use File::Spec;
@@ -34,4 +34,5 @@ foreach my $tuple ( @tuples ) {
 	like( $at, qr/You need/i, "Gets right error message" );
 	};
 
+done_testing();
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 use Test::Output;
 
 use Cwd;
@@ -136,3 +136,5 @@ ok( defined $at, "eval did not fail when MANIFEST exists" );
 like( $at, qr/not up-to-date/, "check_manifest fails and reports not up-to-date" );
 
 }
+
+done_testing();
