@@ -24,9 +24,12 @@ ok( ! (-e '.releaserc'), 'The .releaserc file is missing (good)' );
 unlink 'releaserc';
 ok( ! (-e 'releaserc'), 'The releaserc file is missing (good)' );
 
+my $class = 'Module::Release';
 use_ok( $class );
 
 ok( ! eval{ close STDERR; $class->new() }, 'new() does not die (good)' );
 
-like( $@, qr/Could not find conf file releaserc/, 
+like( $@, qr/Could not find conf file releaserc/,
 	'Missing conf file dies with the right error message' );
+
+done_testing();
