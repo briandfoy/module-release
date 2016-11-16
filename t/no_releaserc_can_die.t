@@ -19,9 +19,10 @@ BEGIN {
 	}
 
 unlink '.releaserc';
-ok( ! (-e '.releaserc'), 'The releaserc file is missing (good)' );
+ok( ! (-e '.releaserc'), 'The .releaserc file is missing (good)' );
 
-my $class = 'Module::Release';
+unlink 'releaserc';
+ok( ! (-e 'releaserc'), 'The releaserc file is missing (good)' );
 
 use_ok( $class );
 
