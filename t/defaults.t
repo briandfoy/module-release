@@ -57,14 +57,14 @@ subtest no_params_debug => sub {
 subtest no_params_no_debug => sub {
 	local %ENV = %required_env; # don't react to overall setup
 
-	$ENV{$var} = 0;
+	$ENV{$debug_env_var} = 0;
 	my $method = 'debug';
 
 	my $release = $class->new;
 	isa_ok( $release, $class );
 
 	can_ok( $release, $method );
-	is( $release->$method(), $ENV{$var},
+	is( $release->$method(), $ENV{$debug_env_var},
 		"$method matches $debug_env_var ($ENV{$debug_env_var})" );
 	};
 
