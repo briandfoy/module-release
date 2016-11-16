@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.122_01 2016-11-16T01:15:00Z
+	* Try harder to find out what's going on with Dan Collins's 
+	testers setup.
+
 2.122 2016-03-04T23:38:14Z
 	* RT #112252 - fix for changes in version.pm
 	* RT #44492  - add ignore_prereqs config option
