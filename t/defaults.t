@@ -2,24 +2,26 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 1;
 
 use Config;
 use File::Spec;
 
 my $class = 'Module::Release';
-my $file  = ".releaserc";
 
-use_ok( $class );
-can_ok( $class, 'new' );
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'new' );
+	};
 
 BEGIN {
 	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
 	require $file;
 	}
-	
+
 
 my %required_env;
+my $debug_env_var = 'RELEASE_DEBUG';
 
 if ( $^O eq 'android' ) {
     my $ldlibpth             = $Config{ldlibpthname};
@@ -27,50 +29,43 @@ if ( $^O eq 'android' ) {
     $required_env{PATH}      = $ENV{PATH};
 }
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Create object with no parameters, clean environment
-{
+subtest no_params_clean => sub {
+	local %ENV = %required_env; # don't react to overall setup
+	my $method = 'debug';
 
-local %ENV = %required_env; # don't react to overall setup
-my $method = 'debug';
+	my $release = $class->new;
+	isa_ok( $release, $class );
 
-my $release = $class->new;
-isa_ok( $release, $class );
+	can_ok( $release, $method );
+	ok( ! $release->$method(), "debug starts off" );
+	};
 
-can_ok( $release, $method );
-ok( ! $release->$method(), "debug starts off" );
-}
+subtest no_params_debug => sub {
+	local %ENV = %required_env; # don't react to overall setup
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Create object with no parameters, RELEASE_DEBUG = 1
-{
-local %ENV = %required_env; # don't react to overall setup
-my $var = "RELEASE_DEBUG";
+	$ENV{$debug_env_var} = 1;
+	my $method = 'debug';
 
-$ENV{RELEASE_DEBUG} = 1;
-my $method = 'debug';
+	my $release = $class->new;
+	isa_ok( $release, $class );
 
-my $release = $class->new;
-isa_ok( $release, $class );
+	can_ok( $release, $method );
+	is( $release->$method(), $ENV{$debug_env_var},
+		"$method matches $debug_env_var ($ENV{$debug_env_var})" );
+	};
 
-can_ok( $release, $method );
-is( $release->$method(), $ENV{$var}, 
-	"$method matches $var ($ENV{RELEASE_DEBUG})" );
-}
+subtest no_params_no_debug => sub {
+	local %ENV = %required_env; # don't react to overall setup
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Create object with no parameters, RELEASE_DEBUG = 0
-{
-local %ENV = %required_env; # don't react to overall setup
-my $var = "RELEASE_DEBUG";
+	$ENV{$var} = 0;
+	my $method = 'debug';
 
-$ENV{RELEASE_DEBUG} = 0;
-my $method = 'debug';
+	my $release = $class->new;
+	isa_ok( $release, $class );
 
-my $release = $class->new;
-isa_ok( $release, $class );
+	can_ok( $release, $method );
+	is( $release->$method(), $ENV{$var},
+		"$method matches $debug_env_var ($ENV{$debug_env_var})" );
+	};
 
-can_ok( $release, $method );
-is( $release->$method(), $ENV{$var}, 
-	"$method matches $var ($ENV{RELEASE_DEBUG})" );
-}
+done_testing();
