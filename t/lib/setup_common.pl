@@ -1,5 +1,5 @@
 use strict;
-use warnings;
+use diagnostics;
 
 use Cwd;
 use File::Spec;
@@ -7,12 +7,13 @@ use File::Path;
 use Test::More 1;
 
 my $old_dir = cwd;
-my $conf    = $^O eq 'MSWin32' ? '.releaserc' : 'releaserc';
+
+sub conf_file { $^O eq 'MSWin32' ? '.releaserc' : 'releaserc' }
+my $dir = File::Spec->catfile( qw(t test_dir) );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Setup a test directory
 subtest test_dir => sub {
-	my $dir = File::Spec->catfile( qw(t test_dir) );
 	mkdir $dir, 0755 unless -d $dir;
 	ok( -d $dir, "Test directory is there" );
 
@@ -23,15 +24,15 @@ subtest test_dir => sub {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create empty configuration file
 subtest create_empty_conf => sub {
-	my $rc = open my $fh, '>:utf8', $conf;
+	my $rc = open my $fh, '>:utf8', conf_file();
 	my $error = $! unless $rc;
 
-	ok( $rc, "Opened empty $conf" );
-	diag( "Error creating $conf! $!" ) unless $rc;
+	ok( $rc, "Opened empty " . conf_file() );
+	diag( "Error creating " . conf_file() . "! $!" ) unless $rc;
 	close $fh;
 
-	ok( -e $conf, "$conf exists" );
-	END { unlink $conf }
+	ok( -e conf_file(), conf_file() . " exists" );
+	END { unlink conf_file() }
 	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
