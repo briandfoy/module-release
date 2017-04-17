@@ -15,7 +15,7 @@ subtest setup => sub {
 	};
 
 BEGIN {
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
 	require $file;
 	}
 

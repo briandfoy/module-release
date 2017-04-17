@@ -14,7 +14,7 @@ use Test::More;
 BEGIN {
 	use Cwd;
 	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
 	require $file;
 	}
 

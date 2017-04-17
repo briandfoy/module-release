@@ -6,7 +6,7 @@ use Test::More 'no_plan';
 
 BEGIN {
 	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
 	require $file;
 	}
 
