@@ -28,7 +28,7 @@ my @subs = qw(
 	get_perl
 	_looks_like_perl
 	);
-	
+
 can_ok( $class, @subs );
 }
 

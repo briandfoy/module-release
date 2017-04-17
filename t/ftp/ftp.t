@@ -19,13 +19,13 @@ BEGIN {
 	require $file;
 	}
 
-my @subs = qw( 
-	ftp_upload ftp_passive_on ftp_passive_off ftp_passive 
-	ftp_class_name get_ftp_object 
-	default_ftp_hostname default_ftp_user 
+my @subs = qw(
+	ftp_upload ftp_passive_on ftp_passive_off ftp_passive
+	ftp_class_name get_ftp_object
+	default_ftp_hostname default_ftp_user
 	default_ftp_password default_ftp_upload_dir
 	);
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create test object
 my $release = $class->new;
@@ -38,9 +38,9 @@ foreach my $sub ( @subs )
 	ok( ! $release->can( $sub ), "$sub not loaded yet" );
 	}
 
-ok( 
-	$release->load_mixin( 'Module::Release::FTP' ), 
-	"Loaded Kwalitee mixin" 
+ok(
+	$release->load_mixin( 'Module::Release::FTP' ),
+	"Loaded Kwalitee mixin"
 	);
 
 can_ok( $release, @subs );
@@ -127,15 +127,15 @@ like( $at, qr/Couldn't open/, "With undef FTP class, ftp_upload dies" );
 BEGIN {
 package Module::Release::MockFTP;
 
-sub new 
+sub new
 	{
 	my $class = shift;
-	
+
 	unshift @_, "Site";
-	
-	bless { @_ }, $class 
+
+	bless { @_ }, $class
 	}
-	
+
 sub login   { 1 }
 sub cwd     { 1 }
 sub binary  { 1 }
@@ -173,7 +173,7 @@ close $fh;
 
 is( -s Module::Release::MockFTP->put, Module::Release::MockFTP->size,
 	"test distro has the right size" );
-	
+
 # now test it to the end with passive on
 $release->ftp_passive_on;
 stdout_like

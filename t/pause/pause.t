@@ -18,8 +18,8 @@ BEGIN {
 	require $file;
 	}
 
-my @subs = qw( 
-	pause_claim should_upload_to_pause pause_ftp_site 
+my @subs = qw(
+	pause_claim should_upload_to_pause pause_ftp_site
 	set_pause_ftp_site pause_claim_base_url
 	pause_claim_content pause_claim_content_type
 	);
@@ -35,10 +35,10 @@ foreach my $sub ( @subs )
 	{
 	ok( ! $release->can( $sub ), "$sub not loaded yet" );
 	}
-	
-ok( 
-	$release->load_mixin( 'Module::Release::PAUSE' ), 
-	"Loaded PAUSE mixin" 
+
+ok(
+	$release->load_mixin( 'Module::Release::PAUSE' ),
+	"Loaded PAUSE mixin"
 	);
 
 can_ok( $release, @subs );
@@ -52,7 +52,7 @@ foreach my $sub ( @constant_subs )
 	{
 	ok( defined $release->$sub(), "method $sub returns something that's defined" );
 	}
-	
+
 }
 
 
@@ -66,7 +66,7 @@ stderr_like
 	qr/does not look like a hostname/,
 	"set_pause_ftp_site fails for no argument";
 
-is( $release->pause_ftp_site, $site, 
+is( $release->pause_ftp_site, $site,
 	"pause_ftp_site stays the same after set failure" );
 
 stderr_like
@@ -74,7 +74,7 @@ stderr_like
 	qr/does not look like a hostname/,
 	"set_pause_ftp_site fails for empty string";
 
-is( $release->pause_ftp_site, $site, 
+is( $release->pause_ftp_site, $site,
 	"pause_ftp_site stays the same after set failure" );
 
 stderr_like
@@ -82,7 +82,7 @@ stderr_like
 	qr/does not look like a hostname/,
 	"set_pause_ftp_site fails for 'foo'";
 
-is( $release->pause_ftp_site, $site, 
+is( $release->pause_ftp_site, $site,
 	"pause_ftp_site stays the same after set failure" );
 
 
@@ -145,7 +145,7 @@ ok( ! $release->should_upload_to_pause, "Shouldn't upload to PAUSE when password
 my $site = $release->pause_ftp_site;
 ok( defined $site, "pause_ftp_site returns something that is defined" );
 ok( length $site, "pause_ftp_site returns something that is long" );
-like( $site, qr/[a-z0-9-]+(\.[a-z0-9-]+)+/, 
+like( $site, qr/[a-z0-9-]+(\.[a-z0-9-]+)+/,
 	"pause_ftp_site returns something that looks like a host name" );
 }
 
@@ -156,7 +156,7 @@ $release->set_pause_ftp_site( 'pause.perl.org' );
 my $site = $release->pause_ftp_site;
 ok( defined $site, "pause_ftp_site returns something that is defined" );
 ok( length $site, "pause_ftp_site returns something that is long" );
-like( $site, qr/[a-z0-9-]+(\.[a-z0-9-]+)+/, 
+like( $site, qr/[a-z0-9-]+(\.[a-z0-9-]+)+/,
 	"pause_ftp_site returns something that looks like a host name" );
 }
 
@@ -193,8 +193,8 @@ like( $content, qr/foo\.tgz/, "Has the right distro name" );
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Test the reponse to PAUSE claim. Mock the user agent and 
-# HTTP::Response. 
+# Test the reponse to PAUSE claim. Mock the user agent and
+# HTTP::Response.
 BEGIN {
 no warnings 'redefine';
 

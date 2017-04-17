@@ -6,9 +6,9 @@ BEGIN {
 use Test::More;
 eval "use  Module::CPANTS::Analyse";
 my $at = $@;
-plan $at ? 
-	( 'skip_all', 'You need  Module::CPANTS::Analyse to check Kwalitee' ) 
-	: 
+plan $at ?
+	( 'skip_all', 'You need  Module::CPANTS::Analyse to check Kwalitee' )
+	:
 	'no_plan';
 }
 
@@ -41,9 +41,9 @@ isa_ok( $release, $class );
 # Create test object
 ok( ! $release->can( 'check_kwalitee' ), 'check_kwalitee not loaded yet' );
 
-ok( 
-	$release->load_mixin( 'Module::Release::Kwalitee' ), 
-	"Loaded Kwalitee mixin" 
+ok(
+	$release->load_mixin( 'Module::Release::Kwalitee' ),
+	"Loaded Kwalitee mixin"
 	);
 
 can_ok( $release, @subs );

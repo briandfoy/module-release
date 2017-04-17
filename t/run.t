@@ -74,7 +74,7 @@ like( $at, qr/Could not open command/, "Error message with bad command" );
 {
 stderr_like
 	{ eval { $release->run( qq|$^X -e "exit 255"| ) } }
-	qr/didn't close cleanly/, 
+	qr/didn't close cleanly/,
 	"Error message with bad close";
 }
 

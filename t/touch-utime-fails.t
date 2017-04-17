@@ -43,11 +43,11 @@ foreach my $name ( @files )
 	{
 	open my($fh), ">", $name; close $fh;
 	ok( -e $name, "test file $name exists" );
-	
+
 	CORE::utime $past, $past, $name;
 	cmp_ok( -M $name, ">", 2, "File is older than two days" );
 	}
-	
+
 CORE::utime $future, $future, $files[-1];
 cmp_ok( -M $files[-1], "<", 2, "File is newer than two days (in the future)" );
 
@@ -59,7 +59,7 @@ foreach my $file ( @files )
 	CORE::utime( $past, $past, $file );
 	is( (stat $file)[9], $past, "Set $file to past time" );
 	}
-	
+
 stderr_like
 	{ $release->touch( @files ) }
 	qr/did not set utime/,
