@@ -34,19 +34,29 @@ It looks in local_name to get the name of the distribution file.
 
 =cut
 
+
+my %Prereq_modules = (
+	'' => 'Test::Prereq',
+	'Makefile.PL' => 'Test::Prereq',
+	'Build.PL' => 'Test::Prereq::Build',
+);
+
 sub check_prereqs
 	{
-	eval "require Test::Prereq; 1 " or
-		$_[0]->_die( "You need Test::Prereq to check prereqs" );
+	my $prereqs_type = $_[0]->config->makefile_PL;
+	my $test_prereqs = $Prereq_modules{$prereqs_type} || 'Test::Prereq';
 
-	$_[0]->_print( "Checking prereqs... " );
+	eval "require $test_prereqs; 1 " or
+		$_[0]->_die( "You need $test_prereqs to check prereqs" );
+
+	$_[0]->_print( "Checking prereqs with $test_prereqs... " );
 
 	my $perl = $_[0]->{perl};
 
 	my @ignore = $_[0]->_get_prereq_ignore_list;
 
 	my $messages = $_[0]->run(
-		qq|$perl -MTest::Prereq -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"|
+		qq|$perl -M$test_prereqs -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"|
 		);
 
 	$_[0]->_die( "Prereqs had a problem:\n$messages\n" )
