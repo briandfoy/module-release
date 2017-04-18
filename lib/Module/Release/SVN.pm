@@ -9,7 +9,7 @@ use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.123_01';
+$VERSION = '2.123_02';
 
 =encoding utf8
 
