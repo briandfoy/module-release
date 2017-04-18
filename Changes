@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.123_01 2017-04-18T09:24:25Z
+	* Fix the relative path requires. v5.26 will remove the . from
+	@INC.
+
 2.123 2016-12-05T18:39:56Z
 	* Catch up with latest Test::More and perl behavior
 
