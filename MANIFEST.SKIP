@@ -59,6 +59,7 @@
 
 \.releaserc
 \.travis\.yml
+\.appveyor\.yml
 \.bbproj
 sf_upload
 t/ftp/
