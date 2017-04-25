@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.123_02 2017-04-25T18:49:34Z
+	* Test on AppVeyor, fix other minor dist things
+
 2.123_01 2017-04-18T09:24:25Z
 	* Fix the relative path requires. v5.26 will remove the . from
 	@INC.
