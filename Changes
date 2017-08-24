@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.123_03 2017-08-24T21:19:47Z
+	* Remove hack to get around OpenSSL problem with TLS. I don't
+	need that anymore.
+
 2.123_02 2017-04-25T18:49:34Z
 	* Test on AppVeyor, fix other minor dist things
 
