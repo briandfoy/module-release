@@ -9,6 +9,9 @@ Reported by Sagar Shah.
 
 =cut
 
+use strict;
+use warnings;
+
 use Test::More;
 
 BEGIN {
