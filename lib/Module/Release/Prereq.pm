@@ -18,7 +18,7 @@ Module::Release::Prereq - Check pre-requisites list in build file
 =head1 SYNOPSIS
 
 The release script automatically loads this module and checks your
-prerequisite declaration against what you actaully used in the
+prerequisite declaration against what you actually used in the
 tests.
 
 =head1 DESCRIPTION
