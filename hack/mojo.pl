@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Module::Release;
 
 my $release = Module::Release->new;
