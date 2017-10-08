@@ -25,7 +25,6 @@ subtest test_dir => sub {
 # Create empty configuration file
 subtest create_empty_conf => sub {
 	my $rc = open my $fh, '>:utf8', conf_file();
-	my $error = $! unless $rc;
 
 	ok( $rc, "Opened empty " . conf_file() );
 	diag( "Error creating " . conf_file() . "! $!" ) unless $rc;
