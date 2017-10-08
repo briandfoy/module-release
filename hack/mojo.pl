@@ -7,4 +7,4 @@ $release->config->set( cpan_user => 'BDFOY' );
 $release->config->set( cpan_pass => 'R$45tear' );
 
 $release->load_mixin( 'Module::Release::WebUpload::Mojo' );
-$release->web_upload; 
+$release->web_upload;
