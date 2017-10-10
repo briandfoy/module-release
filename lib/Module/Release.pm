@@ -363,7 +363,7 @@ sub mixin_loaded { exists $Loaded_mixins{ $_[1] } }
 
 =back
 
-=head2 Methods for configuation and settings
+=head2 Methods for configuration and settings
 
 =over 4
 
@@ -589,7 +589,7 @@ sub null_fh  {
 
 =item quiet
 
-Get the value of queit mode (true or false).
+Get the value of quiet mode (true or false).
 
 =item turn_quiet_on
 
@@ -1024,7 +1024,7 @@ sub check_manifest {
 
 =item manifest_name
 
-Return the name of the manifes file, probably F<MANIFEST>.
+Return the name of the manifest file, probably F<MANIFEST>.
 
 =item manifest
 
