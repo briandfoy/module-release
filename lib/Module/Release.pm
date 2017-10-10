@@ -1196,7 +1196,7 @@ you may well want to overload it.
 =cut
 
 sub get_readme {
-	open my $fh, '<README' or return '';
+	open my $fh, '<', 'README' or return '';
 	my $data = do {
 		local $/;
 		<$fh>;
@@ -1249,7 +1249,7 @@ sub run {
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 
-	open my($fh), "$command |" or $self->_die( "Could not open command [$command]: $!" );
+	open my($fh), "-|", "$command" or $self->_die( "Could not open command [$command]: $!" );
 	$fh->autoflush;
 
 	my $output = '';
