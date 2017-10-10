@@ -67,7 +67,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 

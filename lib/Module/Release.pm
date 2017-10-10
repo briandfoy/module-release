@@ -1375,7 +1375,7 @@ H.Merijn Brand has contributed many patches and features.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 

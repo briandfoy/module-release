@@ -244,7 +244,7 @@ A string representing options to add to the command line.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github as part of the Module::Release project:
+This source is in GitHub as part of the Module::Release project:
 
 	https://github.com/briandfoy/module-release
 
