@@ -102,8 +102,7 @@ subtest 'three part versions' => sub {
         ['Foo'        => '', "...with no suffix"],
     );
 
-    my $case;
-    foreach $case (@cases) {
+    foreach my $case (@cases) {
         my ($dist_name, $expected_version, $descr) = @$case;
         my $mock = bless { remote_file => $dist_name }, $class;
         my $got_version = $mock->dist_version;
