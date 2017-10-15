@@ -41,6 +41,11 @@ subtest 'formatting dev version' => sub {
 		'Development version stays in there'
 		);
 
+	$mock = bless { remote_file => 'Foo-1.125_039.tar.gz' }, $class;
+	is(
+		$mock->dist_version, '1.125_039',
+		'Development version handles more than two decimal places'
+		);
 	};
 
 subtest 'formatting release version' => sub {
@@ -48,6 +53,11 @@ subtest 'formatting release version' => sub {
 	my $got = $mock->dist_version;
 	is( $mock->dist_version, '3.45',
 		"Without development version it's fine"
+		);
+
+	$mock = bless { remote_file => 'Foo-1.001.tar.gz' }, $class;
+	is( $mock->dist_version, '1.001',
+		"Three decimal places are retained in version number"
 		);
 	};
 
