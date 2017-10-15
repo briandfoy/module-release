@@ -543,9 +543,9 @@ unless( $release->debug or $opts{C} ) {
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $cvs_commit = `$command "* for version $Version" 2>&1`;
+	my $vcs_commit = `$command "* for version $Version" 2>&1`;
 
-	$release->_print( $cvs_commit );
+	$release->_print( $vcs_commit );
 	}
 else {
 	$release->_print( "Skipping Changes file" );
