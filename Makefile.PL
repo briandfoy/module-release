@@ -67,6 +67,7 @@ my %WriteMakefile = (
 		'ConfigReader::Simple'  => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
+		'Term::ReadKey'         => '0',
 		'URI'                   => '0',
 		},
 

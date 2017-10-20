@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Sub::Override;
 use Capture::Tiny qw( capture );
 
@@ -53,6 +53,19 @@ is( $release->get_env_var('MOO'),
         "MOO not supplied.  Aborting...\n",
         "Error message about missing variable shown in debug mode"
     );
+}
+
+{
+    my $terminal_input =
+      Sub::Override->new( 'Module::Release::_slurp' => sub { "s3cr3t\n" } );
+    $ENV{'CPAN_PASS'} = undef;
+    my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('CPAN_PASS') };
+    is(
+        $stdout,
+        'CPAN_PASS is not set.  Enter it now: ',
+        'Undef CPAN_PASS variable prompts for value'
+    );
+    is( $result[0], 's3cr3t', 'Variable password from input' );
 }
 
 # vim: expandtab shiftwidth=4

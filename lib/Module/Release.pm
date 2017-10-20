@@ -1302,7 +1302,17 @@ sub get_env_var {
 	return $pass if defined( $pass ) && length( $pass );
 
 	$self->_print( "$field is not set.  Enter it now: " );
-	$pass = $self->_slurp;
+	if ($field eq 'CPAN_PASS') {
+		# don't echo passwords to the screen
+		require Term::ReadKey;
+		local $| = 1;
+		Term::ReadKey::ReadMode('noecho');
+		$pass = $self->_slurp;
+		Term::ReadKey::ReadMode('restore');
+	}
+	else {
+		$pass = $self->_slurp;
+	}
 	chomp $pass;
 
 	return $pass if defined( $pass ) && length( $pass );
