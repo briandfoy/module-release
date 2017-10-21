@@ -1188,23 +1188,6 @@ sub check_for_passwords {
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
-=item get_readme()
-
-Read and parse the F<README> file.  This is pretty specific, so
-you may well want to overload it.
-
-=cut
-
-sub get_readme {
-	open my $fh, '<', 'README' or return '';
-	my $data = do {
-		local $/;
-		<$fh>;
-		};
-
-	return $data;
-	}
-
 =item get_changes()
 
 Read and parse the F<Changes> file.  This is pretty specific, so
