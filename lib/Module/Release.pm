@@ -30,6 +30,7 @@ use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
+use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -1223,6 +1224,21 @@ sub get_changes {
 		}
 
 	return $data;
+	}
+
+=item get_release_date()
+
+Return a string representing the current date and time (in UTC) in the
+L<CPAN::Changes::Spec> format so that it can be added directly to the
+Changes file.
+
+=cut
+
+sub get_release_date {
+	my $self = shift;
+	my $dt = DateTime->now(time_zone => 'UTC');
+
+	return $dt->datetime . 'Z';
 	}
 
 =item run
