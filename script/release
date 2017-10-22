@@ -494,6 +494,8 @@ if( $opts{t} ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
 unless( $release->debug or $opts{C} ) {
+	$release->show_recent_contributors;
+
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
 

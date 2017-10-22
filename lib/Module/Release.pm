@@ -30,6 +30,7 @@ use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
+use Try::Tiny;
 
 my %Loaded_mixins = ( );
 
@@ -1223,6 +1224,37 @@ sub get_changes {
 		}
 
 	return $data;
+	}
+
+=item show_recent_contributors()
+
+Show recent contributors before creating/extending Changes.
+
+This output relies upon the method C<get_recent_contributors()> having been
+implemented in the relevant mixin for your version control system.
+
+=cut
+
+sub show_recent_contributors {
+	my $self = shift;
+        my @contributors = try {
+            $self->get_recent_contributors();
+        }
+        catch {
+            return ();
+        };
+	$self->_print("Contributors since last release:\n") if @contributors;
+	$self->_print( "\t", $_, "\n" ) for (@contributors);
+	}
+
+=item get_recent_contributors()
+
+Return a list of contributors since last release.
+
+=cut
+
+sub get_recent_contributors {
+	$_[0]->_die( "get_recent_contributors must be implemented in a mixin class" );
 	}
 
 =item run
