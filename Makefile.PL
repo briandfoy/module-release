@@ -74,6 +74,7 @@ my %WriteMakefile = (
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
+		'Capture::Tiny'         => '0',
 		},
 
 	'META_MERGE' => {
