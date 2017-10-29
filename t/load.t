@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 my @classes = qw(
 		Module::Release
 		Module::Release::Kwalitee
