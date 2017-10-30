@@ -65,6 +65,7 @@ my %WriteMakefile = (
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
+		'DateTime'              => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
 		'URI'                   => '0',
@@ -74,6 +75,7 @@ my %WriteMakefile = (
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
+		'Capture::Tiny'         => '0',
 		},
 
 	'META_MERGE' => {

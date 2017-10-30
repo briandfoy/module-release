@@ -30,6 +30,7 @@ use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
+use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -363,7 +364,7 @@ sub mixin_loaded { exists $Loaded_mixins{ $_[1] } }
 
 =back
 
-=head2 Methods for configuation and settings
+=head2 Methods for configuration and settings
 
 =over 4
 
@@ -589,7 +590,7 @@ sub null_fh  {
 
 =item quiet
 
-Get the value of queit mode (true or false).
+Get the value of quiet mode (true or false).
 
 =item turn_quiet_on
 
@@ -1024,7 +1025,7 @@ sub check_manifest {
 
 =item manifest_name
 
-Return the name of the manifes file, probably F<MANIFEST>.
+Return the name of the manifest file, probably F<MANIFEST>.
 
 =item manifest
 
@@ -1188,23 +1189,6 @@ sub check_for_passwords {
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
-=item get_readme()
-
-Read and parse the F<README> file.  This is pretty specific, so
-you may well want to overload it.
-
-=cut
-
-sub get_readme {
-	open my $fh, '<README' or return '';
-	my $data = do {
-		local $/;
-		<$fh>;
-		};
-
-	return $data;
-	}
-
 =item get_changes()
 
 Read and parse the F<Changes> file.  This is pretty specific, so
@@ -1223,6 +1207,21 @@ sub get_changes {
 		}
 
 	return $data;
+	}
+
+=item get_release_date()
+
+Return a string representing the current date and time (in UTC) in the
+L<CPAN::Changes::Spec> format so that it can be added directly to the
+Changes file.
+
+=cut
+
+sub get_release_date {
+	my $self = shift;
+	my $dt = DateTime->now(time_zone => 'UTC');
+
+	return $dt->datetime . 'Z';
 	}
 
 =item run
@@ -1249,7 +1248,7 @@ sub run {
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 
-	open my($fh), "$command |" or $self->_die( "Could not open command [$command]: $!" );
+	open my($fh), "-|", "$command" or $self->_die( "Could not open command [$command]: $!" );
 	$fh->autoflush;
 
 	my $output = '';
@@ -1375,7 +1374,7 @@ H.Merijn Brand has contributed many patches and features.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 

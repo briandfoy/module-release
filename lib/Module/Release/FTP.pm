@@ -124,7 +124,7 @@ sub ftp_class_name { 'Net::FTP' }
 
 =item get_ftp_object( HOSTNAME )
 
-Create and returnt the FTP object, based on the class name from
+Create and return the FTP object, based on the class name from
 C<ftp_class_name>. IT connects to HOSTNAME, but does not login.
 
 =cut
@@ -194,7 +194,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 

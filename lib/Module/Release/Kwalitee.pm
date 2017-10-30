@@ -35,8 +35,10 @@ It looks in local_name to get the name of the distribution file.
 
 sub check_kwalitee
 	{
-	eval "require Module::CPANTS::Analyse; 1" or
-		$_[0]->_die( "You need Module::CPANTS::Analyse to check kwalitee" );
+	my $cpants_analyse = "Module::CPANTS::Analyse";
+	my $cpants_lint = "App::CPANTS::Lint";
+	eval "require $cpants_analyse; require $cpants_lint; 1" or
+		$_[0]->_die( "You need $cpants_analyse and $cpants_lint to check kwalitee" );
 
 	$_[0]->_print( "Checking kwalitee... " );
 
@@ -82,7 +84,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 

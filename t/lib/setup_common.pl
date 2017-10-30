@@ -24,6 +24,7 @@ subtest test_dir => sub {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create empty configuration file
 subtest create_empty_conf => sub {
+
 	my $rc = open my $fh, '>:encoding(UTF-8)', conf_file();
 	my $error = $! unless $rc;
 

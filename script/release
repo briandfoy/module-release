@@ -244,7 +244,7 @@ A string representing options to add to the command line.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github as part of the Module::Release project:
+This source is in GitHub as part of the Module::Release project:
 
 	https://github.com/briandfoy/module-release
 
@@ -254,7 +254,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -500,15 +500,7 @@ unless( $release->debug or $opts{C} ) {
 	die "Changes file does not exist!\n" unless -e $changes;
 
 	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
-
-	my( $year, $month, $day, $hour, $minute, $second )
-		= (gmtime)[5,4,3,2,1,0];
-	$year += 1900;
-	$month += 1;
-	my $datetime = sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ",
-		$year, $month, $day, $hour, $minute, $second;
-
-	my $str = $Version . ' ' . $datetime . "\n";
+	my $str = $Version . ' ' . $release->get_release_date . "\n";
 
 	while( <STDIN> ) {
 		$_ =~ s/\A \s* (\*|-)? \s*/- /; # Make bullets (-)
@@ -543,9 +535,9 @@ unless( $release->debug or $opts{C} ) {
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $cvs_commit = `$command "* for version $Version" 2>&1`;
+	my $vcs_commit = `$command "* for version $Version" 2>&1`;
 
-	$release->_print( $cvs_commit );
+	$release->_print( $vcs_commit );
 	}
 else {
 	$release->_print( "Skipping Changes file" );
