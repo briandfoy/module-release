@@ -16,11 +16,6 @@ BEGIN {
 
 my $release = Module::Release->new;
 
-dies_ok(
-    sub { $release->get_recent_contributors },
-    "Non-subclassed get_recent_contributors dies"
-);
-
 {
 no warnings 'redefine';
 local *Module::Release::get_recent_contributors =
