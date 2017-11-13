@@ -52,5 +52,4 @@ EOF
         "Contributors since last release are shown" );
 }
 
-# vim: expandtab shiftwidth=4
 done_testing();
