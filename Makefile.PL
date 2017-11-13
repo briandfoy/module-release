@@ -68,17 +68,19 @@ my %WriteMakefile = (
 		'DateTime'              => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
+		'Try::Tiny'             => '0',
 		'Term::ReadKey'         => '0',
 		'URI'                   => '0',
 		},
 
 	'TEST_REQUIRES' => {
+		'Test::Exception'       => '0',
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
+		'Capture::Tiny'         => '0',
     'Capture::Tiny'         => '0',
     'File::Temp'            => '0',
-    'Sub::Override'         => '0',
 		},
 
 	'META_MERGE' => {
