@@ -26,4 +26,4 @@ is(
     $input,
     "to be or not to be\n",
     '_slurp returns content from input file handle'
-);
+	);
