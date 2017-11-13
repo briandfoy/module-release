@@ -44,7 +44,7 @@ my %Prereq_modules = (
 sub check_prereqs
 	{
 	my $prereqs_type = $_[0]->config->makefile_PL;
-	my $test_prereqs = $Prereq_modules{$prereqs_type} || 'Test::Prereq';
+	my $test_prereqs = $Prereq_modules{$prereqs_type // ''} || 'Test::Prereq';
 
 	eval "require $test_prereqs; 1 " or
 		$_[0]->_die( "You need $test_prereqs to check prereqs" );
