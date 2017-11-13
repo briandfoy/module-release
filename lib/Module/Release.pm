@@ -24,12 +24,13 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.123_03';
+$VERSION = '2.123_04';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
+use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -1199,23 +1200,6 @@ sub check_for_passwords {
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
-=item get_readme()
-
-Read and parse the F<README> file.  This is pretty specific, so
-you may well want to overload it.
-
-=cut
-
-sub get_readme {
-	open my $fh, '<', 'README' or return '';
-	my $data = do {
-		local $/;
-		<$fh>;
-		};
-
-	return $data;
-	}
-
 =item get_changes()
 
 Read and parse the F<Changes> file.  This is pretty specific, so
@@ -1234,6 +1218,21 @@ sub get_changes {
 		}
 
 	return $data;
+	}
+
+=item get_release_date()
+
+Return a string representing the current date and time (in UTC) in the
+L<CPAN::Changes::Spec> format so that it can be added directly to the
+Changes file.
+
+=cut
+
+sub get_release_date {
+	my $self = shift;
+	my $dt = DateTime->now(time_zone => 'UTC');
+
+	return $dt->datetime . 'Z';
 	}
 
 =item run

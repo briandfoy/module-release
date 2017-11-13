@@ -16,7 +16,9 @@ MANIFEST.SKIP
 README.pod
 script/release
 t/abstract.t
+t/changes.t
 t/compile.t
+t/dates.t
 t/defaults.t
 t/dist_version.t
 t/kwalitee/check_kwalitee.t
@@ -28,6 +30,7 @@ t/mixins.t
 t/new.t
 t/no_releaserc_can_die.t
 t/output.t
+t/passwords.t
 t/perls.t
 t/pod.t
 t/pod_coverage.t
