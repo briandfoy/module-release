@@ -1258,7 +1258,6 @@ Changes file.
 sub get_release_date {
 	my $self = shift;
 	my $dt = DateTime->now(time_zone => 'UTC');
-
 	return $dt->datetime . 'Z';
 	}
 
