@@ -24,13 +24,14 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.123_03';
+$VERSION = '2.123_04';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
 use Try::Tiny;
+use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -196,6 +197,7 @@ sub _set_defaults {
 			debug          => $ENV{RELEASE_DEBUG} || 0,
 			local_file     => undef,
 			remote_file    => undef,
+			input_fh       => *STDIN{IO},
 			output_fh      => *STDOUT{IO},
 			debug_fh       => *STDERR{IO},
 			null_fh        => IO::Null->new(),
@@ -559,6 +561,16 @@ sub reset_perls {
 	return $self->{perls}{$^X} = $];
 	}
 
+
+=item input_fh
+
+Return the value of input_fh.
+
+=cut
+
+sub input_fh {
+    return $_[0]->{input_fh};
+}
 
 =item output_fh
 
@@ -1189,23 +1201,6 @@ sub check_for_passwords {
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
-=item get_readme()
-
-Read and parse the F<README> file.  This is pretty specific, so
-you may well want to overload it.
-
-=cut
-
-sub get_readme {
-	open my $fh, '<', 'README' or return '';
-	my $data = do {
-		local $/;
-		<$fh>;
-		};
-
-	return $data;
-	}
-
 =item get_changes()
 
 Read and parse the F<Changes> file.  This is pretty specific, so
@@ -1255,6 +1250,21 @@ Return a list of contributors since last release.
 
 sub get_recent_contributors {
 	$_[0]->_die( "get_recent_contributors must be implemented in a mixin class" );
+  }
+  
+=item get_release_date()
+
+Return a string representing the current date and time (in UTC) in the
+L<CPAN::Changes::Spec> format so that it can be added directly to the
+Changes file.
+
+=cut
+
+sub get_release_date {
+	my $self = shift;
+	my $dt = DateTime->now(time_zone => 'UTC');
+
+	return $dt->datetime . 'Z';
 	}
 
 =item run
@@ -1323,7 +1333,17 @@ sub get_env_var {
 	return $pass if defined( $pass ) && length( $pass );
 
 	$self->_print( "$field is not set.  Enter it now: " );
-	$pass = <>;
+	if ($field eq 'CPAN_PASS') {
+		# don't echo passwords to the screen
+		require Term::ReadKey;
+		local $| = 1;
+		Term::ReadKey::ReadMode('noecho');
+		$pass = $self->_slurp;
+		Term::ReadKey::ReadMode('restore');
+	}
+	else {
+		$pass = $self->_slurp;
+	}
 	chomp $pass;
 
 	return $pass if defined( $pass ) && length( $pass );
@@ -1345,6 +1365,17 @@ output_fh to a null filehandle, output goes nowhere.
 =cut
 
 sub _print { print { $_[0]->output_fh } @_[1..$#_] }
+
+=item _slurp
+
+Read a line from whatever is in input_fh and return it.
+
+=cut
+
+sub _slurp {
+    my $fh = $_[0]->input_fh;
+    return <$fh>;
+}
 
 =item _dashes()
 

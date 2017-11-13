@@ -502,15 +502,7 @@ unless( $release->debug or $opts{C} ) {
 	die "Changes file does not exist!\n" unless -e $changes;
 
 	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
-
-	my( $year, $month, $day, $hour, $minute, $second )
-		= (gmtime)[5,4,3,2,1,0];
-	$year += 1900;
-	$month += 1;
-	my $datetime = sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ",
-		$year, $month, $day, $hour, $minute, $second;
-
-	my $str = $Version . ' ' . $datetime . "\n";
+	my $str = $Version . ' ' . $release->get_release_date . "\n";
 
 	while( <STDIN> ) {
 		$_ =~ s/\A \s* (\*|-)? \s*/- /; # Make bullets (-)
@@ -545,9 +537,9 @@ unless( $release->debug or $opts{C} ) {
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $cvs_commit = `$command "* for version $Version" 2>&1`;
+	my $vcs_commit = `$command "* for version $Version" 2>&1`;
 
-	$release->_print( $cvs_commit );
+	$release->_print( $vcs_commit );
 	}
 else {
 	$release->_print( "Skipping Changes file" );

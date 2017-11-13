@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.123_04 2017-11-13T17:35:47Z
+	* Many internal improvements from Paul Cochrane thanks to 
+	Hacktoberfest.
+
 2.123_03 2017-08-24T21:19:47Z
 	* Remove hack to get around OpenSSL problem with TLS. I don't
 	need that anymore.
