@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More tests => 10;
-use Sub::Override;
 use Capture::Tiny qw( capture );
 
 use Module::Release;
@@ -18,52 +17,51 @@ BEGIN {
 my $release = Module::Release->new;
 $release->{'preset_field'} = 'preset';
 is( $release->get_env_var('PRESET_FIELD'),
-    'preset', 'Preset field value returned' );
+	'preset', 'Preset field value returned' );
 
 $ENV{'MOO'} = 'baa';
 is( $release->get_env_var('MOO'),
-    'baa', 'Preset environment variable value returned' );
+	'baa', 'Preset environment variable value returned' );
+
+no warnings 'redefine';
 
 {
-    my $terminal_input =
-      Sub::Override->new( 'Module::Release::_slurp' => sub { "baa\n" } );
-    $ENV{'MOO'} = '';
-    my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
-    is(
-        $stdout,
-        'MOO is not set.  Enter it now: ',
-        'Empty environment variable prompts for value'
-    );
-    is( $result[0], 'baa', 'Variable read from input' );
+local *Module::Release::_slurp = sub { "baa\n" };
+local $ENV{'MOO'} = '';
+my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
+is(
+	$stdout,
+	'MOO is not set.  Enter it now: ',
+	'Empty environment variable prompts for value'
+	);
+is( $result[0], 'baa', 'Variable read from input' );
 }
 
 {
-    my $terminal_input =
-      Sub::Override->new( 'Module::Release::_slurp' => sub { "\n" } );
-    $ENV{'MOO'} = undef;
-    $release->turn_debug_on;
-    my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
-    is(
-        $stdout,
-        'MOO is not set.  Enter it now: ',
-        'Undef environment variable prompts for value'
-    );
-    is(
-        $stderr,
-        "MOO not supplied.  Aborting...\n",
-        "Error message about missing variable shown in debug mode"
-    );
+local *Module::Release::_slurp = sub { "\n" };
+local $ENV{'MOO'} = undef;
+$release->turn_debug_on;
+my( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
+is(
+	$stdout,
+	'MOO is not set.  Enter it now: ',
+	'Undef environment variable prompts for value'
+	);
+is(
+	$stderr,
+	"MOO not supplied.  Aborting...\n",
+	"Error message about missing variable shown in debug mode"
+	);
 }
 
 {
-    my $terminal_input =
-      Sub::Override->new( 'Module::Release::_slurp' => sub { "s3cr3t\n" } );
-    $ENV{'CPAN_PASS'} = undef;
-    my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('CPAN_PASS') };
-    is(
-        $stdout,
-        'CPAN_PASS is not set.  Enter it now: ',
-        'Undef CPAN_PASS variable prompts for value'
-    );
-    is( $result[0], 's3cr3t', 'Variable password from input' );
+local *Module::Release::_slurp = sub { "s3cr3t\n" };
+local $ENV{'CPAN_PASS'} = undef;
+my( $stdout, $stderr, @result ) = capture { $release->get_env_var('CPAN_PASS') };
+is(
+	$stdout,
+	'CPAN_PASS is not set.  Enter it now: ',
+	'Undef CPAN_PASS variable prompts for value'
+);
+is( $result[0], 's3cr3t', 'Variable password from input' );
 }

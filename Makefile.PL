@@ -74,13 +74,11 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::Exception'       => '0',
+ 		'Capture::Tiny'         => '0',
+		'File::Temp'            => '0',
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',
-		'Capture::Tiny'         => '0',
-    'Capture::Tiny'         => '0',
-    'File::Temp'            => '0',
 		},
 
 	'META_MERGE' => {
