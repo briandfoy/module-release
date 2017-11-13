@@ -196,6 +196,7 @@ sub _set_defaults {
 			debug          => $ENV{RELEASE_DEBUG} || 0,
 			local_file     => undef,
 			remote_file    => undef,
+			input_fh       => *STDIN{IO},
 			output_fh      => *STDOUT{IO},
 			debug_fh       => *STDERR{IO},
 			null_fh        => IO::Null->new(),
@@ -559,6 +560,16 @@ sub reset_perls {
 	return $self->{perls}{$^X} = $];
 	}
 
+
+=item input_fh
+
+Return the value of input_fh.
+
+=cut
+
+sub input_fh {
+    return $_[0]->{input_fh};
+}
 
 =item output_fh
 
@@ -1290,7 +1301,17 @@ sub get_env_var {
 	return $pass if defined( $pass ) && length( $pass );
 
 	$self->_print( "$field is not set.  Enter it now: " );
-	$pass = <>;
+	if ($field eq 'CPAN_PASS') {
+		# don't echo passwords to the screen
+		require Term::ReadKey;
+		local $| = 1;
+		Term::ReadKey::ReadMode('noecho');
+		$pass = $self->_slurp;
+		Term::ReadKey::ReadMode('restore');
+	}
+	else {
+		$pass = $self->_slurp;
+	}
 	chomp $pass;
 
 	return $pass if defined( $pass ) && length( $pass );
@@ -1312,6 +1333,17 @@ output_fh to a null filehandle, output goes nowhere.
 =cut
 
 sub _print { print { $_[0]->output_fh } @_[1..$#_] }
+
+=item _slurp
+
+Read a line from whatever is in input_fh and return it.
+
+=cut
+
+sub _slurp {
+    my $fh = $_[0]->input_fh;
+    return <$fh>;
+}
 
 =item _dashes()
 
