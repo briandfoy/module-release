@@ -18,27 +18,26 @@ print $git_update, "\n-------------\n";
 $git_update =~ s/^#\s//gm; # one space
 print $git_update, "\n-------------\n";
 
-$git_update =~ s/^\s*\(.*?\)[\r\n]+//mg;	
+$git_update =~ s/^\s*\(.*?\)[\r\n]+//mg;
 print $git_update, "\n-------------\n";
 
 
 my(undef, %bits ) = split /^(\w.*):[\r\n]+/m, $git_update;
 
-
 foreach my $key ( keys %bits )
 	{
-	my @lines = 
-		map { my $x = $_; $x =~ s/^\s+//; $x =~ s/\s+$//; $x } 
+	my @lines =
+		map { my $x = $_; $x =~ s/^\s+//; $x =~ s/\s+$//; $x }
 		split /[\r\n]+/, $bits{ $key };
-	
+
 	$" = "\n\t";
 	print "$key lines:\n\t@lines\n";
-	
+
 	$bits{$key} = [ @lines ];
 	}
 
 print Dumper( \%bits );
-	
+
 __DATA__
 # On branch master
 # Changes to be committed:
