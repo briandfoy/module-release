@@ -1231,20 +1231,10 @@ implemented in the relevant mixin for your version control system.
 
 sub show_recent_contributors {
 	my $self = shift;
-	my @contributors = $self->get_recent_contributors();
+	return unless $self->can( 'get_recent_contributors' );
+	my @contributors = $self->get_recent_contributors;
 	$self->_print("Contributors since last release:\n") if @contributors;
 	$self->_print( "\t", $_, "\n" ) for @contributors;
-	}
-
-=item get_recent_contributors()
-
-Return a list of contributors since last release.
-
-=cut
-
-sub get_recent_contributors {
-	$_[0]->_warn( "get_recent_contributors must be implemented in a mixin class" );
-	return ();
 	}
 
 =item get_release_date()
