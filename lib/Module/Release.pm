@@ -1208,7 +1208,7 @@ you may well want to overload it.
 =cut
 
 sub get_changes {
-	open my $fh, '<:utf8', 'Changes' or return '';
+	open my $fh, '<:encoding(UTF-8)', 'Changes' or return '';
 
 	my $data = <$fh>;  # get first line
 

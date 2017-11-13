@@ -516,8 +516,8 @@ unless( $release->debug or $opts{C} ) {
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
-	open my $in, '<:utf8', $bak or die "Could not read old $changes file! $!\n";
-	open my $out, ">:utf8", $changes;
+	open my $in, '<:encoding(UTF-8)', $bak or die "Could not read old $changes file! $!\n";
+	open my $out, ">:encoding(UTF-8)", $changes;
 
 	while( <$in> ) {
 		print $out $_;
