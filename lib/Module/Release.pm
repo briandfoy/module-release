@@ -24,7 +24,7 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.123_04';
+$VERSION = '2.123_05';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
