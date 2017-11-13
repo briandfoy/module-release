@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Test::Exception;
 use Capture::Tiny qw( capture_stdout );
 
 use Module::Release;
