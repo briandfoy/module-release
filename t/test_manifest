@@ -20,3 +20,6 @@ without.t
 changes.t
 dates.t
 passwords.t
+contributors.t
+get_env_var.t
+input.t

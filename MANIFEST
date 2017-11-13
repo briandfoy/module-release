@@ -18,9 +18,12 @@ script/release
 t/abstract.t
 t/changes.t
 t/compile.t
+t/contributors.t
 t/dates.t
 t/defaults.t
 t/dist_version.t
+t/get_env_var.t
+t/input.t
 t/kwalitee/check_kwalitee.t
 t/lib/setup_common.pl
 t/load.t
