@@ -68,7 +68,6 @@ my %WriteMakefile = (
 		'DateTime'              => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
-		'Try::Tiny'             => '0',
 		'Term::ReadKey'         => '0',
 		'URI'                   => '0',
 		},

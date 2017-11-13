@@ -30,7 +30,6 @@ use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
-use Try::Tiny;
 use DateTime;
 
 my %Loaded_mixins = ( );
@@ -1232,14 +1231,9 @@ implemented in the relevant mixin for your version control system.
 
 sub show_recent_contributors {
 	my $self = shift;
-        my @contributors = try {
-            $self->get_recent_contributors();
-        }
-        catch {
-            return ();
-        };
+	my @contributors = $self->get_recent_contributors();
 	$self->_print("Contributors since last release:\n") if @contributors;
-	$self->_print( "\t", $_, "\n" ) for (@contributors);
+	$self->_print( "\t", $_, "\n" ) for @contributors;
 	}
 
 =item get_recent_contributors()
@@ -1249,9 +1243,10 @@ Return a list of contributors since last release.
 =cut
 
 sub get_recent_contributors {
-	$_[0]->_die( "get_recent_contributors must be implemented in a mixin class" );
-  }
-  
+	$_[0]->_warn( "get_recent_contributors must be implemented in a mixin class" );
+	return ();
+	}
+
 =item get_release_date()
 
 Return a string representing the current date and time (in UTC) in the
