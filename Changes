@@ -19,7 +19,7 @@ Revision history for Perl module Module::Release
 	* Catch up with latest Test::More and perl behavior
 
 2.122_01 2016-11-16T01:15:00Z
-	* Try harder to find out what's going on with Dan Collins's 
+	* Try harder to find out what's going on with Dan Collins's
 	testers setup.
 
 2.122 2016-03-04T23:38:14Z

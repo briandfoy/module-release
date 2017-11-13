@@ -31,7 +31,7 @@ release - give your Perl distros to the world
 
 	# set $ENV{AUTOMATED_TESTING} to a true value
 	release -a
-	
+
 
 =head1 DESCRIPTION
 
@@ -154,7 +154,7 @@ release does not test the perls in any particular order.
 
 =item automated_testing
 
-Set C<automated_testing> to the value you want for the 
+Set C<automated_testing> to the value you want for the
 $ENV{AUTOMATED_TESTING} setting. By default this is 0, so
 testing is started in interactive mode.
 
@@ -383,19 +383,19 @@ my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 my $skip_dist    = $opts{D} || $release->config->skip_dist;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Set automated testing from command line, config, environment, or default 
+# Set automated testing from command line, config, environment, or default
 {
 no warnings 'uninitialized';
 
-$ENV{AUTOMATED_TESTING} = ( 
-	grep { defined } ( 
-		$opts{a}, $release->config->automated_testing, 
-		$ENV{AUTOMATED_TESTING}, 0 ) 
+$ENV{AUTOMATED_TESTING} = (
+	grep { defined } (
+		$opts{a}, $release->config->automated_testing,
+		$ENV{AUTOMATED_TESTING}, 0 )
 	)[0];
 $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
-}	
-	
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
 unless( $opts{T} ) {
@@ -416,7 +416,7 @@ unless( $opts{T} ) {
 		else {
 			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
 			}
-		
+
 		unless( $skip_dist ) {
 			$release->dist;
 			$release->disttest;
@@ -562,7 +562,7 @@ while( $release->should_upload_to_pause ) {
 	$release->_print("Now uploading to PAUSE\n" );
 	$release->_print("============Uploading to PAUSE\n");
 	last if $release->debug;
-	
+
 	$release->web_upload;
 
 	last;
