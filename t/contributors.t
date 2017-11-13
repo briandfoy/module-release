@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
 use Test::Exception;
 use Capture::Tiny qw( capture_stdout );
 
@@ -55,3 +54,4 @@ EOF
 }
 
 # vim: expandtab shiftwidth=4
+done_testing();
