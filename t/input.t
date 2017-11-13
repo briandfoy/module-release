@@ -27,5 +27,3 @@ is(
     "to be or not to be\n",
     '_slurp returns content from input file handle'
 );
-
-# vim: expandtab shiftwidth=4

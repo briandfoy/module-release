@@ -67,5 +67,3 @@ is( $release->get_env_var('MOO'),
     );
     is( $result[0], 's3cr3t', 'Variable password from input' );
 }
-
-# vim: expandtab shiftwidth=4
