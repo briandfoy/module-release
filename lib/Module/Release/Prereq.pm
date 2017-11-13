@@ -39,7 +39,7 @@ my %Prereq_modules = (
 	'' => 'Test::Prereq',
 	'Makefile.PL' => 'Test::Prereq',
 	'Build.PL' => 'Test::Prereq::Build',
-);
+	);
 
 sub check_prereqs
 	{
