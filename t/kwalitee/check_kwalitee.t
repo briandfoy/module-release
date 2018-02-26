@@ -4,12 +4,19 @@ use warnings;
 
 BEGIN {
 use Test::More;
-eval "use  Module::CPANTS::Analyse";
-my $at = $@;
-plan $at ?
-	( 'skip_all', 'You need  Module::CPANTS::Analyse to check Kwalitee' )
-	:
-	'no_plan';
+eval "use Module::CPANTS::Analyse";
+my $at = !! $@;
+
+eval "use App::CPANTS::Lint";
+$at += !! $@;
+
+if( $at ) {
+	plan 'skip_all', 'You need Module::CPANTS::Analyse and App::CPANTS::Lint to check Kwalitee';
+	exit;
+	}
+else {
+	plan 'no_plan';
+	}
 }
 
 use Test::Output;
@@ -44,7 +51,7 @@ ok( ! $release->can( 'check_kwalitee' ), 'check_kwalitee not loaded yet' );
 ok(
 	$release->load_mixin( 'Module::Release::Kwalitee' ),
 	"Loaded Kwalitee mixin"
-	);
+	) ;
 
 can_ok( $release, @subs );
 
@@ -106,3 +113,4 @@ ok( defined $at, "check_kwalitee dies when kwalitee doesn't pass" );
 like( $at, qr/suck/, "CPANTS reports that I suck" );
 }
 
+done_testing();
