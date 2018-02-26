@@ -51,7 +51,7 @@ ok( ! $release->can( 'check_kwalitee' ), 'check_kwalitee not loaded yet' );
 ok(
 	$release->load_mixin( 'Module::Release::Kwalitee' ),
 	"Loaded Kwalitee mixin"
-	) ;
+	) or BAIL_OUT( "Couldn't load the Module::Release::Kwalitee. Giving up hope." );
 
 can_ok( $release, @subs );
 
