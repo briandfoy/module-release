@@ -44,5 +44,3 @@ EOF
 
     unlink "Changes" or die "$!";
 }
-
-# vim: expandtab shiftwidth=4

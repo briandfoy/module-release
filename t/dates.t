@@ -28,5 +28,3 @@ like(
         '2017-09-02T10:05:49Z',
         "Returns known datetime as a string in required format" );
 }
-
-# vim: expandtab shiftwidth=4
