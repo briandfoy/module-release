@@ -32,7 +32,6 @@ release - give your Perl distros to the world
 	# set $ENV{AUTOMATED_TESTING} to a true value
 	release -a
 
-
 =head1 DESCRIPTION
 
 This is the prototype program for using C<Module::Release>. You should
@@ -247,7 +246,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -263,7 +262,7 @@ the automated_testing feature.
 =cut
 
 use Getopt::Std;
-use Module::Release '2.01';
+use Module::Release '2.021';
 
 my $class = "Module::Release";
 
