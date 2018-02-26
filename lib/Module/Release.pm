@@ -83,8 +83,7 @@ Do you want debugging output? Set this to a true value
 =item CPAN_PASS
 
 Your CPAN password. If you don't set this and you want to upload to
-PAUSE, you should be prompted for it. Failing that, the module tries
-to upload anonymously but cannot claim the file for you.
+PAUSE, you should be prompted for it.
 
 =back
 
@@ -250,10 +249,6 @@ sub _process_configuration {
 
 	# Figure out options
 	$self->{cpan} = $self->config->cpan_user eq '<none>' ? 0 : 1;
-
-	$self->{passive_ftp} =
-		($self->config->passive_ftp && $self->config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
-
 
 	{
 	my @pairs = (

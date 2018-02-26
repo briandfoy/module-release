@@ -43,8 +43,7 @@ you should write your own script to match your process.
 
 This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
-source control, uploads it to the PAUSE anonymous FTP directory and
-claims it on PAUSE.
+source control, and uploads it to the PAUSE.
 
 By default this script assumes that you use CVS, but recognizes SVN
 and git and switches when appropriate.
@@ -78,7 +77,7 @@ source control complains, fail.
 
 =item Upload to PAUSE
 
-This program used to use FTP uploads, but PAUSE has turned that feature.
+This program used to use FTP uploads, but PAUSE has turned off that feature.
 Now it uploads through the web form.
 
 =item Tag the repository
@@ -161,12 +160,6 @@ testing is started in interactive mode.
 =item cpan_user
 
 The PAUSE user
-
-=item passive_ftp
-
-Set C<passive_ftp> to "y" or "yes" for passive FTP transfers.  Usually
-this is to get around a firewall issue. Note that PAUSE has turned off
-FTP uploads, so this setting is useless now.
 
 =item perls
 
