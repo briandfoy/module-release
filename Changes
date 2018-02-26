@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.124_01 2018-02-26T21:05:24Z
+	* Fix a test issue when App::CPANTS::Lint is missing (optional feature)
+	* Clean up tests for lack of . in @INC to load common file
+
 2.124 2018-02-26T12:24:12Z
 	* Make this a stable release
 
