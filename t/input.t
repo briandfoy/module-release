@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More 1.0 tests => 3;
 use File::Temp qw(:seekable);
 
 use Module::Release;

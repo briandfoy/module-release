@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 1.0;
 use Capture::Tiny qw( capture_stdout );
 
 use Module::Release;

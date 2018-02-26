@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.95;
+use Test::More  1.0;
 
 my $class = 'Module::Release';
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More 1.0 tests => 10;
 use Capture::Tiny qw( capture );
 
 use Module::Release;

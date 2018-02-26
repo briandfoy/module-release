@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More 1.0 tests => 7;
 use Capture::Tiny qw(capture_stderr);
 
 use Module::Release;

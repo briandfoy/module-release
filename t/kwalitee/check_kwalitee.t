@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 BEGIN {
-use Test::More;
+use Test::More 1.0;
 eval "use Module::CPANTS::Analyse";
 my $at = !! $@;
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More 1.0 tests => 4;
 
 use Module::Release;
 

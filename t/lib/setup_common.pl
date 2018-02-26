@@ -4,7 +4,7 @@ use diagnostics;
 use Cwd;
 use File::Spec;
 use File::Path;
-use Test::More 1;
+use Test::More 1.0;
 
 my $old_dir = cwd;
 

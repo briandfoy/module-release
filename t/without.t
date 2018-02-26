@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 1.0;
 
 BEGIN {
 	use File::Spec;
