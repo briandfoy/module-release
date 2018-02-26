@@ -13,8 +13,8 @@ can_ok( $class, 'new' );
 my $old_dir = cwd();
 
 BEGIN {
-	use File::Spec;
-	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
+	use File::Spec::Functions qw(rel2abs catfile);
+	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
 	require $file;
 	}
 

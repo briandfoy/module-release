@@ -13,8 +13,8 @@ use_ok( $class );
 can_ok( $class, 'new' );
 
 BEGIN {
-	use File::Spec;
-	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
+	use File::Spec::Functions qw(rel2abs catfile);
+	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
 	require $file;
 	}
 
