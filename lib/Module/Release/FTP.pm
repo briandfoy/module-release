@@ -14,7 +14,7 @@ our @EXPORT = qw(
 	default_ftp_password default_ftp_upload_dir
 	);
 
-$VERSION = '2.124';
+$VERSION = '2.124_01';
 
 =encoding utf8
 
