@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.125 2018-02-27T10:55:54Z
+	* Make this a stable release
+
 2.124_02 2018-02-26T21:12:00Z
 	* Remove the FTP module from MANIFEST
 
