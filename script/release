@@ -269,7 +269,7 @@ Ken Williams turned the original release(1) script into a module.
 Andy Lester contributed to the module and script.
 
 H. Merijn Brand submitted patches to work with 5.005 and to create
-the automated_testing feature.
+the automated_testing and required features.
 
 =cut
 
