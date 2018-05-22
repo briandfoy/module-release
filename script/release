@@ -190,6 +190,18 @@ prerequisites.
 DEPRECATED AND REMOVED. You should really just write your own
 release script. Fork this one even!
 
+=item required
+
+An optional list of comma-separated modules that are required to be
+available. These are checked I<before> building C<Makefile>.
+
+ required DBI,Text::CSV_XS,SQL::Statement
+
+A list like this can be handy when testing against a lot of perl
+versions (see C<perls> above) in which some do and some do not have
+all required modules installed. Another good reason to have this is
+when testing against I<optional> modules.
+
 =back
 
 =head2 Environment
@@ -373,6 +385,7 @@ $release->load_mixin( 'Module::Release::Prereq' );
 
 my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 my $skip_dist    = $opts{D} || $release->config->skip_dist;
+my $required     =             $release->config->required || "";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default
@@ -393,11 +406,20 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 unless( $opts{T} ) {
 	my $old_perl = $release->get_perl;
 
-	foreach my $perl ( $release->perls ) {
+	PERL: foreach my $perl ( $release->perls ) {
 		$release->_print("============Testing with $perl\n");
 		$release->set_perl( $perl ) or next;
 
 		$release->clean;
+
+		foreach my $mod ( grep m/\S/ => split m/\s*,\s*/ => $required ) {
+			system "$perl -M$mod -e1 >/dev/null 2>&1";
+			if( $? ) {
+				warn "Prereq $mod not available\n";
+				next PERL;
+				}
+			}
+
 		$release->build_makefile;
 		$release->make;
 		$release->test;
