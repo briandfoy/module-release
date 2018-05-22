@@ -274,7 +274,7 @@ the automated_testing feature.
 =cut
 
 use Getopt::Std;
-use Module::Release '2.021';
+use Module::Release '2.126';
 
 my $class = "Module::Release";
 
@@ -291,7 +291,7 @@ getopts('aChdptvkT', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = '2.01';
+my( $script_version ) = '2.126';
 
 if( $opts{v} ) {
 	print "$0 version $script_version\n";

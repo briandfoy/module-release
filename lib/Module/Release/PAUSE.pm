@@ -10,7 +10,7 @@ use Carp qw(croak);
 our @EXPORT = qw(
 	);
 
-$VERSION = '2.125';
+$VERSION = '2.126';
 
 =encoding utf8
 
