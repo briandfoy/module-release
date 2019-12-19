@@ -63,7 +63,7 @@ sub web_upload {
 		 form => $params,
 		 );
 
-	if( my $res = $tx->success ) {
+	if( my $res = eval { $tx->result } ) {
 		$self->_print( "File uploaded\n" );
 		return 1;
 		}
