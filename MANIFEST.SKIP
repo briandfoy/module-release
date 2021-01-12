@@ -67,3 +67,6 @@ t/ftp/
 t/pause/
 hack/
 ToDo
+\bMANIFEST\s\d
+\bChanges\s\d
+
