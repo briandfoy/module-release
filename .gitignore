@@ -8,7 +8,6 @@
 *.tar
 *.tar.gz
 *.tgz
-*.yml
 *.zip
 *test_dir*
 .DS_Store
