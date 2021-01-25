@@ -22,8 +22,9 @@ like(
 	);
 
 {
-no warnings 'redefine';
-local *DateTime::datetime = sub { '2017-09-02T10:05:49' };
+no warnings qw(redefine once);
+local *Time::Piece::datetime = sub { '2017-09-02T10:05:49' };
+local *Time::Piece::gmtime   = sub { 'Time::Piece' };
 is( $release->get_release_date,
 	'2017-09-02T10:05:49Z',
 	"Returns known datetime as a string in required format" );
