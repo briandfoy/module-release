@@ -65,7 +65,6 @@ my %WriteMakefile = (
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
-		'DateTime'              => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
 		'Term::ReadKey'         => '0',

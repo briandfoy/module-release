@@ -31,7 +31,6 @@ use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
-use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -1242,9 +1241,8 @@ Changes file.
 =cut
 
 sub get_release_date {
-	my $self = shift;
-	my $dt = DateTime->now(time_zone => 'UTC');
-	return $dt->datetime . 'Z';
+	state $rc = require Time::Piece;
+	return Time::Piece->gmtime->datetime . 'Z';
 	}
 
 =item run
