@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More 1.0 tests => 10;
+use Test::More 1.0;
 use Capture::Tiny qw( capture );
 
 use Module::Release;
@@ -25,43 +25,45 @@ is( $release->get_env_var('MOO'),
 
 no warnings 'redefine';
 
-{
-local *Module::Release::_slurp = sub { "baa\n" };
-local $ENV{'MOO'} = '';
-my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
-is(
-	$stdout,
-	'MOO is not set.  Enter it now: ',
-	'Empty environment variable prompts for value'
-	);
-is( $result[0], 'baa', 'Variable read from input' );
-}
+subtest empty => sub {
+	local *Module::Release::_slurp = sub { "baa\n" };
+	local $ENV{'MOO'} = '';
+	my ( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
+	is(
+		$stdout,
+		'MOO is not set.  Enter it now: ',
+		'Empty environment variable prompts for value'
+		);
+	is( $result[0], 'baa', 'Variable read from input' );
+	};
 
-{
-local *Module::Release::_slurp = sub { "\n" };
-local $ENV{'MOO'} = undef;
-$release->turn_debug_on;
-my( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
-is(
-	$stdout,
-	'MOO is not set.  Enter it now: ',
-	'Undef environment variable prompts for value'
-	);
-is(
-	$stderr,
-	"MOO not supplied.  Aborting...\n",
-	"Error message about missing variable shown in debug mode"
-	);
-}
+subtest undefined => sub {
+	local *Module::Release::_slurp = sub { "\n" };
+	local $ENV{'MOO'} = undef;
+	$release->turn_debug_on;
+	my( $stdout, $stderr, @result ) = capture { $release->get_env_var('MOO') };
+	is(
+		$stdout,
+		'MOO is not set.  Enter it now: ',
+		'Undef environment variable prompts for value'
+		);
+	is(
+		$stderr,
+		"MOO not supplied.  Aborting...\n",
+		"Error message about missing variable shown in debug mode"
+		);
+	};
 
-{
-local *Module::Release::_slurp = sub { "s3cr3t\n" };
-local $ENV{'CPAN_PASS'} = undef;
-my( $stdout, $stderr, @result ) = capture { $release->get_env_var('CPAN_PASS') };
-is(
-	$stdout,
-	'CPAN_PASS is not set.  Enter it now: ',
-	'Undef CPAN_PASS variable prompts for value'
-);
-is( $result[0], 's3cr3t', 'Variable password from input' );
-}
+subtest cpan_pass => sub {
+	local *Module::Release::_slurp = sub { "s3cr3t\n" };
+	local $ENV{'CPAN_PASS'} = undef;
+	my( $stdout, $stderr, @result ) = capture { $release->get_env_var('CPAN_PASS') };
+	is(
+		$stdout,
+		'CPAN_PASS is not set.  Enter it now: ',
+		'Undef CPAN_PASS variable prompts for value'
+	);
+	is( $result[0], 's3cr3t', 'Variable password from input' );
+	};
+
+done_testing();
