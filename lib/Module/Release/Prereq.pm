@@ -40,8 +40,7 @@ my %Prereq_modules = (
 	'Build.PL' => 'Test::Prereq::Build',
 	);
 
-sub check_prereqs
-	{
+sub check_prereqs {
 	my $prereqs_type = $_[0]->config->makefile_PL;
 	my $test_prereqs = $Prereq_modules{$prereqs_type // ''} || 'Test::Prereq';
 
@@ -64,8 +63,7 @@ sub check_prereqs
 	$_[0]->_print( "done\n" );
 	}
 
-sub _get_prereq_ignore_list
-	{
+sub _get_prereq_ignore_list {
 	my @ignore = split /\s+/, $_[0]->config->ignore_prereqs || '';
 	}
 
