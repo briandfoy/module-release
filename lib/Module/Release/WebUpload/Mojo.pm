@@ -67,7 +67,7 @@ sub web_upload {
 		return 1;
 		}
 	else {
-		my $err = $tx->error;
+		my $err = $tx->res->error;
 		$self->_print( "$err->{code} response: $err->{message}" ) if $err->{code};
 		$self->_print( "Connection error: $err->{message}" );
 		return 0;
