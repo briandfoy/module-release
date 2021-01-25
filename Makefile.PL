@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/module-release';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.010',
+	'MIN_PERL_VERSION' => '5.016',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
