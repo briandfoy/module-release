@@ -3,13 +3,12 @@ package Module::Release::SVN;
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.126';
+our $VERSION = '2.126';
 
 =encoding utf8
 

@@ -3,11 +3,10 @@ package Module::Release::MANIFEST;
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 our @EXPORT = qw( check_MANIFEST );
 
-$VERSION = '2.126';
+our $VERSION = '2.126';
 
 =encoding utf8
 

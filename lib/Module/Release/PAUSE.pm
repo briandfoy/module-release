@@ -3,14 +3,12 @@ package Module::Release::PAUSE;
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp qw(croak);
 
-our @EXPORT = qw(
-	);
+our @EXPORT = qw();
 
-$VERSION = '2.126';
+our $VERSION = '2.126';
 
 =encoding utf8
 

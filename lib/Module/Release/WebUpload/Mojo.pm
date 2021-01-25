@@ -3,7 +3,6 @@ package Module::Release::WebUpload::Mojo;
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 use Carp qw(croak);
 use Mojo::UserAgent;
@@ -16,7 +15,7 @@ our @EXPORT = qw(
 	pause_add_uri
 	);
 
-$VERSION = '2.126';
+our $VERSION = '2.126';
 
 =encoding utf8
 

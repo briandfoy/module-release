@@ -3,11 +3,10 @@ package Module::Release::Kwalitee;
 use strict;
 use warnings;
 use Exporter qw(import);
-use vars qw($VERSION);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-$VERSION = '2.126';
+our $VERSION = '2.126';
 
 =encoding utf8
 
