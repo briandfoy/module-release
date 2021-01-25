@@ -66,7 +66,7 @@ my %WriteMakefile = (
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
 		'IO::Null'              => '0',
-		'Mojolicious'           => '4.50',
+		'Mojolicious'           => '8',
 		'Term::ReadKey'         => '0',
 		'URI'                   => '0',
 		},
