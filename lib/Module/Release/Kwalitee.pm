@@ -1,3 +1,5 @@
+use v5.10;
+
 package Module::Release::Kwalitee;
 
 use strict;
