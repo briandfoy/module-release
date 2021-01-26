@@ -31,3 +31,11 @@ jobs:
               run: |
                 perl Makefile.PL
                 make test
+            - name: Run tests in parallel
+              run: |
+                perl Makefile.PL
+                HARNESS_OPTIONS=j10 make test
+            - name: Run dist tests
+              run: |
+                perl Makefile.PL
+                make disttest
