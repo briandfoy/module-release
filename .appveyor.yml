@@ -34,5 +34,7 @@ build_script:
   - perl Makefile.PL
   - cmd: gmake test
   - cmd: gmake disttest
+  - cmd: set HARNESS_OPTIONS=j10 && gmake test
   - sh: make test
   - sh: make disttest
+  - sh: HARNESS_OPTIONS=j10 make test
