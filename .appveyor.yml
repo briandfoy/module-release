@@ -5,6 +5,7 @@
 image:
   - Visual Studio 2019
   - ubuntu
+  - macos
 
 environment:
   PERL5LIB: /home/appveyor/perl5/lib/perl5
