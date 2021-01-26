@@ -56,7 +56,7 @@ subtest undefined => sub {
 
 SKIP: {
 	skip "Windows GitHub runner doesn't have a console", 2
-		if $ENV{CI} and $ENV{GITHUB_WORKFLOW} eq 'windows';
+		if $ENV{CI} and ($ENV{GITHUB_WORKFLOW}//'') eq 'windows';
 	subtest cpan_pass => sub {
 		local *Module::Release::_slurp = sub { "s3cr3t\n" };
 		local $ENV{'CPAN_PASS'} = undef;
