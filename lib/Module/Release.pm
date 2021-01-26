@@ -472,7 +472,7 @@ sub perls {
     my $self = shift;
 
     my @perls = keys %{$self->{perls}};
-	warn "perls are [@perls]\n";
+	$self->_debug( "perls at the start [@perls]" );
 
     # Sort them
     @perls =
@@ -482,9 +482,10 @@ sub perls {
 	map  { [ $_, (m{.*/(.*)}) ] }
 	grep { -x $_ }
 	@perls;
-	warn "perls are [@perls]\n";
 
-    warn "Testing with ", scalar @perls, " versions of perl\n";
+	$self->_debug( "perls after filtering [@perls]" );
+	$self->_debug( "Testing with " . @perls . " perls" );
+
     return @perls;
     }
 
