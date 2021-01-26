@@ -33,4 +33,6 @@ install:
 build_script:
   - perl Makefile.PL
   - cmd: gmake test
+  - cmd: gmake disttest
   - sh: make test
+  - sh: make disttest
