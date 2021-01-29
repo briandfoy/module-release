@@ -1,4 +1,4 @@
-use v5.10;
+use v5.16;
 
 package Module::Release::SVN;
 
