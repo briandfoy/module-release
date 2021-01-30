@@ -49,7 +49,9 @@ sub _metacpan {
 
 
 sub cpan_version {
-	my $module = _metacpan()->module( _module() );
+	my $self = shift;
+
+	my $module = _metacpan()->module( $self->module_name );
 
 	my $date    = $module->{data}{date};
 	my $version = $module->{data}{version};

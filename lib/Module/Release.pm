@@ -965,6 +965,13 @@ sub dist_version_format {
 	sprintf "%s.%s%s", $major, $minor, $dev;
 	}
 
+sub module_name {
+	my $self = shift;
+
+	my $name = $self->local_file;
+	say "Name is $name";
+	}
+
 =item check_manifest
 
 Run `make manifest` and report anything it finds. If it gives output,
