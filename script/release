@@ -495,6 +495,8 @@ $release->_debug( "dist version is  $Version\n" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
+$release->load_mixin( 'Module::Release::MetaCPAN' );
+
 my $cpan_version = $release->cpan_version;
 my $dist_version = $release->dist_version;
 
