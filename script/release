@@ -502,19 +502,19 @@ $release->_debug( "dist version is  $Version\n" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
-{
-$release->load_mixin( 'Module::Release::MetaCPAN' );
+unless( $opts{V} ) {
+	$release->load_mixin( 'Module::Release::MetaCPAN' );
 
-my $cpan = $release->cpan_version;
-my $dist = $release->dist_version;
+	my $cpan = $release->cpan_version;
+	my $dist = $release->dist_version;
 
-$release->_print("CPAN Version: $cpan\n");
-$release->_print("Dist Version: $dist\n");
+	$release->_print("CPAN Version: $cpan\n");
+	$release->_print("Dist Version: $dist\n");
 
-if( version->parse($cpan) >= version->parse($dist) ) {
-	$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
+	if( version->parse($cpan) >= version->parse($dist) ) {
+		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
+		}
 	}
-}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
