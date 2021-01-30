@@ -967,12 +967,16 @@ sub dist_version_format {
 
 sub module_name {
 	my $self = shift;
+	return $self->{module_name} if $self->{module_name};
 
 	my $name = $self->local_file;
+	$self->_debug( "Guessing name. Local file is  <$name>." );
+
 	$name =~ s/-\d.*//g;
 	$name =~ s/-/::/g;
+	$self->_debug( "Guessing name. Module name is  <$name>." );
 
-	say "Name is $name";
+	$self->{module_name} = $name;
 	}
 
 =item check_manifest
