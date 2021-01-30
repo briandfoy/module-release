@@ -12,13 +12,15 @@ release - give your Perl distros to the world
 
 	release [OPTIONS] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
+	# print a help message and exit
+	release -h
+
 	# try a dry run without uploading anything
 	release -t
+
 	# skip dist while checking
 	release -D
 
-	# print a help message and exit
-	release -h
 
 	# skip kwalitee testing (e.g. a script distro)
 	release -k
