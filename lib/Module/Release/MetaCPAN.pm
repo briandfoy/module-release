@@ -36,7 +36,9 @@ subclasses.
 
 =over 4
 
-=item C<cpan_version()>
+=item * cpan_version()
+
+Return the version of the module on CPAN.
 
 =cut
 
