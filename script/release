@@ -493,6 +493,14 @@ $Version = $release->dist_version;
 
 $release->_debug( "dist version is  $Version\n" );
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check that this is a version later than the one of CPAN
+my $cpan_version = $release->cpan_version;
+my $dist_version = $release->dist_version;
+
+$release->_print("CPAN Version: $cpan_version\n");
+$release->_print("Dist Version: $dist_version\n");
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
