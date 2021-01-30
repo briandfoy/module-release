@@ -131,6 +131,10 @@ Skip the tests. This is useful when you just want to upload.
 
 Print the program name and version then exit
 
+=item -V
+
+Skip the version check against CPAN
+
 =back
 
 =head2 Configuration
@@ -289,7 +293,7 @@ my @extra_opts = split /\s+/, $ENV{RELEASE_OPTS};
 push @ARGV, @extra_opts;
 
 my %opts;
-getopts('aChdptvkT', \%opts) or $opts{h} = 1;
+getopts('aChdptvVkT', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -318,6 +322,7 @@ both) if not supplied.
 	-k   Skip kwalitee check
 	-t   Just make and test distribution, don't tag/upload
 	-v   Print the script version number and exit
+	-V   Skip the version check
 
 The program works in the current directory, and looks for a .releaserc
 or releaserc file and the environment for its preferences.  See
@@ -497,14 +502,19 @@ $release->_debug( "dist version is  $Version\n" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
+{
 $release->load_mixin( 'Module::Release::MetaCPAN' );
 
-my $cpan_version = $release->cpan_version;
-my $dist_version = $release->dist_version;
+my $cpan = $release->cpan_version;
+my $dist = $release->dist_version;
 
-$release->_print("CPAN Version: $cpan_version\n");
-$release->_print("Dist Version: $dist_version\n");
+$release->_print("CPAN Version: $cpan\n");
+$release->_print("Dist Version: $dist\n");
 
+if( version->parse($cpan) >= version->parse($dist) ) {
+	$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
+	}
+}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
