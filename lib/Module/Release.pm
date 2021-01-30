@@ -95,6 +95,24 @@ C<ConfigReader::Simple> to get these values:
 
 =over 4
 
+=item cpan_user
+
+Your PAUSE user id.
+
+=item cpan_pass
+
+Your PAUSE password, but don't use this. Put it in the environment
+variable.
+
+=item http_proxy
+
+=item https_proxy
+
+=item ignore_prereqs
+
+A whitespace separated list of modules for C<Test::Prereq> to ignore.
+But, don't use C<Test::Prereq>. It was not a good idea.
+
 =item makefile_PL
 
 The name of the file to run as F<Makefile.PL>.  The default is
@@ -111,19 +129,10 @@ The name of the file created by C<makefile_PL> above.  The default is
 C<"Makefile">, but you can set it to C<"Build"> for
 C<Module::Build>-based systems.
 
-=item cpan_user
+=item module_name
 
-Your PAUSE user id.
-
-=item cpan_pass
-
-=item http_proxy
-
-=item https_proxy
-
-=item ignore_prereqs
-
-A whitespace separated list of modules for C<Test::Prereq> to ignore.
+C<release> tries to guess the module name from the distro name, but if
+you don't like that, set the module name in the config file.
 
 =back
 
@@ -202,7 +211,7 @@ sub _set_defaults {
 			quiet          => 0,
 			devnull        => File::Spec->devnull,
 			ignore_prereqs => '',
-
+			module_name    => undef,
 			%params,
 		   };
 
@@ -255,6 +264,7 @@ sub _process_configuration {
 		[ qw(Makefile.PL makefile_PL) ],
 		[ qw(Makefile    makefile)    ],
 		[ qw(make        make)        ],
+		[ qw(module_name module_name) ],
 		);
 
 	foreach my $pair ( @pairs ) {
@@ -264,7 +274,6 @@ sub _process_configuration {
 			if $self->config->exists($config);
 		}
 	}
-
 
 	my @required = qw(  );
 
@@ -276,7 +285,6 @@ sub _process_configuration {
 			}
 		}
 	$self->_die( "Missing configuration data" ) unless $ok;
-
 
 	if( $self->config->perls ) {
 		my @paths = split /:/, $self->config->perls;
