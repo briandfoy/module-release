@@ -969,6 +969,9 @@ sub module_name {
 	my $self = shift;
 
 	my $name = $self->local_file;
+	$name =~ s/-\d.*//g;
+	$name =~ s/-/::/g;
+
 	say "Name is $name";
 	}
 
