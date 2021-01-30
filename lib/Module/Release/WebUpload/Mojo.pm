@@ -17,7 +17,7 @@ our @EXPORT = qw(
 	pause_add_uri
 	);
 
-our $VERSION = '2.126_01';
+our $VERSION = '2.126_02';
 
 =encoding utf8
 

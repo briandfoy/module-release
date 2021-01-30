@@ -280,7 +280,7 @@ the automated_testing and required features.
 =cut
 
 use Getopt::Std;
-use Module::Release '2.126';
+use Module::Release '2.126_02';
 
 my $class = "Module::Release";
 
