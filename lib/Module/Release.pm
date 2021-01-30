@@ -965,6 +965,13 @@ sub dist_version_format {
 	sprintf "%s.%s%s", $major, $minor, $dev;
 	}
 
+=item module_name
+
+Returns the module name. This either takes it from the config file
+or tries to guess it from the distro name.
+
+=cut
+
 sub module_name {
 	my $self = shift;
 	return $self->{module_name} if $self->{module_name};
