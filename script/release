@@ -376,7 +376,6 @@ foreach my $vcs ( @vcs ) {
 
 	last;
 	}
-
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -407,6 +406,22 @@ $ENV{AUTOMATED_TESTING} = (
 $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
 }
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Check that this is a version later than the one of CPAN
+unless( $opts{V} ) {
+	$release->load_mixin( 'Module::Release::MetaCPAN' );
+
+	my $cpan = $release->cpan_version;
+	my $dist = $release->dist_version;
+
+	$release->_print("CPAN Version: $cpan\n");
+	$release->_print("Dist Version: $dist\n");
+
+	if( version->parse($cpan) >= version->parse($dist) ) {
+		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
+		}
+	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
@@ -499,22 +514,6 @@ else {
 $Version = $release->dist_version;
 
 $release->_debug( "dist version is  $Version\n" );
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Check that this is a version later than the one of CPAN
-unless( $opts{V} ) {
-	$release->load_mixin( 'Module::Release::MetaCPAN' );
-
-	my $cpan = $release->cpan_version;
-	my $dist = $release->dist_version;
-
-	$release->_print("CPAN Version: $cpan\n");
-	$release->_print("Dist Version: $dist\n");
-
-	if( version->parse($cpan) >= version->parse($dist) ) {
-		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
-		}
-	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
