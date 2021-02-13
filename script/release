@@ -607,7 +607,16 @@ unless( $release->debug or $opts{C} ) {
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $vcs_commit = `$command "* for version $Version" 2>&1`;
+	my $commit_message = do {
+		if( $release->can( 'vcs_commit_message' ) ) { # Module::Release::Git 1.016
+			$release->vcs_commit_message( { version => $Version } );
+			}
+		else {
+			sprintf '* for release %s', $Version;
+			}
+		};
+
+	my $vcs_commit = `$command "$commit_message" 2>&1`;
 
 	$release->_print( $vcs_commit );
 	}
