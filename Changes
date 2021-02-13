@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.127_01 2021-02-13T12:11:43Z
+	* Test the new Changes UTF-8 stuff - åü⏎☃
+
 2.127 2021-02-13T11:46:58Z
 	* Move dist testing past quicker-to-fail sanity checks
 	* Check that the release will have a version larger than what is
