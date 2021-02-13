@@ -405,6 +405,16 @@ foreach my $vcs ( @vcs ) {
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Are we on the right branch? I've made mistakes where I released
+# from an experimental branch, and I don't want to do that again.
+if( $release->can('is_allowed_branch') ) {  # New in Module::Release::Git 1.016
+	my $branch = $release->vcs_branch;
+ 	unless( $release->is_allowed_branch ) {
+		$release->_die( "Configuration blocks release from branch <$branch>" );
+		}
+	}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Will we upload to PAUSE?
 if( $release->config->cpan_user ) { # not a dry run
 	$release->load_mixin( 'Module::Release::PAUSE' );
