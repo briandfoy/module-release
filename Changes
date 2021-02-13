@@ -11,6 +11,7 @@ Revision history for Perl module Module::Release
 	* see the "Configuration" section in script/release for what's
 	new. Most things should be fine even if you don't have the latest
 	modules.
+	* release now sets standard input to UTF-8.
 
 2.126_01 2021-01-29T18:36:09Z
 	* Fix the code to look back in git history to find the latest
