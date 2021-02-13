@@ -798,7 +798,7 @@ name if not set on the command line.
 
 sub dist {
 	my $self = shift;
-	$self->_print( "Making dist... " );
+	$self->_print( "Making dist...\n" );
 
 	$self->build_makefile;
 
@@ -823,7 +823,7 @@ sub dist {
 	$self->_die( "Local file '$self->{local_file}' does not exist\n" )
 		unless -f $self->local_file;
 
-	$self->_print( "done\n" );
+	$self->_print( "Done making dist\n" );
 	}
 
 =item disttest
@@ -983,11 +983,11 @@ sub module_name {
 	return $self->{module_name} if $self->{module_name};
 
 	my $name = $self->local_file;
-	$self->_debug( "Guessing name. Local file is  <$name>." );
+	$self->_debug( "Guessing name. Local file is  <$name>\n" );
 
 	$name =~ s/-\d.*//g;
 	$name =~ s/-/::/g;
-	$self->_debug( "Guessing name. Module name is  <$name>." );
+	$self->_debug( "Guessing name. Module name is  <$name>\n" );
 
 	$self->{module_name} = $name;
 	}
