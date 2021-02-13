@@ -45,9 +45,11 @@ jobs:
                 perl Makefile.PL
                 make test
             - name: Run tests in parallel
+              env:
+                HARNESS_OPTIONS: 'j10'
               run: |
                 perl Makefile.PL
-                set HARNESS_OPTIONS=j10 && make test
+                make test
             - name: Run dist tests
               run: |
                 perl Makefile.PL
