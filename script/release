@@ -67,6 +67,14 @@ Look in the current working directory for C<.releaserc>.  See the
 Configuration section.  If release cannot find the configuration file,
 it dies.
 
+=item Various sanity checks
+
+These are related to various mistakes I've made at some point.
+
+	* am I allowed to release from this branch (so, not an experimental branch)
+	* have I listed all the prereqs?
+	* is the version greater than what I've already released?
+
 =item Test and make the distribution
 
 Run make realclean, perl Makefile.PL, make test, make dist, make
