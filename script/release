@@ -379,7 +379,6 @@ my $release = $class->new( %params );
 $release->_debug( "release $script_version, using $class "
 	.  $class->VERSION . "\n" );
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # load whatever will handle source control
 {
@@ -594,7 +593,7 @@ unless( $release->debug or $opts{C} ) {
 	close $out;
 
 	my $command = do {
-		if(    -d 'CVS' )  { 'cvs commit -m' }
+		   if( -d 'CVS'  ) { 'cvs commit -m' }
 		elsif( -d '.svn' ) { 'svn commit -m' }
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
