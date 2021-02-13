@@ -168,11 +168,33 @@ release does not test the perls in any particular order.
 
 =over 4
 
+=item allow_glob_in_perls
+
+If true, expand globs in the C<perls> configuration.
+
+Default: 0
+
+=item allow_branches
+
+A comma-separated list of literal branch names that are allowed
+to release (requires Module::Release::Git 1.016).
+
+=item allow_branches_regex
+
+A Perl pattern to match version control branches that are allowed
+to release (requires Module::Release::Git 1.016).
+
 =item automated_testing
 
 Set C<automated_testing> to the value you want for the
 $ENV{AUTOMATED_TESTING} setting. By default this is 0, so
 testing is started in interactive mode.
+
+=item commit_message_format
+
+A sprintf format for the message when C<release> commits its changes.
+So far this takes one C<%s> placeholder for the module version
+(requires Module::Release::Git 1.016).
 
 =item cpan_user
 
@@ -185,23 +207,6 @@ a true value, globs in paths will expand to their paths so you can specify
 many perls.
 
 Default: the perl that's running C<release>.
-
-=item allow_glob_in_perls
-
-If true, expand globs in the C<perls> configuration.
-
-Default: 0
-
-=item skip_kwalitee
-
-Set to a false value to skip kwalitee checks (such as for a script
-distribution with no modules in it).
-
-=item skip_prereqs
-
-Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
-checks. By default this is 0 and C<release> will try to check
-prerequisites.
 
 =item release_subclass
 
@@ -219,6 +224,17 @@ A list like this can be handy when testing against a lot of perl
 versions (see C<perls> above) in which some do and some do not have
 all required modules installed. Another good reason to have this is
 when testing against I<optional> modules.
+
+=item skip_kwalitee
+
+Set to a false value to skip kwalitee checks (such as for a script
+distribution with no modules in it).
+
+=item skip_prereqs
+
+Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
+checks. By default this is 0 and C<release> will try to check
+prerequisites.
 
 =back
 
