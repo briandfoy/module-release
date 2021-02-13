@@ -3,8 +3,8 @@ Revision history for Perl module Module::Release
 2.127 2021-02-13T11:46:58Z
 	* Move dist testing past quicker-to-fail sanity checks
 	* Check that the release will have a version larger than what is
-	already on CPAN
-	* Add Module::Release::Git 1.016 featues to control which branch 
+	already on CPAN. There's a new ::MetaCPAN plugin for that.
+	* Add Module::Release::Git 1.016 features to control which branch
 	can release and set the commit message format from config
 	* Clean up a lot of the output, adding more section headers as
 	the process moves through its stages
