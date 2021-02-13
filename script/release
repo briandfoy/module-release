@@ -453,6 +453,7 @@ unless( $opts{V} ) {
 	# need to make the dist to guess the name, then look up that
 	# name in MetaCPAN
 	$release->dist;
+	$release->_print("Module name is <". $release->module_name . ">\n");
 
 	my $cpan = $release->cpan_version;
 	my $dist = $release->dist_version;
@@ -463,45 +464,6 @@ unless( $opts{V} ) {
 	if( version->parse($cpan) >= version->parse($dist) ) {
 		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
 		}
-	}
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# test with a bunch of perls
-unless( $opts{T} ) {
-	my $old_perl = $release->get_perl;
-
-	PERL: foreach my $perl ( $release->perls ) {
-		$release->_print("============Testing with $perl\n");
-		$release->set_perl( $perl ) or next;
-
-		$release->clean;
-
-		foreach my $mod ( grep m/\S/ => split m/\s*,\s*/ => $required ) {
-			system "$perl -M$mod -e1 >/dev/null 2>&1";
-			if( $? ) {
-				warn "Prereq $mod not available\n";
-				next PERL;
-				}
-			}
-
-		$release->build_makefile;
-		$release->make;
-		$release->test;
-
-		unless( $skip_prereqs ) {
-			$release->check_prereqs;
-			}
-		else {
-			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
-			}
-
-		unless( $skip_dist ) {
-			$release->dist;
-			$release->disttest;
-			}
-		}
-
-	$release->set_perl( $old_perl );
 	}
 
 
@@ -555,6 +517,47 @@ else {
 $Version = $release->dist_version;
 
 $release->_debug( "dist version is <$Version>\n" );
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# test with a bunch of perls
+unless( $opts{T} ) {
+	my $old_perl = $release->get_perl;
+
+	PERL: foreach my $perl ( $release->perls ) {
+		$release->_print("============Testing with $perl\n");
+		$release->set_perl( $perl ) or next;
+
+		$release->clean;
+
+		foreach my $mod ( grep m/\S/ => split m/\s*,\s*/ => $required ) {
+			system "$perl -M$mod -e1 >/dev/null 2>&1";
+			if( $? ) {
+				warn "Prereq $mod not available\n";
+				next PERL;
+				}
+			}
+
+		$release->build_makefile;
+		$release->make;
+		$release->test;
+
+		unless( $skip_prereqs ) {
+			$release->check_prereqs;
+			}
+		else {
+			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
+			}
+
+		unless( $skip_dist ) {
+			$release->dist;
+			$release->disttest;
+			}
+		}
+
+	$release->set_perl( $old_perl );
+	}
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
