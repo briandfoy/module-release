@@ -46,8 +46,11 @@ This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
 source control, and uploads it to the PAUSE.
 
-By default this script assumes that you use CVS, but recognizes SVN
-and git and switches when appropriate.
+By default this script assumes that you use Git as your source control
+and relies mostly on L<Module::Release::Git>, which is an external
+module. This distributes L<Module::Release::SVN>, but I haven't touched
+that in years. There's still some code for CVS that I should probably
+rip out.
 
 =head2 Process
 
