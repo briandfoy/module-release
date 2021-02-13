@@ -420,7 +420,6 @@ if( $release->config->cpan_user ) { # not a dry run
 	$release->load_mixin( 'Module::Release::PAUSE' );
 	}
 
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Are we checking prereqs?
 $release->load_mixin( 'Module::Release::Prereq' );
@@ -587,8 +586,8 @@ unless( $release->debug or $opts{C} ) {
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
-	open my $in, '<:encoding(UTF-8)', $bak or die "Could not read old $changes file! $!\n";
-	open my $out, ">:encoding(UTF-8)", $changes;
+	open my $in,  '<:encoding(UTF-8)', $bak or $release->_die( "Could not read old $changes file! $!\n" );
+	open my $out, '>:encoding(UTF-8)', $changes;
 
 	while( <$in> ) {
 		print $out $_;
