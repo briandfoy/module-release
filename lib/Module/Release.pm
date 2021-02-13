@@ -953,8 +953,6 @@ sub dist_version {
 		$self->_debug( "Unhandled version" );
 		return '';
 		}
-
-
 	}
 
 =item dist_version_format

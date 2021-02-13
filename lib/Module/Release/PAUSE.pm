@@ -20,16 +20,13 @@ Module::Release::PAUSE - Interact with the Perl Authors Upload Server (PAUSE)
 
 =head1 SYNOPSIS
 
+=head1 DESCRIPTION
+
 The release script automatically loads this module if it thinks that you
 want to upload to PAUSE by noticing the C<cpan_user> configuration
 directive.
 
-=head1 DESCRIPTION
-
-=over 4
-
-
-=back
+There's nothing here yet.
 
 =head1 SEE ALSO
 
