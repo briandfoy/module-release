@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.127_03 2021-02-25T20:43:48Z
+	* Silence a warning from using a missing CPAN version
+
 2.127_02 2021-02-25T20:28:34Z
 	* Handle a problem looking for a new module on CPAN
 
