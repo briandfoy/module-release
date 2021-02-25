@@ -53,7 +53,10 @@ sub _metacpan {
 sub cpan_version {
 	my $self = shift;
 
-	my $module = _metacpan()->module( $self->module_name );
+	# One reason for failure is that this is a new module not yet
+	# on CPAN
+	my $module = eval { _metacpan()->module( $self->module_name ) };
+	return unless $module;
 
 	my $date    = $module->{data}{date};
 	my $version = $module->{data}{version};
