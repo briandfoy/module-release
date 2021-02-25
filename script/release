@@ -450,7 +450,7 @@ unless( $opts{V} ) {
 	$release->dist;
 	$release->_print("Module name is <". $release->module_name . ">\n");
 
-	my $cpan = $release->cpan_version;
+	my $cpan = $release->cpan_version // '<undef>';
 	my $dist = $release->dist_version;
 
 	$release->_print("CPAN Version: $cpan\n");
