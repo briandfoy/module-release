@@ -10,7 +10,7 @@ use Carp;
 
 our @EXPORT = qw( cpan_version );
 
-our $VERSION = '2.127_02';
+our $VERSION = '2.127_03';
 
 =encoding utf8
 
