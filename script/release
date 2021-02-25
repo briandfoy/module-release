@@ -391,15 +391,10 @@ my @vcs = (
 
 foreach my $vcs ( @vcs ) {
 	next unless -e $vcs->[0];
-
 	my $module = $vcs->[1];
-
 	$release->_debug( "I see an $vcs->[0] directory, so I'm loading $module\n" );
-
 	$release->load_mixin( $module );
-
 	$release->_die( "Could not load $module: $@\n" ) if $@;
-
 	last;
 	}
 }
