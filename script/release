@@ -451,7 +451,7 @@ unless( $opts{V} ) {
 	$release->_print("Module name is <". $release->module_name . ">\n");
 
 	my $cpan = $release->cpan_version // '<undef>';
-	my $dist = $release->dist_version;
+	my $dist = eval { $release->dist_version } // '<error?>';
 
 	$release->_print("CPAN Version: $cpan\n");
 	$release->_print("Dist Version: $dist\n");
@@ -505,7 +505,7 @@ if ($skip_dist) {
 	}
 else {
 	$release->dist unless( $release->local_file and -e $release->local_file );
-	$Version = $release->dist_version;
+	$Version = eval { $release->dist_version } // 'error?';
 	$release->_debug( "dist version is <$Version>\n" );
 	}
 
