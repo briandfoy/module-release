@@ -69,3 +69,7 @@ jobs:
               run: |
                 perl Makefile.PL
                 make disttest
+            - name: Run coverage tests
+              run: |
+                cpan -M https://www.cpan.org -T Devel::Cover Devel::Cover::Report::Coveralls
+                cover -test -report coveralls
