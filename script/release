@@ -519,8 +519,10 @@ $release->_debug( "dist version is <$Version>\n" );
 unless( $opts{T} ) {
 	my $old_perl = $release->get_perl;
 
-	PERL: foreach my $perl ( $release->perls ) {
-		$release->_print("============Testing with $perl\n");
+	my @perls = $release->perls;
+	my ($n, $N) = (1, scalar @perls);
+	PERL: foreach my $perl ( @perls ) {
+		$release->_print("============ Testing with $perl (", $n++, "/$N)\n");
 		$release->set_perl( $perl ) or next;
 
 		$release->clean;
