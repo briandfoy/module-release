@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.127_04 2021-02-26T15:13:29Z
+	* Tell the tests where to find t/lib/setup_common.pl, since v5.26
+	turned off the dot in @INC.
+
 2.127_03 2021-02-25T20:43:48Z
 	* Silence a warning from using a missing CPAN version
 
