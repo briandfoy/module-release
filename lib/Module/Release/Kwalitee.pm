@@ -8,7 +8,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-our $VERSION = '2.127_04';
+our $VERSION = '2.127_05';
 
 =encoding utf8
 

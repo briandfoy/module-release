@@ -4,6 +4,8 @@ on:
     push:
         branches:
             - '*'
+            - '!linux*'
+            - '!windows*'
         tags-ignore:
             # I tag release pushes but those should have already been tested
             - 'release-*'
@@ -29,9 +31,14 @@ jobs:
             - name: Platform check
               run: uname -a
             - name: Set up Perl
-              run: brew install perl
+              run: |
+                brew install perl
+                echo /usr/local/Cellar/perl/5.32.1/bin >> $GITHUB_PATH
             - name: Perl version check
-              run: perl -V
+              run: |
+                echo $PATH
+                which perl
+                perl -V
             - name: Prepare cpan
               run: |
                 openssl version
@@ -51,7 +58,12 @@ jobs:
               run: |
                 perl Makefile.PL
                 make disttest
-            - name: Run coverage tests
+            - name: Setup coverage tests
               run: |
+                echo $PATH
                 cpan -M https://www.cpan.org -T Devel::Cover Devel::Cover::Report::Coveralls
+            - name: Run coverage tests
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
                 cover -test -report coveralls

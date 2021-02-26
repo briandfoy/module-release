@@ -7,6 +7,8 @@ on:
         tags-ignore:
             # I tag release pushes but those should have already been tested
             - 'release-*'
+            - '!linux*'
+            - '!macos*'
         paths-ignore:
             # list all the files which are irrelevant to the tests
             # non-code, support files, docs, etc
@@ -55,7 +57,11 @@ jobs:
               run: |
                 perl Makefile.PL
                 make disttest
-            - name: Run coverage tests
+            - name: Setup coverage tests
               run: |
                 cpan -M https://www.cpan.org -T Devel::Cover Devel::Cover::Report::Coveralls
+            - name: Run coverage tests
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
                 cover -test -report coveralls
