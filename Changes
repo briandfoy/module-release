@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Release
 
+2.128 2021-03-11T03:09:57Z
+	* promote to a user release.
+
 2.127_04 2021-02-26T15:13:29Z
 	* Tell the tests where to find t/lib/setup_common.pl, since v5.26
 	turned off the dot in @INC.
