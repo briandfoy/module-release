@@ -35,8 +35,6 @@ Revision history for Perl module Module::Release
 	are modest. Time::Piece comes with Perl.
 	* Tux added a `require` field to configuration
 	* Dump Travis CI but add Github Actions
-
-2.126 2018-05-22T14:13:33Z
 	* Add "required" .releaserc entry to test perls before you use them
 
 2.125 2018-02-27T10:55:54Z
