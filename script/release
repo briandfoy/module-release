@@ -23,7 +23,6 @@ release - give your Perl distros to the world
 	# skip dist while checking
 	release -D
 
-
 	# skip kwalitee testing (e.g. a script distro)
 	release -k
 
@@ -107,12 +106,20 @@ repository.  You should be able to checkout the code from any release.
 
 =item -a
 
-Set $ENV{AUTOMATED_TESTING} to true. You can also set automated_testing
-in the configuration file.
+Set $ENV{AUTOMATED_TESTING} to true. You can also set C<automated_testing>
+in the configuration file
+
+=item -C
+
+Skip the Changes file. This is also the C<skip_changes> config option
 
 =item -d
 
-Show debugging information
+Show debugging information. This is also the C<debug> config option
+
+=item -D
+
+Skip building the dist. This is also the C<skip_dist> config option
 
 =item -h
 
@@ -120,10 +127,15 @@ Print a help message then exit
 
 =item -k
 
-Skip the kwalitee checks. You can also set the skip_kwalitee directive
+Skip the kwalitee checks. You can also set the C<skip_kwalitee> directive
 to a true value in the configuration file.
 
 Have you considered just fixing the kwalitee though? :)
+
+=item -m
+
+Skip the manifest check. You can also set the C<skip_manifest> directive
+to a true value in the configuration file.
 
 =item -p
 
@@ -134,11 +146,11 @@ Have you considered just fixing the prereqs though? :)
 
 =item -t
 
-Run all checks then stop. Do not change any files or upload the distribution.
+Run all checks then stop. Do not change any files or upload the distribution
 
 =item -T
 
-Skip the tests. This is useful when you just want to upload.
+Skip the tests. This is useful when you just want to upload
 
 =item -v
 
@@ -201,6 +213,10 @@ So far this takes one C<%s> placeholder for the module version
 
 The PAUSE user
 
+=item dry_run
+
+When true, stop before releasing the dist. This is also the C<-t> switch.
+
 =item perls
 
 A colon-separated list of perls to test with. If C<allow_glob_in_perls> is
@@ -226,16 +242,36 @@ versions (see C<perls> above) in which some do and some do not have
 all required modules installed. Another good reason to have this is
 when testing against I<optional> modules.
 
+=item skip_changes
+
+Skip updating the changes. This is also the C<-C> switch.
+
+=item skip_cpan_version_check
+
+Skip comparing the local module version to the previous release version.
+This is also the C<-V> switch.
+
 =item skip_kwalitee
 
-Set to a false value to skip kwalitee checks (such as for a script
-distribution with no modules in it).
+Set to a true value to skip kwalitee checks (such as for a script
+distribution with no modules in it). This is also the C<-k> command-line
+switch.
+
+=item skip_manifest
+
+Set to a true value, it skips checking the MANIFEST file. This is also
+the C<-m> command-line switch.
 
 =item skip_prereqs
 
 Set C<skip_prereqs> to 1 if you don't want to run the Test::Prereq
 checks. By default this is 0 and C<release> will try to check
-prerequisites.
+prerequisites. This is also the C<-p> command-line switch.
+
+=item skip_tests
+
+Set C<skip_tests> to 1 if you don't want to run any of the tests. This
+is also the C<-T> command-line switch.
 
 =back
 
@@ -322,7 +358,7 @@ my @extra_opts = split /\s+/, $ENV{RELEASE_OPTS};
 push @ARGV, @extra_opts;
 
 my %opts;
-getopts('aChdptvVkT', \%opts) or $opts{h} = 1;
+getopts('aCdDhkmptTvV', \%opts) or $opts{h} = 1;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -347,8 +383,11 @@ both) if not supplied.
 	-C   Skip Changes file (useful for re-running botched releases)
 	-h   This help
 	-d   Print extra debugging information
+	-D   Skip building the dist
 	-k   Skip kwalitee check
+	-m   Skip the MANIFEST check
 	-t   Just make and test distribution, don't tag/upload
+	-T   Skip tests
 	-v   Print the script version number and exit
 	-V   Skip the version check
 
@@ -373,7 +412,7 @@ elsif( $params{local} ) {
     $params{remote} = $params{local};
 	}
 
-$params{debug} = 1 if $opts{d};
+$params{debug} = 1 if( $opts{d} // $release->config->debug );
 
 my $release = $class->new( %params );
 
@@ -422,9 +461,9 @@ if( $release->config->cpan_user ) { # not a dry run
 # Are we checking prereqs?
 $release->load_mixin( 'Module::Release::Prereq' );
 
-my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
-my $skip_dist    = $opts{D} || $release->config->skip_dist;
-my $required     =             $release->config->required || "";
+my $skip_prereqs = $opts{p} // $release->config->skip_prereqs;
+my $skip_dist    = $opts{D} // $release->config->skip_dist;
+my $required     =             $release->config->required // "";
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Set automated testing from command line, config, environment, or default
@@ -442,7 +481,7 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
-unless( $opts{V} ) {
+unless( $opts{V} // $release->config->skip_cpan_version_check ) {
 	$release->_print("============Checking CPAN versions\n");
 	$release->load_mixin( 'Module::Release::MetaCPAN' );
 
@@ -465,7 +504,7 @@ unless( $opts{V} ) {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check kwalitee
-unless( $opts{k} || $release->config->skip_kwalitee  ) {
+unless( $opts{k} // $release->config->skip_kwalitee  ) {
 	$release->load_mixin( 'Module::Release::Kwalitee' );
 	$release->_print("============Testing for kwalitee\n");
 	$release->clean;
@@ -481,7 +520,7 @@ else {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check MANIFEST. When we run 'make manifest' nothing should be
 # added or removed from MANIFEST
-unless( $opts{'m'} || $release->config->skip_manifest ) {
+unless( $opts{'m'} // $release->config->skip_manifest ) {
 	$release->_print("============Checking MANIFEST\n");
 	$release->load_mixin('Module::Release::MANIFEST');
 	$release->clean;
@@ -517,7 +556,7 @@ $release->_debug( "dist version is <$Version>\n" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
-unless( $opts{T} ) {
+unless( $opts{T} // $release->config->skip_tests ) {
 	my $old_perl = $release->get_perl;
 
 	my @perls = $release->perls;
@@ -560,8 +599,7 @@ unless( $opts{T} ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # exit if this is a dry run. Everything following this changes
 # things or uploads. Don't leave anything behind.
-
-if( $opts{t} ) {
+if( $opts{t} // $release->config->dry_run ) {
 	$release->_print("============Cleaning up\n");
 	$release->_print( "This is a dry run, so stopping. Cleaning up.\n" );
 	$release->distclean;
@@ -573,7 +611,7 @@ if( $opts{t} ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
 $release->_print("============Getting Changes\n");
-unless( $release->debug or $opts{C} ) {
+unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
 	$release->show_recent_contributors;
 
 	my $changes = "Changes";
