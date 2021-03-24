@@ -412,7 +412,7 @@ elsif( $params{local} ) {
     $params{remote} = $params{local};
 	}
 
-$params{debug} = 1 if( $opts{d} // $release->config->debug );
+$params{debug} = 1 if( $opts{d} );
 
 my $release = $class->new( %params );
 
