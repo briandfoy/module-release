@@ -169,7 +169,7 @@ directory.  The file name is F<.releaserc>.
 
 release's own F<.releaserc> looks like this:
 
-    cpan_user BDFOY
+	cpan_user BDFOY
 
 If you would like to test with multiple perl binaries (version 1.21
 and later), list them as a colon-separated list in the C<perls>
@@ -406,10 +406,10 @@ my %params;
 $params{local}  = shift @ARGV if @ARGV;
 
 if( @ARGV ) {
-    $params{remote} = shift @ARGV;
+	$params{remote} = shift @ARGV;
 	}
 elsif( $params{local} ) {
-    $params{remote} = $params{local};
+	$params{remote} = $params{local};
 	}
 
 $params{debug} = 1 if( $opts{d} );
@@ -445,7 +445,7 @@ foreach my $vcs ( @vcs ) {
 if( $release->can('is_allowed_branch') ) {  # New in Module::Release::Git 1.016
 	$release->_print("============Checking for allowed branch\n");
 	my $branch = $release->vcs_branch;
- 	unless( $release->is_allowed_branch ) {
+	unless( $release->is_allowed_branch ) {
 		$release->_die( "Configuration blocks release from branch <$branch>\n" );
 		}
 	$release->_print( "Branch <$branch> is allowed to release\n" );
