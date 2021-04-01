@@ -287,7 +287,7 @@ release script. Fork this one even!
 An optional list of comma-separated modules that are required to be
 available. These are checked I<before> building C<Makefile>.
 
- required DBI,Text::CSV_XS,SQL::Statement
+	required DBI,Text::CSV_XS,SQL::Statement
 
 A list like this can be handy when testing against a lot of perl
 versions (see C<perls> above) in which some do and some do not have
@@ -412,20 +412,20 @@ push @ARGV, @extra_opts;
 
 my %opts;
 GetOptions(
-    'v|version'			=> sub { say "$0 version $script_version"; exit },
-    'h|help|usage|?'		=> sub { usage(0) },
+    'v|version'            => sub { say "$0 version $script_version"; exit },
+    'h|help|usage|?'       => sub { usage(0) },
 
-    'a|automated-testing!'	=> \$opts{a},
-    'C|skip-changes!'		=> \$opts{C},
-    'd|skip-debug!'		=> \$opts{d},
-    'D|skip-dist!'		=> \$opts{D},
-    'j|jobs:0'			=> \$opts{j},
-    'k|skip-kwalitee!'		=> \$opts{k},
-    'm|skip-manifest!'		=> \$opts{m},
-    'p|skip-prereq!'		=> \$opts{p},
-    't|test-only|dry-run!'	=> \$opts{t},
-    'T|skip-tests!'		=> \$opts{T},
-    'V|skip-version!'		=> \$opts{V},
+    'a|automated-testing!' => \$opts{a},
+    'C|skip-changes!'      => \$opts{C},
+    'd|skip-debug!'        => \$opts{d},
+    'D|skip-dist!'         => \$opts{D},
+    'j|jobs:0'             => \$opts{j},
+    'k|skip-kwalitee!'     => \$opts{k},
+    'm|skip-manifest!'     => \$opts{'m'},
+    'p|skip-prereq!'       => \$opts{p},
+    't|test-only|dry-run!' => \$opts{t},
+    'T|skip-tests!'        => \$opts{T},
+    'V|skip-version!'      => \$opts{V},
     ) or usage(1);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -434,7 +434,7 @@ sub usage {
 	my $err = shift and select STDERR;
 	print <<"USE";
 
-Use: release -aCdhktv [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -aCdDhkmptTvV [-j[N]] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
@@ -442,11 +442,13 @@ both) if not supplied.
 
 	-a   Set AUTOMATED_TESTING to true
 	-C   Skip Changes file (useful for re-running botched releases)
-	-h   This help
 	-d   Print extra debugging information
 	-D   Skip building the dist
+	-h   This help
+	-jN  Enable parallel tests
 	-k   Skip kwalitee check
 	-m   Skip the MANIFEST check
+	-p   Skip the orereqs check
 	-t   Just make and test distribution, don't tag/upload
 	-T   Skip tests
 	-v   Print the script version number and exit
@@ -457,7 +459,8 @@ or releaserc file and the environment for its preferences.  See
 `perldoc $0`, for more information.
 
 USE
-	exit $err;
+
+	exit 2;
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -534,7 +537,8 @@ $ENV{AUTOMATED_TESTING} = (
 	grep { defined } (
 		$opts{a}, $release->config->automated_testing,
 		$ENV{AUTOMATED_TESTING}, 0 )
-	)[0];
+		)[0];
+
 $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
 }
@@ -618,7 +622,6 @@ if ($skip_dist) {
 else {
 	$release->dist unless( $release->local_file and -e $release->local_file );
 	$Version = eval { $release->dist_version } // 'error?';
-	$release->_debug( "dist version is <$Version>\n" );
 	}
 
 $release->_debug( "dist version is <$Version>\n" );
