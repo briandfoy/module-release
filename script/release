@@ -35,6 +35,10 @@ release - give your Perl distros to the world
 	# set $ENV{AUTOMATED_TESTING} to a true value
 	release -a
 
+	# Enable parallel testing by setting $ENV{HARNESS_OPTIONS}
+	release -j
+	release -j8
+
 =head1 DESCRIPTION
 
 This is the prototype program for using C<Module::Release>. You should
@@ -106,26 +110,54 @@ repository.  You should be able to checkout the code from any release.
 
 =item -a
 
+=item --automated-testing
+
 Set $ENV{AUTOMATED_TESTING} to true. You can also set C<automated_testing>
 in the configuration file
 
 =item -C
 
+=item --skip-changes
+
 Skip the Changes file. This is also the C<skip_changes> config option
 
 =item -d
+
+=item --skip-debug
 
 Show debugging information. This is also the C<debug> config option
 
 =item -D
 
+=item --skip-dist
+
 Skip building the dist. This is also the C<skip_dist> config option
 
 =item -h
 
+=item -?
+
+=item --help
+
+=item --usage
+
 Print a help message then exit
 
+=item -j [#]
+
+=item --jobs[=#]
+
+Enable parallel testing by defining the number of jobs Test::Harness can
+execute in parallel by setting $ENV{HARNESS_OPTIONS} to C<j#>. You can also
+set C<test_jobs> in the configuration file.
+
+When not passing a count or count C<0>, this script will try to use
+System::Info to get the CPU count. If it is not available or returns a
+false value, the count will default to C<9>.
+
 =item -k
+
+=item --skip-kwalitee
 
 Skip the kwalitee checks. You can also set the C<skip_kwalitee> directive
 to a true value in the configuration file.
@@ -134,10 +166,14 @@ Have you considered just fixing the kwalitee though? :)
 
 =item -m
 
+=item --skip-manifest
+
 Skip the manifest check. You can also set the C<skip_manifest> directive
 to a true value in the configuration file.
 
 =item -p
+
+=item --skip-prereq
 
 Skip the prereq checks. You can also set the skip_prereqs directive
 to a true value in the configuration file.
@@ -146,17 +182,27 @@ Have you considered just fixing the prereqs though? :)
 
 =item -t
 
+=item --test-only
+
+=item --dry-run
+
 Run all checks then stop. Do not change any files or upload the distribution
 
 =item -T
+
+=item --skip-tests
 
 Skip the tests. This is useful when you just want to upload
 
 =item -v
 
+=item --version
+
 Print the program name and version then exit
 
 =item -V
+
+=item --skip-version
 
 Skip the version check against CPAN
 
@@ -216,6 +262,12 @@ The PAUSE user
 =item dry_run
 
 When true, stop before releasing the dist. This is also the C<-t> switch.
+
+=item test_jobs
+
+If set, define the number of parallel jobs Test::Harness may use to run
+the tests. If C<0>, try to get the CPU count using System::Info. If that
+is not available or returns a false value, default to C<9>.
 
 =item perls
 
@@ -339,13 +391,14 @@ Ken Williams turned the original release(1) script into a module.
 
 Andy Lester contributed to the module and script.
 
-H. Merijn Brand submitted patches to work with 5.005 and to create
-the automated_testing and required features.
+H. Merijn Brand submitted patches to work with 5.005, to create
+the automated_testing and required features and parallel testing.
 
 =cut
 
-use Getopt::Std;
-use Module::Release '2.127';
+use Getopt::Long qw(:config noignorecase bundling);
+use Module::Release  '2.127';
+my $script_version = '2.127';
 
 my $class = "Module::Release";
 
@@ -358,19 +411,27 @@ my @extra_opts = split /\s+/, $ENV{RELEASE_OPTS};
 push @ARGV, @extra_opts;
 
 my %opts;
-getopts('aCdDhkmptTvV', \%opts) or $opts{h} = 1;
+GetOptions(
+    'v|version'			=> sub { say "$0 version $script_version"; exit },
+    'h|help|usage|?'		=> sub { usage(0) },
 
+    'a|automated-testing!'	=> \$opts{a},
+    'C|skip-changes!'		=> \$opts{C},
+    'd|skip-debug!'		=> \$opts{d},
+    'D|skip-dist!'		=> \$opts{D},
+    'j|jobs:0'			=> \$opts{j},
+    'k|skip-kwalitee!'		=> \$opts{k},
+    'm|skip-manifest!'		=> \$opts{m},
+    'p|skip-prereq!'		=> \$opts{p},
+    't|test-only|dry-run!'	=> \$opts{t},
+    'T|skip-tests!'		=> \$opts{T},
+    'V|skip-version!'		=> \$opts{V},
+    ) or usage(1);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-my( $script_version ) = '2.127';
 
-if( $opts{v} ) {
-	print "$0 version $script_version\n";
-	exit;
-	}
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-if( $opts{h} ) {
+sub usage {
+	my $err = shift and select STDERR;
 	print <<"USE";
 
 Use: release -aCdhktv [ LOCAL_FILE [ REMOTE_FILE ] ]
@@ -396,8 +457,7 @@ or releaserc file and the environment for its preferences.  See
 `perldoc $0`, for more information.
 
 USE
-
-	exit;
+	exit $err;
 	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -479,6 +539,18 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
 }
 
+my $test_jobs = $opts{j} // $release->config->test_jobs;
+if( defined $test_jobs ) {
+	$test_jobs ||= eval {
+		require System::Info;
+		System::Info->new->get_core_count;
+		} || 9;
+	$ENV{HARNESS_OPTIONS} = join ':' => grep { length }
+		(split /:/ => ($ENV{HARNESS_OPTIONS} // "")),
+		"j$test_jobs";
+$release->_debug( "Will use HARNESS_OPTIONS '$ENV{HARNESS_OPTIONS}' during tests\n" );
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
 unless( $opts{V} // $release->config->skip_cpan_version_check ) {
@@ -548,8 +620,6 @@ else {
 	$Version = eval { $release->dist_version } // 'error?';
 	$release->_debug( "dist version is <$Version>\n" );
 	}
-
-$Version = $release->dist_version;
 
 $release->_debug( "dist version is <$Version>\n" );
 
@@ -688,7 +758,7 @@ $release->_debug( "This is where I should release stuff\n" );
 
 while( $release->should_upload_to_pause ) {
 	$release->load_mixin( 'Module::Release::WebUpload::Mojo' );
-	$release->_print("============Uploading to PAUSE\n");
+	$release->_print("============ Uploading to PAUSE\n");
 	last if $release->debug;
 	$release->web_upload;
 	last;
@@ -698,7 +768,7 @@ $release->vcs_tag unless $release->debug;
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-$release->_print("============Cleaning up\n");
+$release->_print("============ Cleaning up\n");
 $release->clean;
 $release->vcs_exit;
 $release->_print( "Done.\n" );
