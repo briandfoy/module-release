@@ -443,7 +443,7 @@ foreach my $vcs ( @vcs ) {
 # Are we on the right branch? I've made mistakes where I released
 # from an experimental branch, and I don't want to do that again.
 if( $release->can('is_allowed_branch') ) {  # New in Module::Release::Git 1.016
-	$release->_print("============Checking for allowed branch\n");
+	$release->_print("============ Checking for allowed branch\n");
 	my $branch = $release->vcs_branch;
 	unless( $release->is_allowed_branch ) {
 		$release->_die( "Configuration blocks release from branch <$branch>\n" );
@@ -482,7 +482,7 @@ $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a}
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
 unless( $opts{V} // $release->config->skip_cpan_version_check ) {
-	$release->_print("============Checking CPAN versions\n");
+	$release->_print("============ Checking CPAN versions\n");
 	$release->load_mixin( 'Module::Release::MetaCPAN' );
 
 	# need to make the dist to guess the name, then look up that
@@ -506,7 +506,7 @@ unless( $opts{V} // $release->config->skip_cpan_version_check ) {
 # check kwalitee
 unless( $opts{k} // $release->config->skip_kwalitee  ) {
 	$release->load_mixin( 'Module::Release::Kwalitee' );
-	$release->_print("============Testing for kwalitee\n");
+	$release->_print("============ Testing for kwalitee\n");
 	$release->clean;
 	$release->build_makefile;
 	$release->make;
@@ -521,7 +521,7 @@ else {
 # check MANIFEST. When we run 'make manifest' nothing should be
 # added or removed from MANIFEST
 unless( $opts{'m'} // $release->config->skip_manifest ) {
-	$release->_print("============Checking MANIFEST\n");
+	$release->_print("============ Checking MANIFEST\n");
 	$release->load_mixin('Module::Release::MANIFEST');
 	$release->clean;
 	$release->build_makefile;
@@ -535,7 +535,7 @@ unless( $opts{'m'} // $release->config->skip_manifest ) {
 # This should happen after everything else because I like to use
 # release as my testing tool before I checkin. It will test but
 # not release if VCS is dirty.
-$release->_print("============Checking source repository\n");
+$release->_print("============ Checking source repository\n");
 
 $release->check_vcs;
 
@@ -600,7 +600,7 @@ unless( $opts{T} // $release->config->skip_tests ) {
 # exit if this is a dry run. Everything following this changes
 # things or uploads. Don't leave anything behind.
 if( $opts{t} // $release->config->dry_run ) {
-	$release->_print("============Cleaning up\n");
+	$release->_print("============ Cleaning up\n");
 	$release->_print( "This is a dry run, so stopping. Cleaning up.\n" );
 	$release->distclean;
 	unlink glob( '*.tar *.tgz *.tar.gz *.tar.bz *.tar.bz2 *.tbz *.zip' );
@@ -610,7 +610,7 @@ if( $opts{t} // $release->config->dry_run ) {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
-$release->_print("============Getting Changes\n");
+$release->_print("============ Getting Changes\n");
 unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
 	$release->show_recent_contributors;
 
@@ -675,7 +675,7 @@ else {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Build the release in preparation for uploading
-$release->_print("============Preparing to release\n");
+$release->_print("============ Preparing to release\n");
 $release->clean;
 $release->touch_all_in_manifest;
 $release->build_makefile;
