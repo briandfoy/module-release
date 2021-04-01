@@ -62,6 +62,7 @@ jobs:
               run: |
                 echo $PATH
                 cpan -M https://www.cpan.org -T Devel::Cover Devel::Cover::Report::Coveralls
+                ls -1 /usr/local/Cellar/perl/*/bin >> $GITHUB_PATH
             - name: Run coverage tests
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
