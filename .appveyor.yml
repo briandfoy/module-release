@@ -4,7 +4,9 @@
 
 image:
   - Visual Studio 2019
-  - ubuntu
+  - Visual Studio 2022
+  - ubuntu1804
+  - ubuntu2004
 
 environment:
   PERL5LIB: /home/appveyor/perl5/lib/perl5
@@ -22,17 +24,15 @@ install:
   - cmd: if not exist "C:\strawberry" cinst strawberryperl
   - cmd: set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
-  - sh: sudo apt-get install build-essential git libssl-dev
+  - sh: sudo apt-get update
+  - sh: sudo env DEBIAN_FRONTEND=noninteractive apt-get -yq install build-essential git libssl-dev
   - sh: sudo apt-get install -y perl
   - sh: export PATH=/home/appveyor/perl5/bin:$PATH
   - perl -v
   - cpan -M https://www.cpan.org -T App::cpanminus ExtUtils::MakeMaker
-  - cpanm --installdeps --notest .
+  - cpanm --notest --installdeps .
 
 build_script:
   - perl Makefile.PL
   - cmd: gmake test
-  - cmd: gmake disttest
   - sh: make test
-  - sh: make disttest
-  - sh: HARNESS_OPTIONS=j10 make test
