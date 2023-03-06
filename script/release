@@ -566,13 +566,22 @@ unless( $opts{V} // $release->config->skip_cpan_version_check ) {
 	$release->dist;
 	$release->_print("Module name is <". $release->module_name . ">\n");
 
-	my $cpan = $release->cpan_version // '<undef>';
-	my $dist = eval { $release->dist_version } // '<error?>';
+	my $cpan_v_default = '<undef>';
+
+	my $cpan = $release->cpan_version // $cpan_v_default;
+	my $dist = eval { $release->dist_version };
+	my $dist_v_error = $@;
 
 	$release->_print("CPAN Version: $cpan\n");
 	$release->_print("Dist Version: $dist\n");
 
-	if( version->parse($cpan) >= version->parse($dist) ) {
+	if( length $dist_v_error ) {
+		$release->_die( "Could not get dist version: $dist_v_error\n" );
+		}
+	elsif( $cpan eq '<undef>' ) {
+		$release->_die( "Could not get CPAN version.\nSkip this CPAN version check with -V if you are sure you want to continue\n" );
+		}
+	elsif( version->parse($cpan) >= version->parse($dist) ) {
 		$release->_die( "Local version <$dist> is not greater than current version <$cpan>\n" );
 		}
 	}
