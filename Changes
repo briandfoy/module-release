@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release
 
+2.129 2023-03-06T10:46:09Z
+	* More careful handling of CPAN version in the case this is the 
+	first release
+
 2.128 2021-03-11T03:09:57Z
 	* promote to a user release.
 
