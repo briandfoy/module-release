@@ -8,7 +8,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw( check_MANIFEST );
 
-our $VERSION = '2.129';
+our $VERSION = '2.131';
 
 =encoding utf8
 
