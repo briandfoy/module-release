@@ -66,7 +66,7 @@ sub web_upload {
 		 );
 
 	if( my $res = eval { $tx->result->is_success } ) {
-		$self->_debug( "Response headers:\n" . $tx->result->res->to_string . "\n" );
+		$self->_debug( "Response headers:\n" . $tx->res->to_string . "\n" );
 		$self->_print( "File uploaded\n" );
 		return 1;
 		}
