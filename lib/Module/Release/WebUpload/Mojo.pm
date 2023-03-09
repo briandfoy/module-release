@@ -45,7 +45,7 @@ sub web_upload {
 
 	my $ua = $self->make_agent;
 
-	$self->_debug( sprintf "Uploading file %s", $self->local_file );
+	$self->_debug( sprintf "Uploading file %s\n", $self->local_file );
 
 	my $params = {
 		HIDDENNAME                    => $self->config->cpan_user,
@@ -70,8 +70,8 @@ sub web_upload {
 		}
 	else {
 		my $err = $tx->res->error;
-		$self->_print( "$err->{code} response: $err->{message}" ) if $err->{code};
-		$self->_print( "Connection error: $err->{message}" );
+		$self->_print( "$err->{code} response: $err->{message}\n" ) if $err->{code};
+		$self->_print( "Connection error: $err->{message}\n" );
 		return 0;
 		}
 	}
