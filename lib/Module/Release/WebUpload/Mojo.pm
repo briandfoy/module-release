@@ -48,6 +48,7 @@ sub web_upload {
 	$self->_debug( sprintf "Uploading file %s\n", $self->local_file );
 
 	my $params = {
+		ACTION                        => 'add_uri',
 		HIDDENNAME                    => $self->config->cpan_user,
 		CAN_MULTIPART                 => 1,
 		pause99_add_uri_subdirtext    => '',
