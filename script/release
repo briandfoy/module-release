@@ -397,8 +397,8 @@ the automated_testing and required features and parallel testing.
 =cut
 
 use Getopt::Long qw(:config noignorecase bundling);
-use Module::Release  '2.127';
-my $script_version = '2.127';
+use Module::Release 2.131;
+my $script_version = '2.131';
 
 my $class = "Module::Release";
 
