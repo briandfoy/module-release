@@ -720,7 +720,7 @@ sub build_makefile {
 		return;
 		}
 
-	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1" );
+	$self->run( "$self->{perl} $self->{'Makefile.PL'} 2>&1 0<&-" );
 
 	$self->_print( "done\n" );
 	}
