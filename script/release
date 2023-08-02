@@ -705,8 +705,9 @@ unless( $release->debug or $opts{C} or $release->config->skip_changes ) {
 	my $str = $Version . ' ' . $release->get_release_date . "\n";
 
 	while( <STDIN> ) {
-		$_ =~ s/\A \s* (\*|-)? \s*/- /; # Make bullets (-)
-		$_ =~ s/\A(\S)/\t$1/;  # always indent
+		$_ =~ s/\A \s* \* \s*/* /x;  # Make top-level bullets (*)
+		$_ =~ s/\A \s* - \s*/\t- /x; # Make second-level bullets (-)
+		$_ =~ s/\A/\t/;              # always indent
 
 		$str .= $_;
 		$release->_print( "> " );
