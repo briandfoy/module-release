@@ -73,7 +73,7 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
- 		'Capture::Tiny'         => '0',
+		'Capture::Tiny'         => '0',
 		'File::Temp'            => '0',
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
