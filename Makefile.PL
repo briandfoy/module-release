@@ -88,6 +88,10 @@ my %WriteMakefile = (
 				url  => $github,
 				web  => $github,
 				},
+			bugtracker => {
+				web  => "$github/issues",
+				url  => "$github/issues",
+				},
 			},
 		keywords => ['workflow', 'module', 'distribution',
 			'pause', 'automation', 'testing'],
