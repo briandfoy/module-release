@@ -51,6 +51,9 @@ to the right places.
 The included C<release> script is a good starting place. Don't be afraid to
 edit it for your own purposes.
 
+The included C<release-test> script is a variation on C<release> aimed at
+pre-release testing against multiple perl versions.
+
 =head2 Configuration
 
 C<Module::Release> looks at several sources for configuration information.

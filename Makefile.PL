@@ -52,7 +52,7 @@ my %WriteMakefile = (
 	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
-	'EXE_FILES'    =>  [ 'script/release' ],
+	'EXE_FILES'    =>  [ 'script/release', 'script/release-test' ],
 
 	'CONFIGURE_REQUIRES' => {
 		'ExtUtils::MakeMaker'   => '6.64',
@@ -98,7 +98,8 @@ my %WriteMakefile = (
 		},
 
 	'MAN1PODS'     => {
-		'script/release' => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
+		'script/release'      => '$(INST_MAN1DIR)/release.$(MAN1EXT)',
+		'script/release-test' => '$(INST_MAN1DIR)/release-test.$(MAN1EXT)',
 		},
 
 	'clean' => { FILES => "$dist-*" },
