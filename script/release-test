@@ -6,7 +6,7 @@
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.01 - 20230804";
+our $VERSION = "0.02 - 20230805";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -80,11 +80,7 @@ unless ($opt_r) {
 	}
     }
 
-$release->load_mixin ("Module::Release::Prereq");
-
-my $skip_prereqs = 1;
-my $skip_dist    = 1;
-my $required     = $release->config->required // "";
+my $required = $release->config->required // "";
 
 $ENV{AUTOMATED_TESTING} = 1;
 
@@ -116,6 +112,7 @@ PERL: foreach my $perl (@perls) {
     $release->clean;
 
     foreach my $mod (grep m/\S/ => split m/\s*,\s*/ => $required) {
+	$mod =~ m/^\w+(::\w+)*$/ or next;
 	system "$perl -M$mod -e1 >/dev/null 2>&1";
 	if ($?) {
 	    warn "Prereq $mod not available\n";
