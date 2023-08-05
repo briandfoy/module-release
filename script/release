@@ -557,7 +557,7 @@ $release->_debug( "Will use HARNESS_OPTIONS '$ENV{HARNESS_OPTIONS}' during tests
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Check that this is a version later than the one of CPAN
-unless( $opts{V} // $skip_dist || $release->config->skip_cpan_version_check ) {
+unless( $opts{V} // $release->config->skip_cpan_version_check ) {
 	$release->_print("============ Checking CPAN versions\n");
 	$release->load_mixin( 'Module::Release::MetaCPAN' );
 
@@ -595,7 +595,7 @@ unless( $opts{k} // $release->config->skip_kwalitee  ) {
 	$release->clean;
 	$release->build_makefile;
 	$release->make;
-	$release->dist unless $skip_dist;
+	$release->dist;
 	$release->check_kwalitee;
 	}
 else {
@@ -684,7 +684,7 @@ unless( $opts{T} // $release->config->skip_tests ) {
 if( $opts{t} // $release->config->dry_run ) {
 	$release->_print("============ Cleaning up\n");
 	$release->_print( "This is a dry run, so stopping. Cleaning up.\n" );
-	eval { $release->distclean };
+	$release->distclean;
 	unlink glob( '*.tar *.tgz *.tar.gz *.tar.bz *.tar.bz2 *.tbz *.zip' );
 	exit;
 	}
@@ -763,7 +763,7 @@ $release->clean;
 $release->touch_all_in_manifest;
 $release->build_makefile;
 $release->make;
-$release->dist unless $skip_dist;
+$release->dist;
 
 $release->check_for_passwords;
 
