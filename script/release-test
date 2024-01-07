@@ -1,12 +1,12 @@
 #!/pro/bin/perl
 
-# A modified version of Module::Reales's "release", aimed at testing the
+# A modified version of Module::Release's "release", aimed at testing the
 # current distribution against all available perls (given .releaserc)
 
 use 5.014002;
 use warnings;
 
-our $VERSION = "0.02 - 20230805";
+our $VERSION = "0.031";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -146,9 +146,9 @@ release-test - test your dist against all available perl versions
 
 =head1 DESCRIPTION
 
-This is a stripped-down version of Module::Release' C<release> tool with default
+This is a stripped-down version of Module::Release's C<release> tool with default
 options aimed at testing the current distribution against all perl versions as
-givern in F<.releaserc>. It should be somewhat equivalent to
+givern in F<.releaserc>. It should be somewhat equivalent to:
 
  $ release -t -a -k -D -m -p -C
 
@@ -177,7 +177,7 @@ This source is in GitHub as part of the Module::Release project:
 
 =head1 SEE ALSO
 
-L<Module::Realease>
+L<Module::Release>
 
 =head1 AUTHOR
 
