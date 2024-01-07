@@ -66,7 +66,7 @@ sub check_kwalitee
 
 =cut
 
-sub cpants_lint {$^O eq 'MSWin32' ? 'cpants_lint.bat' : 'cpants_lint.pl' }
+sub cpants_lint { $^O eq 'MSWin32' ? 'cpants_lint.bat' : 'cpants_lint.pl' }
 
 =item cpants_pass_regex
 
