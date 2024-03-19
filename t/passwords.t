@@ -19,28 +19,28 @@ my $release = $class->new;
 
 $release->turn_debug_on;
 
-{
+subtest 'cpan_user not set' => sub {
     my $output = capture_stderr { $release->check_for_passwords };
     is(
         $output,
-        "CPAN pass is \n",
+        "cpan_user is not set. Not looking for password\n",
         "Debug output shows empty password when password unset"
-    );
-}
+    	);
+	};
 
-{
+subtest 'cpan_user not set' => sub {
     $ENV{'CPAN_PASS'} = 's3cr3t';
     my $output = capture_stderr { $release->check_for_passwords };
     is( $release->config->cpan_pass,
         undef, "Password is unset when cpan username is not set" );
     is(
         $output,
-        "CPAN pass is \n",
+        "cpan_user is not set. Not looking for password\n",
         'Debug output shows unset password when cpan username is not set'
-    );
-}
+    	);
+	};
 
-{
+subtest 'cpan_user not set' => sub {
     $ENV{'CPAN_PASS'} = 's3cr3t';
     $release->config->set( 'cpan_user', 'BDFOY' );
     my $output = capture_stderr { $release->check_for_passwords };
@@ -48,9 +48,9 @@ $release->turn_debug_on;
         's3cr3t', "Password is set when CPAN_PASS is set" );
     is(
         $output,
-        "CPAN pass is s3cr3t\n",
+        "Used get_env_var to get CPAN_PASS\nCPAN pass is s3cr3t\n",
         'Debug output shows password when set'
-    );
-}
+    	);
+	};
 
 done_testing();
