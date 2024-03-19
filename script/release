@@ -448,7 +448,7 @@ both) if not supplied.
 	-jN  Enable parallel tests
 	-k   Skip kwalitee check
 	-m   Skip the MANIFEST check
-	-p   Skip the orereqs check
+	-p   Skip the prereqs check
 	-t   Just make and test distribution, don't tag/upload
 	-T   Skip tests
 	-v   Print the script version number and exit
