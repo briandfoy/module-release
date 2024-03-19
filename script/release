@@ -342,6 +342,13 @@ release reads the C<CPAN_PASS> environment variable to set the
 password for PAUSE.  Of course, you don't need to set the password for
 a system you're not uploading to.
 
+=item * CPAN_PASS_<USER>
+
+Append the CPAN user ID to C<CPAN_PASS> and use that value to interact
+with PAUSE. This allows people to deal with more than one CPAN account
+(for example, work and personal). If this has no value, it is used
+preferentially to C<CPAN_PASS>
+
 =item * RELEASE_DEBUG
 
 The C<RELEASE_DEBUG> environment variable sets the debugging value,

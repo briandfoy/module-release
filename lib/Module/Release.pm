@@ -88,6 +88,15 @@ Do you want debugging output? Set this to a true value
 Your CPAN password. If you don't set this and you want to upload to
 PAUSE, you should be prompted for it.
 
+=item * CPAN_PASS_<USER>
+
+Append the CPAN user ID to C<CPAN_PASS> and use that value to interact
+with PAUSE. This allows people to deal with more than one CPAN account
+(for example, work and personal). If this has no value, it is used
+preferentially to C<CPAN_PASS>.
+
+The CPAN user value comes from the C<cpan_user> release config value.
+
 =back
 
 =head3 C<.releaserc>
@@ -296,6 +305,8 @@ sub _process_configuration {
 			$self->add_a_perl( $path );
 			}
 		}
+
+	$self->_debug( "Config is:\n" . Data::Dumper::Dumper( $self->config ) );
 	}
 
 sub _handle_subclass {
@@ -1219,7 +1230,19 @@ Get passwords for CPAN.
 =cut
 
 sub check_for_passwords {
-	if( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  ) {
+	my $id = $_[0]->config->cpan_user;
+	unless( defined $id ) {
+		$_[0]->_debug( "cpan_user is not set. Not looking for password\n" );
+		return;
+		}
+
+	my $per_user_env_key = uc( "CPAN_PASS_$id" );
+	if( exists $ENV{$per_user_env_key} and length $ENV{$per_user_env_key} ) {
+		$_[0]->_debug( "Found env $per_user_env_key\n" );
+		$_[0]->config->set( 'cpan_pass', $ENV{$per_user_env_key} );
+		}
+	elsif( my $pass = $_[0]->config->cpan_user && $_[0]->get_env_var( "CPAN_PASS" )  ) {
+		$_[0]->_debug( "Used get_env_var to get CPAN_PASS\n" );
 		$_[0]->config->set( 'cpan_pass', $pass );
 		}
 
@@ -1340,6 +1363,7 @@ sub get_env_var {
 	my $pass = $ENV{$field};
 
 	return $pass if defined( $pass ) && length( $pass );
+	return if $field =~ m/\ACPAN_PASS_/;
 
 	$self->_print( "$field is not set.  Enter it now: " );
 	if ($field eq 'CPAN_PASS') {
