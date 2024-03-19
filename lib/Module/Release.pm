@@ -88,7 +88,7 @@ Do you want debugging output? Set this to a true value
 Your CPAN password. If you don't set this and you want to upload to
 PAUSE, you should be prompted for it.
 
-=item * CPAN_PASS_<USER>
+=item CPAN_PASS_<USER>
 
 Append the CPAN user ID to C<CPAN_PASS> and use that value to interact
 with PAUSE. This allows people to deal with more than one CPAN account
@@ -305,8 +305,6 @@ sub _process_configuration {
 			$self->add_a_perl( $path );
 			}
 		}
-
-	$self->_debug( "Config is:\n" . Data::Dumper::Dumper( $self->config ) );
 	}
 
 sub _handle_subclass {
