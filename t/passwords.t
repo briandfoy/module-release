@@ -40,7 +40,8 @@ subtest 'cpan_user not set' => sub {
     	);
 	};
 
-subtest 'cpan_user not set' => sub {
+subtest 'cpan_user set' => sub {
+	local $ENV{'CPAN_PASS_BDFOY'};
     $ENV{'CPAN_PASS'} = 's3cr3t';
     $release->config->set( 'cpan_user', 'BDFOY' );
     my $output = capture_stderr { $release->check_for_passwords };
@@ -49,6 +50,21 @@ subtest 'cpan_user not set' => sub {
     is(
         $output,
         "Used get_env_var to get CPAN_PASS\nCPAN pass is s3cr3t\n",
+        'Debug output shows password when set'
+    	);
+	};
+
+subtest 'cpan_user set, env var set' => sub {
+	my $pass = '123457';
+	local $ENV{'CPAN_PASS_BDFOY'} = $pass;
+    $ENV{'CPAN_PASS'} = 's3cr3t';
+    $release->config->set( 'cpan_user', 'BDFOY' );
+    my $output = capture_stderr { $release->check_for_passwords };
+    is( $release->config->cpan_pass,
+        $pass, "Password is set when CPAN_PASS is set" );
+    is(
+        $output,
+        "Found env CPAN_PASS_BDFOY\nCPAN pass is $pass\n",
         'Debug output shows password when set'
     	);
 	};
