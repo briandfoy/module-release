@@ -100,7 +100,7 @@ Now it uploads through the web form.
 =item Tag the repository
 
 Use the version number (in the distribution name) to tag the
-repository.  You should be able to checkout the code from any release.
+repository. You should be able to checkout the code from any release.
 
 =back
 
