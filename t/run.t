@@ -64,7 +64,7 @@ subtest 'bad command' => sub {
 	ok defined $at, "Bad command dies";
 
 	if( $^O eq 'MSWin32' ) {
-		like $warnings, qr/'foo' is not recognized/, 'Saw Windows error';
+		like $warnings, qr/didn't close cleanly/, 'Saw Windows error';
 		}
 	else {
 		like $at, qr/exec of \Q$command\E failed/, "Error message with bad command";

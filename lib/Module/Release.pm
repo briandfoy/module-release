@@ -1359,11 +1359,12 @@ sub run {
 	waitpid( $pid, 0 );
 	my $child_exit_status = $? >> 8;
 
+
 	$self->_warn( $error ) if length $error;
 
 	if( $child_exit_status ) {
 		$self->_run_error_set;
-		$self->_warn( "Command [$command] didn't close cleanly: $?" );
+		$self->_warn( "Command [$command] didn't close cleanly: $child_exit_status" );
 		}
 
 	return $output;
