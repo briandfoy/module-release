@@ -51,13 +51,24 @@ subtest 'undef arg' => sub {
 
 subtest 'bad command' => sub {
 	local $ENV{PATH} = '';
+	my $warnings;
+	local $SIG{__WARN__} = sub {
+		$warnings = $_[0];
+		};
+
 	my $command = "foo";
 	ok ! -x $command, "$command is not executable (good)";
 
 	my $message = eval { $release->run( qq|$command| ) };
 	my $at = $@;
 	ok defined $at, "Bad command dies";
-	like $at, qr/Could not open command/, "Error message with bad command";
+
+	if( $^O eq 'MSWin32' ) {
+		like $warnings, qr/'foo' is not recognized/, 'Saw Windows error';
+		}
+	else {
+		like $at, qr/Could not open command/, "Error message with bad command";
+		}
 	};
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
