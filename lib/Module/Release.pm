@@ -1323,9 +1323,9 @@ sub run {
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 
-    my $pid = IPC::Open3::open3(
-    	my $child_in, my $child_out, my $child_err = gensym,
-		    $command
+	my $pid = IPC::Open3::open3(
+		my $child_in, my $child_out, my $child_err = gensym,
+		$command
 		);
 	close $child_in;
 
@@ -1357,11 +1357,13 @@ sub run {
 	$self->_debug( $self->_dashes, "\n" );
 
 	waitpid( $pid, 0 );
-    my $child_exit_status = $? >> 8;
+	my $child_exit_status = $? >> 8;
+
+	$self->_warn( $error ) if length $error;
 
 	if( $child_exit_status ) {
 		$self->_run_error_set;
-		$self->_warn(  "Command [$command] didn't close cleanly: $?" );
+		$self->_warn( "Command [$command] didn't close cleanly: $?" );
 		}
 
 	return $output;
