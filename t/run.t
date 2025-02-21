@@ -67,7 +67,7 @@ subtest 'bad command' => sub {
 		like $warnings, qr/'foo' is not recognized/, 'Saw Windows error';
 		}
 	else {
-		like $at, qr/Could not open command/, "Error message with bad command";
+		like $at, qr/exec of \Q$command\E failed/, "Error message with bad command";
 		}
 	};
 

@@ -30,7 +30,9 @@ our $VERSION = '2.137';
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
+use IPC::Open3;
 use Scalar::Util qw(blessed);
+use Symbol 'gensym';
 
 my %Loaded_mixins = ( );
 
@@ -1321,24 +1323,43 @@ sub run {
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 
-	open my($fh), "-|", "$command" or $self->_die( "Could not open command [$command]: $!" );
-	$fh->autoflush;
+    my $pid = IPC::Open3::open3(
+    	my $child_in, my $child_out, my $child_err = gensym,
+		    $command
+		);
+	close $child_in;
+
+	$child_out->autoflush;
+
+	#open my($fh), "-|", "$command" or $self->_die( "Could not open command [$command]: $!" );
+	#$fh->autoflush;
 
 	my $output = '';
+	my $error  = '';
 	my $buffer = '';
 	local $| = 1;
 
 	my $readlen = $self->debug ? 1 : 256;
 
-	while( read $fh, $buffer, $readlen ) {
-		$output .= $_;
+	while( read $child_out, $buffer, $readlen ) {
 		$self->_debug( $_, $buffer );
 		$output .= $buffer;
 		}
 
+	while( read $child_err, $buffer, $readlen ) {
+		$self->_debug( $_, $buffer );
+		$error .= $buffer;
+		}
+
+	if( $error =~ m/exec of .*? failed| Windows/x ) {
+		$self->_warn( "Could not run <$command>: $error" );
+		}
 	$self->_debug( $self->_dashes, "\n" );
 
-	unless( close $fh ) {
+	waitpid( $pid, 0 );
+    my $child_exit_status = $? >> 8;
+
+	if( $child_exit_status ) {
 		$self->_run_error_set;
 		$self->_warn(  "Command [$command] didn't close cleanly: $?" );
 		}
