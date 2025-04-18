@@ -719,7 +719,6 @@ if( $opts{t} // $release->config->dry_run ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
 $release->_print("============ Getting Changes\n");
-say STDERR "OPTS{c} is $opts{c}";
 
 unless( $opts{C} or $release->config->skip_changes ) {
 	$release->show_recent_contributors;
@@ -799,8 +798,6 @@ unless( $opts{C} or $release->config->skip_changes ) {
 else {
 	$release->_print( "Skipping Changes file\n" );
 	}
-
-exit;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Build the release in preparation for uploading
