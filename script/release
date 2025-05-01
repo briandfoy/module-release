@@ -661,6 +661,14 @@ else {
 
 $release->_debug( "dist version is <$Version>\n" );
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# check anything signed by GPG
+unless( $release->config->gpg_signatures ) {
+	$release->_print("============ Checking GPG signatures\n");
+	$release->load_mixin('Module::Release::VerifyGPGSignature');
+	$release->check_all_gpg_signatures;
+	}
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
