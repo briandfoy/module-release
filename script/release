@@ -92,6 +92,12 @@ the C<perls> configuration setting.
 If there are modified files, added files, or extra files so that
 source control complains, fail.
 
+=item Check that any GPG signatures are correct
+
+If C<gpg_signatures> is present in the config, load
+L<Module::Release::VerifyGPGSignature> and verify the configured
+signatures.
+
 =item Upload to PAUSE
 
 This program used to use FTP uploads, but PAUSE has turned off that feature.
@@ -122,7 +128,7 @@ in the configuration file
 Specify the F<Changes> file entry on the command line. If STRING does
 not start with a C<*>, one will be added to the start along with a space.
 
-    release -C "some change"
+    release -c "* some change"
 
 translates to the F<Changes> entry with the date and one bullet item:
 
@@ -460,13 +466,14 @@ sub usage {
 	my $err = shift and select STDERR;
 	print <<"USE";
 
-Use: release -aCdDhkmptTvV [-j[N]] [ LOCAL_FILE [ REMOTE_FILE ] ]
+Use: release -acCdDhkmptTvV [-j[N]] [ LOCAL_FILE [ REMOTE_FILE ] ]
 
 Will upload current release LOCAL_FILE, naming it REMOTE_FILE.  Will
 get LOCAL_FILE and REMOTE_FILE automatically (using same name for
 both) if not supplied.
 
 	-a   Set AUTOMATED_TESTING to true
+	-c   Changes entry as a string on the command line
 	-C   Skip Changes file (useful for re-running botched releases)
 	-d   Print extra debugging information
 	-D   Skip building the dist
@@ -663,7 +670,7 @@ $release->_debug( "dist version is <$Version>\n" );
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # check anything signed by GPG
-unless( $release->config->gpg_signatures ) {
+if( $release->config->gpg_signatures ) {
 	$release->_print("============ Checking GPG signatures\n");
 	$release->load_mixin('Module::Release::VerifyGPGSignature');
 	$release->check_all_gpg_signatures;
@@ -799,9 +806,9 @@ unless( $opts{C} or $release->config->skip_changes ) {
 			}
 		};
 
-	my $vcs_commit = `$command "$commit_message" 2>&1`;
+	my $output = $release->run( qq($command "$commit_message") );
 
-	$release->_print( $vcs_commit );
+	$release->_print( $output );
 	}
 else {
 	$release->_print( "Skipping Changes file\n" );

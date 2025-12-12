@@ -1316,16 +1316,17 @@ sub _run_error_set   { $_[0]->{_run_error} = 1 }
 sub run_error        { $_[0]->{_run_error}     }
 
 sub run {
-	my( $self, $command ) = @_;
+	my( $self, @command ) = @_;
+	@command = grep { defined } @command;
 
 	$self->_run_error_reset;
 
-	$self->_debug( "$command\n" );
-	$self->_die( "Didn't get a command!" ) unless defined $command;
+	$self->_debug( "@command\n" );
+	$self->_die( "Didn't get a command!" ) unless @command;
 
 	my $pid = IPC::Open3::open3(
 		my $child_in, my $child_out, my $child_err = gensym,
-		$command
+		@command
 		);
 	close $child_in;
 
@@ -1352,19 +1353,18 @@ sub run {
 		}
 
 	if( $error =~ m/exec of .*? failed| Windows/x ) {
-		$self->_warn( "Could not run <$command>: $error" );
+		$self->_warn( "Could not run <$command[0]>: $error" );
 		}
 	$self->_debug( $self->_dashes, "\n" );
 
 	waitpid( $pid, 0 );
 	my $child_exit_status = $? >> 8;
 
-
 	$self->_warn( $error ) if length $error;
 
 	if( $child_exit_status ) {
 		$self->_run_error_set;
-		$self->_warn( "Command [$command] didn't close cleanly: $child_exit_status" );
+		$self->_warn( "Command [$command[0]] didn't close cleanly: $child_exit_status" );
 		}
 
 	return $output;
